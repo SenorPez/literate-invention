@@ -1,8 +1,10 @@
 package com.senorpez.projectcars;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 public enum PacketType {
     TELEMETRY_DATA(1367, TelemetryDataPacket.class),
@@ -19,6 +21,13 @@ public enum PacketType {
 
     static PacketType valueOf(Integer packetTypeNumeric) {
         return PacketType.values()[packetTypeNumeric];
+    }
+
+    static PacketType fromLength(Short packetLength) {
+        return Arrays.stream(PacketType.values())
+                .filter(packetType -> packetType.packetLength.equals(packetLength))
+                .findAny()
+                .orElse(null);
     }
 
     Packet getPacket(DataInputStream telemetryData) {
