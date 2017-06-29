@@ -5,8 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static java.nio.file.StandardOpenOption.*;
 
@@ -26,23 +25,25 @@ public class Telemetry implements Iterator<Packet> {
     public static void main(String[] args) {
         Telemetry telemetry = new Telemetry(Paths.get(args[0]));
         while (telemetry.hasNext()) {
-            Packet packet = telemetry.next();
+            Race race = new Race(telemetry);
 
-            if (packet instanceof TelemetryDataPacket) {
-                TelemetryDataPacket telemetryDataPacket = (TelemetryDataPacket) packet;
-            } else if (packet instanceof ParticipantPacket) {
-                ParticipantPacket participantPacket = (ParticipantPacket) packet;
-                System.out.println(participantPacket.getNames().stream()
-                        .filter(s -> !s.isEmpty())
-                        .sorted()
-                        .collect(Collectors.joining(", ")));
-            } else if (packet instanceof AdditionalParticipantPacket) {
-                AdditionalParticipantPacket additionalParticipantPacket = (AdditionalParticipantPacket) packet;
-                System.out.println(additionalParticipantPacket.getNames().stream()
-                        .filter(s -> !s.isEmpty())
-                        .sorted()
-                        .collect(Collectors.joining(", ")));
-            }
+            race.getAll();
+            race.getDrivers().stream()
+                    .sorted((o1, o2) -> {
+                        int compared;
+                        compared = -o1.getLapsComplete().compareTo(o2.getLapsComplete());
+                        if (compared != 0) {
+                            return compared;
+                        }
+                        compared = o1.getRaceTime().compareTo(o2.getRaceTime());
+                        if (compared != 0) {
+                            return compared;
+                        }
+                        return o1.getName().compareTo(o2.getName());
+                    })
+                    .forEach(driver -> System.out.printf("Driver: %s Laps: %d Time: %f\n", driver.getName(), driver.getLapsComplete(), driver.getRaceTime()));
+            System.out.println("-----");
+
         }
     }
 
@@ -61,9 +62,8 @@ public class Telemetry implements Iterator<Packet> {
             PacketType packetType = PacketType.fromLength(telemetryData.readShort());
             return packetType.getPacket(telemetryData);
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public static void convertDirectory(Path telemetryDirectory, Path outputFile) {
@@ -89,6 +89,18 @@ public class Telemetry implements Iterator<Packet> {
                             e.printStackTrace();
                         }
                     });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void mark() {
+        telemetryData.mark(Integer.MAX_VALUE);
+    }
+
+    public void reset() {
+        try {
+            telemetryData.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
