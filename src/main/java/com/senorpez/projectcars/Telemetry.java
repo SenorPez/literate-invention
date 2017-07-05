@@ -28,20 +28,7 @@ public class Telemetry implements Iterator<Packet> {
             Race race = new Race(telemetry);
 
             race.getAll();
-            race.getDrivers().stream()
-                    .sorted((o1, o2) -> {
-                        int compared;
-                        compared = -o1.getLapsComplete().compareTo(o2.getLapsComplete());
-                        if (compared != 0) {
-                            return compared;
-                        }
-                        compared = o1.getRaceTime().compareTo(o2.getRaceTime());
-                        if (compared != 0) {
-                            return compared;
-                        }
-                        return o1.getName().compareTo(o2.getName());
-                    })
-                    .forEach(driver -> System.out.printf("Driver: %s Laps: %d Time: %f\n", driver.getName(), driver.getLapsComplete(), driver.getRaceTime()));
+            race.getClassification().forEach((pos, driver) -> System.out.printf("%d: %s\n", pos, driver.getName()));
             System.out.println("-----");
 
         }

@@ -74,7 +74,7 @@ public class Driver {
         return getBestSector(SECTOR_START);
     }
 
-    private Float getBestSector(CurrentSector currentSector) {
+    Float getBestSector(CurrentSector currentSector) {
         return Collections.min(sectorTimes.stream()
                 .filter(sectorTime -> sectorTime.getSector().equals(currentSector))
                 .map(SectorTime::getTime)
