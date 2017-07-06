@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -6,12 +6,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.senorpez.projectcars.CurrentSector.SECTOR_SECTOR1;
-import static com.senorpez.projectcars.CurrentSector.SECTOR_SECTOR2;
-import static com.senorpez.projectcars.CurrentSector.SECTOR_START;
-import static com.senorpez.projectcars.TelemetryDataPacket.State.FINISHED;
-import static com.senorpez.projectcars.TelemetryDataPacket.State.LOADING;
-import static com.senorpez.projectcars.TelemetryDataPacket.State.PRE_RACE;
+import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_SECTOR1;
+import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_SECTOR2;
+import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_START;
+import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.FINISHED;
+import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.LOADING;
+import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.PRE_RACE;
 
 public class Race implements Iterator<Packet> {
     private final Deque<Packet> racePackets = new ArrayDeque<>();
@@ -20,7 +20,7 @@ public class Race implements Iterator<Packet> {
     private TelemetryDataPacket currentPacket;
     private Float elapsedTime;
 
-    private Race(final Telemetry telemetry) {
+    public Race(final Telemetry telemetry) {
         Packet packet;
         do {
             packet = telemetry.next();
@@ -125,8 +125,8 @@ public class Race implements Iterator<Packet> {
             }
         } catch (final NoSuchElementException e) {
             /* Driver names never populated, so make fake names. */
-            IntStream.rangeClosed(1, numParticipants)
-                    .forEach(value -> drivers.add(new Driver(value - 1, String.format("Driver %d", value))));
+            IntStream.range(0, numParticipants)
+                    .forEach(value -> drivers.add(new Driver(value, String.format("Driver %d", value))));
         }
 
         /* Repopulate race deque. */

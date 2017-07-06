@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 public enum CarFlags {
     CAR_HEADLIGHT(1),

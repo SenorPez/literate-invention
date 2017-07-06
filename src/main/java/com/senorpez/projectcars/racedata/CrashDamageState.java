@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 import java.util.EnumSet;
 import java.util.HashMap;

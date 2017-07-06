@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -20,18 +20,6 @@ public class Telemetry implements Iterator<Packet> {
             e.printStackTrace();
         }
         this.telemetryData = telemetryData;
-    }
-
-    public static void main(String[] args) {
-        Telemetry telemetry = new Telemetry(Paths.get(args[0]));
-        while (telemetry.hasNext()) {
-            Race race = new Race(telemetry);
-
-            while (race.hasNext()) {
-                race.next();
-                System.out.println(race.getElapsedTime());
-            }
-        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.senorpez.projectcars.CurrentSector.*;
+import static com.senorpez.projectcars.racedata.CurrentSector.*;
 
 public class Driver {
     private final Byte index;

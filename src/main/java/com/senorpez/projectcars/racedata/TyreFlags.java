@@ -1,4 +1,4 @@
-package com.senorpez.projectcars;
+package com.senorpez.projectcars.racedata;
 
 public enum TyreFlags {
     TYRE_ATTACHED(1),
