@@ -18,8 +18,9 @@ public class Race implements Iterator<Packet> {
     private final Set<Driver> drivers = new HashSet<>();
 
     private TelemetryDataPacket currentPacket;
+    private Float elapsedTime;
 
-    public Race(Telemetry telemetry) {
+    private Race(final Telemetry telemetry) {
         Packet packet;
         do {
             packet = telemetry.next();
@@ -45,8 +46,8 @@ public class Race implements Iterator<Packet> {
     }
 
     public Boolean completeRace() {
-        TelemetryDataPacket firstPacket = (TelemetryDataPacket) racePackets.getFirst();
-        TelemetryDataPacket lastPacket = (TelemetryDataPacket) racePackets.getLast();
+        final TelemetryDataPacket firstPacket = (TelemetryDataPacket) racePackets.getFirst();
+        final TelemetryDataPacket lastPacket = (TelemetryDataPacket) racePackets.getLast();
 
         return firstPacket.getState() == PRE_RACE && lastPacket.getState() == FINISHED;
     }
@@ -64,54 +65,68 @@ public class Race implements Iterator<Packet> {
 
     @Override
     public Packet next() {
-        Packet packet = racePackets.removeFirst();
+        final Packet packet = racePackets.removeFirst();
 
         if (packet instanceof TelemetryDataPacket) {
-            TelemetryDataPacket telemetryDataPacket = (TelemetryDataPacket) packet;
+            final TelemetryDataPacket telemetryDataPacket = (TelemetryDataPacket) packet;
             if (drivers.size() != ((TelemetryDataPacket) packet).getNumParticipants()) {
                 populateDrivers(((TelemetryDataPacket) packet).getNumParticipants());
             }
 
             populateSectorTimes(telemetryDataPacket);
             currentPacket = (TelemetryDataPacket) packet;
+
+            calculateElapsedTime();
         }
 
         return packet;
     }
 
-    private void populateSectorTimes(TelemetryDataPacket packet) {
+    private void calculateElapsedTime() {
+        if (currentPacket.getCurrentTime() == -1.0) {
+            elapsedTime = 0f;
+        } else {
+            final Driver viewedDriver = drivers.stream()
+                    .filter(driver -> driver.getIndex().equals(currentPacket.getViewedParticipantIndex()))
+                    .findFirst()
+                    .orElse(null);
+            elapsedTime = viewedDriver.getRaceTime() + currentPacket.getCurrentTime();
+        }
+    }
+
+    private void populateSectorTimes(final TelemetryDataPacket packet) {
         drivers.forEach(driver -> {
-            TelemetryDataPacket.ParticipantInfo participantInfo = packet.getParticipantInfo().get(driver.getIndex());
+            final TelemetryDataPacket.ParticipantInfo participantInfo = packet.getParticipantInfo().get(driver.getIndex());
             driver.addSectorTime(participantInfo.getCurrentSector(), participantInfo.getLastSectorTime());
         });
     }
 
-    private void populateDrivers(Byte numParticipants) {
-        Deque<Packet> readPackets = new ArrayDeque<>();
+    private void populateDrivers(final Byte numParticipants) {
+        final Deque<Packet> readPackets = new ArrayDeque<>();
 
         try {
             while (drivers.size() != numParticipants) {
-                Packet packet = racePackets.removeFirst();
+                final Packet packet = racePackets.removeFirst();
                 readPackets.addLast(packet);
 
                 if (packet instanceof ParticipantPacket) {
-                    ParticipantPacket participantPacket = (ParticipantPacket) packet;
-                    AtomicInteger index = new AtomicInteger(0);
+                    final ParticipantPacket participantPacket = (ParticipantPacket) packet;
+                    final AtomicInteger index = new AtomicInteger(0);
                     participantPacket.getNames().stream()
                             .limit(numParticipants)
                             .forEach(name -> drivers.add(new Driver(index.getAndIncrement(), name)));
                 } else if (packet instanceof AdditionalParticipantPacket) {
-                    AdditionalParticipantPacket participantPacket = (AdditionalParticipantPacket) packet;
-                    AtomicInteger index = new AtomicInteger(participantPacket.getOffset());
+                    final AdditionalParticipantPacket participantPacket = (AdditionalParticipantPacket) packet;
+                    final AtomicInteger index = new AtomicInteger(participantPacket.getOffset());
                     participantPacket.getNames().stream()
                             .limit(participantPacket.getOffset() % 16)
                             .forEach(s -> drivers.add(new Driver(index.getAndIncrement(), s)));
                 }
             }
-        } catch (NoSuchElementException e) {
+        } catch (final NoSuchElementException e) {
             /* Driver names never populated, so make fake names. */
             IntStream.rangeClosed(1, numParticipants)
-                    .forEach(value -> drivers.add(new Driver(value, String.format("Driver %d", value))));
+                    .forEach(value -> drivers.add(new Driver(value - 1, String.format("Driver %d", value))));
         }
 
         /* Repopulate race deque. */
@@ -138,7 +153,7 @@ public class Race implements Iterator<Packet> {
         return getBestSectorTime(SECTOR_START);
     }
 
-    private Float getBestSectorTime(CurrentSector currentSector) {
+    private Float getBestSectorTime(final CurrentSector currentSector) {
         return Collections.min(drivers.stream()
                 .map(driver -> driver.getBestSector(currentSector))
                 .collect(Collectors.toList()));
@@ -156,7 +171,7 @@ public class Race implements Iterator<Packet> {
     }
 
     public Integer getCurrentLapNumber() {
-        Short leaderLap = Collections.max(currentPacket.getParticipantInfo().stream()
+        final Short leaderLap = Collections.max(currentPacket.getParticipantInfo().stream()
                 .map(TelemetryDataPacket.ParticipantInfo::getCurrentLap)
                 .collect(Collectors.toList()));
         return Math.max(leaderLap, currentPacket.getLapsInEvent());
@@ -164,5 +179,9 @@ public class Race implements Iterator<Packet> {
 
     public Float getCurrentTime() {
         return currentPacket.getCurrentTime();
+    }
+
+    public float getElapsedTime() {
+        return elapsedTime;
     }
 }

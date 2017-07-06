@@ -27,10 +27,10 @@ public class Telemetry implements Iterator<Packet> {
         while (telemetry.hasNext()) {
             Race race = new Race(telemetry);
 
-            race.getAll();
-            race.getClassification().forEach((pos, driver) -> System.out.printf("%d: %s\n", pos, driver.getName()));
-            System.out.println("-----");
-
+            while (race.hasNext()) {
+                race.next();
+                System.out.println(race.getElapsedTime());
+            }
         }
     }
 

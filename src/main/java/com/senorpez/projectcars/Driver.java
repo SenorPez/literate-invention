@@ -10,21 +10,31 @@ import java.util.stream.IntStream;
 import static com.senorpez.projectcars.CurrentSector.*;
 
 public class Driver {
-    private final Integer index;
+    private final Byte index;
     private final String name;
     private final List<SectorTime> sectorTimes = new ArrayList<>();
 
-    public Driver(Integer index) {
+    public Driver(Byte index) {
+        if (index < -1 || index > 56) throw new IllegalArgumentException("Index must be between -1 and 55");
         this.index = index;
         this.name = String.format("Driver %d", index);
     }
 
-    public Driver(Integer index, String name) {
+    public Driver(Integer index) {
+        this(index.byteValue());
+    }
+
+    public Driver(Byte index, String name) {
+        if (index < -1 || index > 56) throw new IllegalArgumentException("Index must be between -1 and 56");
         this.index = index;
         this.name = name;
     }
 
-    public Integer getIndex() {
+    public Driver(Integer index, String name) {
+        this(index.byteValue(), name);
+    }
+
+    public Byte getIndex() {
         return index;
     }
 
