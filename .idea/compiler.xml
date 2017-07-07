@@ -2,8 +2,14 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="literate-invention_main" target="1.8" />
+      <module name="literate-invention_test" target="1.8" />
       <module name="race-data_main" target="1.8" />
       <module name="race-data_test" target="1.8" />
+      <module name="race-report_main" target="1.8" />
+      <module name="race-report_test" target="1.8" />
+      <module name="racedata_main" target="1.8" />
+      <module name="racedata_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
