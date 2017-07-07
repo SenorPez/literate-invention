@@ -3,12 +3,16 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention.iml" />
+      <module fileurl="file://C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention.iml" filepath="C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" group="literate-invention" />
+      <module fileurl="file://C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention_main.iml" filepath="C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention_main.iml" group="literate-invention" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" group="literate-invention" />
+      <module fileurl="file://C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention_test.iml" filepath="C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\literate-invention_test.iml" group="literate-invention" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data.iml" group="race-data" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data_main.iml" group="race-data" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data_test.iml" group="race-data" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/race-report.iml" filepath="$PROJECT_DIR$/.idea/modules/race-report.iml" group="race-report" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report.iml" group="race-report" />
+      <module fileurl="file://C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\race-report.iml" filepath="C:\Users\502625185\Downloads\Project CARS Race Data\.idea\modules\race-report.iml" group="race-report" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report_main.iml" group="race-report" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report_test.iml" group="race-report" />
     </modules>

@@ -45,7 +45,7 @@ public class Race implements Iterator<Packet> {
         return drivers;
     }
 
-    public Boolean completeRace() {
+    public Boolean isCompleteRace() {
         final TelemetryDataPacket firstPacket = (TelemetryDataPacket) racePackets.getFirst();
         final TelemetryDataPacket lastPacket = (TelemetryDataPacket) racePackets.getLast();
 
@@ -136,9 +136,11 @@ public class Race implements Iterator<Packet> {
     }
 
     public Float getBestLapTime() {
-        return Collections.min(drivers.stream()
+        List<Float> lapTimes = drivers.stream()
                 .map(Driver::getBestLapTime)
-                .collect(Collectors.toList()));
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return (lapTimes.size() > 0) ? Collections.min(lapTimes) : null;
     }
 
     public Float getBestSector1Time() {
@@ -154,9 +156,11 @@ public class Race implements Iterator<Packet> {
     }
 
     private Float getBestSectorTime(final CurrentSector currentSector) {
-        return Collections.min(drivers.stream()
+        List<Float> sectorTimes = drivers.stream()
                 .map(driver -> driver.getBestSector(currentSector))
-                .collect(Collectors.toList()));
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return (sectorTimes.size() > 0) ? Collections.min(sectorTimes) : null;
     }
 
     public Map<Short, Driver> getClassification() {

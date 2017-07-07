@@ -1,9 +1,6 @@
 package com.senorpez.projectcars.racedata;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -69,7 +66,8 @@ public class Driver {
     }
 
     public Float getBestLapTime() {
-        return Collections.min(getLapTimes());
+        List<Float> lapTimes = getLapTimes();
+        return (lapTimes.size() > 0) ? Collections.min(lapTimes) : null;
     }
 
     public Float getBestSector1Time() {
@@ -85,10 +83,11 @@ public class Driver {
     }
 
     Float getBestSector(CurrentSector currentSector) {
-        return Collections.min(sectorTimes.stream()
+        List<Float> sectorTimes = this.sectorTimes.stream()
                 .filter(sectorTime -> sectorTime.getSector().equals(currentSector))
                 .map(SectorTime::getTime)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        return (sectorTimes.size() > 0) ? Collections.min(sectorTimes) : null;
     }
 
     public Integer getLapsComplete() {

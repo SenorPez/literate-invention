@@ -27,6 +27,12 @@ springBoot {
     executable = true
 }
 
+bootRun {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
 dependencies {
     compile project(':race-data')
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '1.5.3.RELEASE'
