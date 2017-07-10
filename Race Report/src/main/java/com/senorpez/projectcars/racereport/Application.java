@@ -30,11 +30,11 @@ public class Application {
     private BeanFactory beanFactory;
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
         final Telemetry telemetry = new Telemetry(Paths.get(args[0]));
         while (telemetry.hasNext()) {
             RACES.add(new Race(telemetry));
         }
+        SpringApplication.run(Application.class, args);
     }
 
     @Bean
