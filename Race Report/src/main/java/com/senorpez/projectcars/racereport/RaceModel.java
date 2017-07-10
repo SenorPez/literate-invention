@@ -2,7 +2,9 @@ package com.senorpez.projectcars.racereport;
 
 import com.senorpez.projectcars.racedata.Race;
 import org.springframework.hateoas.Identifiable;
+import org.springframework.hateoas.core.Relation;
 
+@Relation(value = "race", collectionRelation = "race")
 public class RaceModel implements Identifiable<Integer> {
     private final Integer index;
     private final Boolean completeRace;
@@ -12,16 +14,15 @@ public class RaceModel implements Identifiable<Integer> {
     private final Float bestSector3Time;
     private final Integer packetCount;
 
-
     public RaceModel(Integer index, Race race) {
+        race.getAll();
         this.index = index;
         this.completeRace = race.isCompleteRace();
-        race.getAll();
         this.bestLapTime = race.getBestLapTime();
         this.bestSector1Time = race.getBestSector1Time();
         this.bestSector2Time = race.getBestSector2Time();
         this.bestSector3Time = race.getBestSector3Time();
-        this.packetCount = race.getRacePackets().size();
+        this.packetCount = race.getPacketCount();
     }
 
     @Override

@@ -23,11 +23,12 @@ public class RaceController {
     Resources<Resource> races() {
         IdentifiableResourceAssembler<RaceModel, Resource> assembler = new IdentifiableResourceAssembler<>(RaceController.class, Resource.class);
         final AtomicInteger index = new AtomicInteger(1);
-                return new Resources<>(
+        return new Resources<>(
                 Application.RACES.stream()
                         .map(race -> new RaceModel(index.getAndIncrement(), race))
                         .map(assembler::toResource)
                         .collect(Collectors.toList()),
-                linkTo(methodOn(RaceController.class).races()).withSelfRel());
+                linkTo(methodOn(RaceController.class).races()).withSelfRel(),
+                linkTo(methodOn(RootController.class).root()).withRel("index"));
     }
 }

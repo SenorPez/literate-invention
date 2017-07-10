@@ -20,6 +20,9 @@ public class Race implements Iterator<Packet> {
     private TelemetryDataPacket currentPacket;
     private Float elapsedTime;
 
+    private Boolean completeRace = false;
+    private Integer packetCount = 0;
+
     public Race(final Telemetry telemetry) {
         Packet packet;
         do {
@@ -34,22 +37,17 @@ public class Race implements Iterator<Packet> {
             if (packet == null) break;
         }
 
-        this.next();
-    }
+        final TelemetryDataPacket firstPacket = (TelemetryDataPacket) racePackets.getFirst();
+        final TelemetryDataPacket lastPacket = (TelemetryDataPacket) racePackets.getLast();
 
-    public Deque<Packet> getRacePackets() {
-        return racePackets;
+        this.completeRace = firstPacket.getState() == PRE_RACE && lastPacket.getState() == FINISHED;
+        this.packetCount = racePackets.size();
+
+        this.next();
     }
 
     public Set<Driver> getDrivers() {
         return drivers;
-    }
-
-    public Boolean isCompleteRace() {
-        final TelemetryDataPacket firstPacket = (TelemetryDataPacket) racePackets.getFirst();
-        final TelemetryDataPacket lastPacket = (TelemetryDataPacket) racePackets.getLast();
-
-        return firstPacket.getState() == PRE_RACE && lastPacket.getState() == FINISHED;
     }
 
     public void getAll() {
@@ -187,5 +185,13 @@ public class Race implements Iterator<Packet> {
 
     public float getElapsedTime() {
         return elapsedTime;
+    }
+
+    public Boolean isCompleteRace() {
+        return completeRace;
+    }
+
+    public Integer getPacketCount() {
+        return packetCount;
     }
 }
