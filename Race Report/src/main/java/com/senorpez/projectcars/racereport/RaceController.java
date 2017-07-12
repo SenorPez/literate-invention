@@ -1,15 +1,11 @@
 package com.senorpez.projectcars.racereport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RequestMapping(
         value = "/races",
@@ -17,16 +13,21 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
         produces = "application/json; charset=UTF-8"
 )
 @RestController
-public class RaceController {
+class RaceController {
     private final RaceService service;
 
     @Autowired
-    RaceController(RaceService service) {
+    RaceController(final RaceService service) {
         this.service = service;
     }
 
     @RequestMapping
-    Resources<Resource<EmbeddedRaceModel>> races() {
+    Resources<EmbeddedRaceResource> races() {
         return service.findAll();
+    }
+
+    @RequestMapping(value = "/{raceId}")
+    RaceResource race(@PathVariable final int raceId) {
+        return service.findOne(raceId);
     }
 }

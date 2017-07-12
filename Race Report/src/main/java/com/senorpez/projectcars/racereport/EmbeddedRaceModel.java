@@ -1,6 +1,5 @@
 package com.senorpez.projectcars.racereport;
 
-import com.senorpez.projectcars.racedata.Race;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
@@ -10,9 +9,8 @@ public class EmbeddedRaceModel implements Identifiable<Integer> {
     private final boolean completeRace;
     private final int packetCount;
 
-    public EmbeddedRaceModel(int index, Race race) {
-        race.getAll();
-        this.index = index;
+    EmbeddedRaceModel(final RaceModel race) {
+        this.index = race.getId();
         this.completeRace = race.isCompleteRace();
         this.packetCount = race.getPacketCount();
     }

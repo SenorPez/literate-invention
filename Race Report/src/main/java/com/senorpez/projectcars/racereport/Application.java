@@ -29,7 +29,7 @@ public class Application {
     @Autowired
     private BeanFactory beanFactory;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final Telemetry telemetry = new Telemetry(Paths.get(args[0]));
         while (telemetry.hasNext()) {
             RACES.add(new Race(telemetry));
@@ -47,7 +47,7 @@ public class Application {
             setSupportedMediaTypes(Collections.singletonList(
                     new MediaType("application", "doesntmatter") {
                         @Override
-                        public boolean isCompatibleWith(MediaType other) {
+                        public boolean isCompatibleWith(final MediaType other) {
                             if (other == null) {
                                 return false;
                             } else if (other.getSubtype().startsWith("vnd.senorpez") && other.getSubtype().endsWith("+json")) {
@@ -58,7 +58,7 @@ public class Application {
                     }
             ));
 
-            ObjectMapper halObjectMapper = beanFactory.getBean(HAL_OBJECT_MAPPER_BEAN_NAME, ObjectMapper.class);
+            final ObjectMapper halObjectMapper = beanFactory.getBean(HAL_OBJECT_MAPPER_BEAN_NAME, ObjectMapper.class);
             setObjectMapper(halObjectMapper);
         }
     }

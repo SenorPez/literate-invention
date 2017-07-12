@@ -14,10 +14,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
         produces = "application/json; charset=UTF-8"
 )
 @RestController
-public class RootController {
+class RootController {
     @RequestMapping
     ResourceSupport root() {
-        ResourceSupport root = new ResourceSupport();
+        final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
         root.add(linkTo(methodOn(RaceController.class).races()).withRel("races"));
         return root;
