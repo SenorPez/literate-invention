@@ -11,23 +11,19 @@ public class Driver {
     private final String name;
     private final List<SectorTime> sectorTimes = new ArrayList<>();
 
-    public Driver(Byte index) {
+    private Driver(final Byte index) {
         if (index < -1 || index > 56) throw new IllegalArgumentException("Index must be between -1 and 55");
         this.index = index;
         this.name = String.format("Driver %d", index);
     }
 
-    public Driver(Integer index) {
-        this(index.byteValue());
-    }
-
-    public Driver(Byte index, String name) {
+    private Driver(final Byte index, final String name) {
         if (index < -1 || index > 56) throw new IllegalArgumentException("Index must be between -1 and 56");
         this.index = index;
         this.name = name;
     }
 
-    public Driver(Integer index, String name) {
+    Driver(final Integer index, final String name) {
         this(index.byteValue(), name);
     }
 
@@ -45,19 +41,19 @@ public class Driver {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) return true;
         if (!(obj instanceof Driver)) return false;
 
-        Driver driver = (Driver) obj;
+        final Driver driver = (Driver) obj;
         return name.equals(driver.name);
     }
 
-    public void addSectorTime(CurrentSector currentSector, Float lastSectorTime) {
+    void addSectorTime(final CurrentSector currentSector, final Float lastSectorTime) {
         if (lastSectorTime != -123.0) {
             if (sectorTimes.size() == 0) sectorTimes.add(new SectorTime(currentSector, lastSectorTime));
             else {
-                SectorTime sectorTime = new SectorTime(currentSector, lastSectorTime);
+                final SectorTime sectorTime = new SectorTime(currentSector, lastSectorTime);
                 if (!(sectorTimes.get(sectorTimes.size() - 1).equals(sectorTime))) {
                     sectorTimes.add(sectorTime);
                 }
@@ -66,7 +62,9 @@ public class Driver {
     }
 
     public Float getBestLapTime() {
-        List<Float> lapTimes = getLapTimes();
+        final List<Float> lapTimes = getLapTimes().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         return (lapTimes.size() > 0) ? Collections.min(lapTimes) : null;
     }
 
@@ -82,8 +80,8 @@ public class Driver {
         return getBestSector(SECTOR_START);
     }
 
-    Float getBestSector(CurrentSector currentSector) {
-        List<Float> sectorTimes = this.sectorTimes.stream()
+    Float getBestSector(final CurrentSector currentSector) {
+        final List<Float> sectorTimes = this.sectorTimes.stream()
                 .filter(sectorTime -> sectorTime.getSector().equals(currentSector))
                 .map(SectorTime::getTime)
                 .collect(Collectors.toList());
@@ -94,14 +92,14 @@ public class Driver {
         return getLapTimes().size();
     }
 
-    public List<Float> getLapTimes() {
+    private List<Float> getLapTimes() {
         /* Make sure first sector time is SECTOR_SECTOR1. Trim until that's true. */
         if (sectorTimes.size() < 3) return new ArrayList<>();
 
-        List<SectorTime> trimmedList = sectorTimes;
+        final List<SectorTime> trimmedList = sectorTimes;
         while (trimmedList.get(0).getSector() != SECTOR_SECTOR1) trimmedList.remove(0);
 
-        Integer laps = trimmedList.size() / 3;
+        final Integer laps = trimmedList.size() / 3;
         return IntStream.range(0, laps)
                 .mapToObj(n -> trimmedList.subList(n * 3, (n * 3) + 3))
                 .map(list -> list.stream()
@@ -143,11 +141,11 @@ public class Driver {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (obj == this) return true;
             if (!(obj instanceof SectorTime)) return false;
 
-            SectorTime sectorTime = (SectorTime) obj;
+            final SectorTime sectorTime = (SectorTime) obj;
             return sector.equals(sectorTime.sector)
                     && time.equals(sectorTime.time);
         }

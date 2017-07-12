@@ -1,9 +1,12 @@
 package com.senorpez.projectcars.racereport;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.senorpez.projectcars.racedata.Driver;
 import com.senorpez.projectcars.racedata.Race;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
+
+import java.util.Set;
 
 @Relation(value = "race", collectionRelation = "race")
 public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRaceModel> {
@@ -15,6 +18,8 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
     private final Float bestSector3Time;
     private final Integer packetCount;
 
+    private final Set<Driver> drivers;
+
     RaceModel(final Integer index, final Race race) {
         race.getAll();
         this.index = index;
@@ -24,6 +29,8 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
         this.bestSector2Time = race.getBestSector2Time();
         this.bestSector3Time = race.getBestSector3Time();
         this.packetCount = race.getPacketCount();
+
+        this.drivers = race.getDrivers();
     }
 
     @JsonIgnore
@@ -59,5 +66,10 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
 
     public Integer getPacketCount() {
         return packetCount;
+    }
+
+    @JsonIgnore
+    public Set<Driver> getDrivers() {
+        return drivers;
     }
 }

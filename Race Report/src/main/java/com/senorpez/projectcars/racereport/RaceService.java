@@ -16,7 +16,7 @@ final public class RaceService implements GenericService<EmbeddedRaceResource, R
         final AtomicInteger index = new AtomicInteger(0);
         return new Resources<>(Application.RACES.stream()
                 .map(race -> new RaceModel(index.incrementAndGet(), race))
-                .map(model -> makeResource(model,
+                .map(model -> makeResource(model.getEmbeddable(),
                         () -> new EmbeddedRaceResource(model.getEmbeddable()),
                         RaceController.class,
                         EmbeddedRaceResource.class))
@@ -36,6 +36,7 @@ final public class RaceService implements GenericService<EmbeddedRaceResource, R
                         () -> new RaceResource(
                                 model,
                                 linkTo(methodOn(RaceController.class).races()).withRel("races"),
+                                linkTo(methodOn(DriverController.class).drivers(raceId)).withRel("drivers"),
                                 linkTo(methodOn(RootController.class).root()).withRel("index")),
                         RaceController.class,
                         RaceResource.class))

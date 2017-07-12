@@ -19,6 +19,10 @@ public class ResourceAssembler<T extends Identifiable<?>, D extends ResourceSupp
         return createResource(entity);
     }
 
+    D toResource(final T entity, final Object... parameters) {
+        return createResource(entity, parameters);
+    }
+
     @Override
     protected D instantiateResource(final T entity) {
         return supplier.get();

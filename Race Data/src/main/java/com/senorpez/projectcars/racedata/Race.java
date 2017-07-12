@@ -134,7 +134,7 @@ public class Race implements Iterator<Packet> {
     }
 
     public Float getBestLapTime() {
-        List<Float> lapTimes = drivers.stream()
+        final List<Float> lapTimes = drivers.stream()
                 .map(Driver::getBestLapTime)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -154,7 +154,7 @@ public class Race implements Iterator<Packet> {
     }
 
     private Float getBestSectorTime(final CurrentSector currentSector) {
-        List<Float> sectorTimes = drivers.stream()
+        final List<Float> sectorTimes = drivers.stream()
                 .map(driver -> driver.getBestSector(currentSector))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
