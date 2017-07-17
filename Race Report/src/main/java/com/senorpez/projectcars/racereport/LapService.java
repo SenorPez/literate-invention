@@ -14,7 +14,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class LapService implements NewServiceInterface<
         LapModel,
         LapResource,
-        Integer> {
+        Integer, Integer> {
     @Override
     public List<LapModel> findAll(final Collection<Integer> entities) {
         return entities.stream()

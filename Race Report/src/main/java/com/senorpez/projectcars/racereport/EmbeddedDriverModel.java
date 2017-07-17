@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.racereport;
 
+import com.senorpez.projectcars.racedata.Driver;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
@@ -10,6 +11,11 @@ public class EmbeddedDriverModel implements Identifiable<Integer> {
 
     EmbeddedDriverModel(final DriverModel driver) {
         this.id = driver.getId();
+        this.name = driver.getName();
+    }
+
+    EmbeddedDriverModel(final Driver driver) {
+        this.id = driver.getIndex();
         this.name = driver.getName();
     }
 

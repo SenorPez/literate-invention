@@ -12,29 +12,29 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Service
-public class DriverService implements NewServiceInterface<
-        DriverModel,
-        DriverResource,
+public class EmbeddedDriverService implements NewServiceInterface<
+        EmbeddedDriverModel,
+        EmbeddedDriverResource,
         Driver, Integer> {
     @Override
-    public List<DriverModel> findAll(final Collection<Driver> entities) {
+    public List<EmbeddedDriverModel> findAll(final Collection<Driver> entities) {
         return entities.stream()
-                .map(DriverModel::new)
+                .map(EmbeddedDriverModel::new)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public DriverModel findOne(final Collection<Driver> entities, final Integer entityId) {
+    public EmbeddedDriverModel findOne(final Collection<Driver> entities, final Integer entityId) {
         return entities.stream()
-                .map(DriverModel::new)
+                .map(EmbeddedDriverModel::new)
                 .filter(model -> model.getId().equals(entityId))
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("Error."));
     }
 
     @Override
-    public Resources<DriverResource> toResource(final List<DriverModel> models, final Object... parameters) {
-        final Resources<DriverResource> resources = new Resources<>(models.stream()
+    public Resources<EmbeddedDriverResource> toResource(final List<EmbeddedDriverModel> models, final Object... parameters) {
+        final Resources<EmbeddedDriverResource> resources = new Resources<>(models.stream()
                 .map(model -> toResource(model, parameters))
                 .collect(Collectors.toList()));
         resources.add(linkTo(methodOn(DriverController.class).drivers((int) parameters[0])).withSelfRel());
@@ -42,14 +42,14 @@ public class DriverService implements NewServiceInterface<
     }
 
     @Override
-    public DriverResource toResource(final DriverModel model, final Object... parameters) {
+    public EmbeddedDriverResource toResource(final EmbeddedDriverModel model, final Object... parameters) {
         return makeResource(model,
-                () -> new DriverResource(
+                () -> new EmbeddedDriverResource(
                         model,
                         linkTo(methodOn(DriverController.class).drivers((int) parameters[0])).withRel("drivers"),
                         linkTo(methodOn(RootController.class).root()).withRel("index")),
                 DriverController.class,
-                DriverResource.class,
+                EmbeddedDriverResource.class,
                 parameters);
     }
 }

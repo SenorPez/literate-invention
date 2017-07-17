@@ -24,19 +24,16 @@ import java.util.stream.IntStream;
 public class LapController {
     private final LapService lapService;
     private final RaceService raceService;
-    private final DriverService driverService;
 
     @Autowired
-    LapController(final LapService lapService, final RaceService raceService, final DriverService driverService) {
+    LapController(final LapService lapService, final RaceService raceService) {
         this.lapService = lapService;
         this.raceService = raceService;
-        this.driverService = driverService;
     }
 
     @RequestMapping
     Resources<LapResource> laps(@PathVariable final int raceId) {
         final RaceModel raceModel = raceService.findOneModel(raceId);
-        System.out.println("THING:" + raceModel.getCurrentLapNumber());
         final List<LapModel> lapModels = lapService.findAll(IntStream
                 .rangeClosed(1, raceModel.getCurrentLapNumber())
                 .boxed()
