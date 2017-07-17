@@ -42,4 +42,13 @@ final public class RaceService implements GenericService<EmbeddedRaceResource, R
                         RaceResource.class))
                 .orElseThrow(() -> new RuntimeException("Error."));
     }
+
+    RaceModel findOneModel(final int raceId) {
+        final AtomicInteger index = new AtomicInteger(0);
+        return Application.RACES.stream()
+                .map(race -> new RaceModel(index.incrementAndGet(), race))
+                .filter(race -> race.getId().equals(raceId))
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Error"));
+    }
 }

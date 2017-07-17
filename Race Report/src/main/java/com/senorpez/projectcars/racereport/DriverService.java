@@ -65,4 +65,13 @@ final public class DriverService implements ChildService<RaceModel, Driver, Embe
     public DriverResource findOne(final int driverId) {
         throw new UnsupportedOperationException();
     }
+
+    public DriverModel findOneModel(final RaceModel parent, final int id) {
+        return parent.getDrivers().stream()
+                .map(DriverModel::new)
+                .filter(driver -> driver.getId().equals(id))
+                .findAny()
+                .orElseThrow(RuntimeException::new);
+
+    }
 }

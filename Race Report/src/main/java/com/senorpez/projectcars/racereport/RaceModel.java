@@ -10,25 +10,27 @@ import java.util.Set;
 
 @Relation(value = "race", collectionRelation = "race")
 public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRaceModel> {
-    private final Integer index;
+    private final Integer id;
     private final Boolean completeRace;
     private final Float bestLapTime;
     private final Float bestSector1Time;
     private final Float bestSector2Time;
     private final Float bestSector3Time;
     private final Integer packetCount;
+    private final Integer currentLapNumber;
 
     private final Set<Driver> drivers;
 
-    RaceModel(final Integer index, final Race race) {
+    RaceModel(final Integer id, final Race race) {
         race.getAll();
-        this.index = index;
+        this.id = id;
         this.completeRace = race.isCompleteRace();
         this.bestLapTime = race.getBestLapTime();
         this.bestSector1Time = race.getBestSector1Time();
         this.bestSector2Time = race.getBestSector2Time();
         this.bestSector3Time = race.getBestSector3Time();
         this.packetCount = race.getPacketCount();
+        this.currentLapNumber = race.getCurrentLapNumber();
 
         this.drivers = race.getDrivers();
     }
@@ -41,7 +43,7 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
 
     @Override
     public Integer getId() {
-        return index;
+        return id;
     }
 
     public Boolean isCompleteRace() {
@@ -68,8 +70,12 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
         return packetCount;
     }
 
+    public Integer getCurrentLapNumber() {
+        return currentLapNumber;
+    }
+
     @JsonIgnore
-    public Set<Driver> getDrivers() {
+    Set<Driver> getDrivers() {
         return drivers;
     }
 }

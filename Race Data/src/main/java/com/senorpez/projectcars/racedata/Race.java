@@ -6,12 +6,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_SECTOR1;
-import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_SECTOR2;
-import static com.senorpez.projectcars.racedata.CurrentSector.SECTOR_START;
-import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.FINISHED;
-import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.LOADING;
-import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.PRE_RACE;
+import static com.senorpez.projectcars.racedata.CurrentSector.*;
+import static com.senorpez.projectcars.racedata.TelemetryDataPacket.State.*;
 
 public class Race implements Iterator<Packet> {
     private final Deque<Packet> racePackets = new ArrayDeque<>();
@@ -176,7 +172,7 @@ public class Race implements Iterator<Packet> {
         final Short leaderLap = Collections.max(currentPacket.getParticipantInfo().stream()
                 .map(TelemetryDataPacket.ParticipantInfo::getCurrentLap)
                 .collect(Collectors.toList()));
-        return Math.max(leaderLap, currentPacket.getLapsInEvent());
+        return Math.min(leaderLap, currentPacket.getLapsInEvent());
     }
 
     public Float getCurrentTime() {

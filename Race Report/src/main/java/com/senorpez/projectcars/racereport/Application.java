@@ -43,7 +43,7 @@ public class Application {
     }
 
     private class HalMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
-        HalMappingJackson2HttpMessageConverter() {
+        private HalMappingJackson2HttpMessageConverter() {
             setSupportedMediaTypes(Collections.singletonList(
                     new MediaType("application", "doesntmatter") {
                         @Override

@@ -7,7 +7,7 @@ import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "driver", collectionRelation = "driver")
 class DriverModel implements Identifiable<Integer>, Embeddable<EmbeddedDriverModel> {
-    private final Integer index;
+    private final Integer id;
     private final String name;
     private final Float bestLapTime;
     private final Float bestSector1Time;
@@ -17,7 +17,7 @@ class DriverModel implements Identifiable<Integer>, Embeddable<EmbeddedDriverMod
     private final Float raceTime;
 
     DriverModel(final Driver driver) {
-        this.index = driver.getIndex().intValue();
+        this.id = driver.getIndex().intValue();
         this.name = driver.getName();
         this.bestLapTime = driver.getBestLapTime();
         this.bestSector1Time = driver.getBestSector1Time();
@@ -35,11 +35,7 @@ class DriverModel implements Identifiable<Integer>, Embeddable<EmbeddedDriverMod
 
     @Override
     public Integer getId() {
-        return index;
-    }
-
-    public Integer getIndex() {
-        return index;
+        return id;
     }
 
     public String getName() {

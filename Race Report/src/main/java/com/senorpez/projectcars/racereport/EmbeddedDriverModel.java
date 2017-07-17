@@ -5,17 +5,17 @@ import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "driver", collectionRelation = "driver")
 public class EmbeddedDriverModel implements Identifiable<Integer> {
-    private final int index;
+    private final int id;
     private final String name;
 
     EmbeddedDriverModel(final DriverModel driver) {
-        this.index = driver.getId();
+        this.id = driver.getId();
         this.name = driver.getName();
     }
 
     @Override
     public Integer getId() {
-        return index;
+        return id;
     }
 
     public String getName() {
