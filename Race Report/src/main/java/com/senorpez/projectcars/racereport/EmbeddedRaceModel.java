@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "race", collectionRelation = "race")
-public class EmbeddedRaceModel implements Identifiable<Integer> {
+class EmbeddedRaceModel implements Identifiable<Integer> {
     private final int id;
     private final boolean completeRace;
     private final int packetCount;

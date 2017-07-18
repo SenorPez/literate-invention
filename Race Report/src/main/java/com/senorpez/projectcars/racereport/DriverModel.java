@@ -1,12 +1,11 @@
 package com.senorpez.projectcars.racereport;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.senorpez.projectcars.racedata.Driver;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "driver", collectionRelation = "driver")
-class DriverModel implements Identifiable<Integer>, Embeddable<EmbeddedDriverModel> {
+class DriverModel implements Identifiable<Integer> {
     private final Integer id;
     private final String name;
     private final Float bestLapTime;
@@ -25,12 +24,6 @@ class DriverModel implements Identifiable<Integer>, Embeddable<EmbeddedDriverMod
         this.bestSector3Time = driver.getBestSector3Time();
         this.lapsComplete = driver.getLapsComplete();
         this.raceTime = driver.getRaceTime();
-    }
-
-    @JsonIgnore
-    @Override
-    public EmbeddedDriverModel getEmbeddable() {
-        return new EmbeddedDriverModel(this);
     }
 
     @Override

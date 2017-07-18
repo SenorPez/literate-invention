@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "lap", collectionRelation = "lap")
-public class LapModel implements Identifiable<Integer> {
+class LapModel implements Identifiable<Integer> {
     private final Integer id;
 
     LapModel(final Integer id) {

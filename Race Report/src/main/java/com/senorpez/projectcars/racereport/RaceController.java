@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequestMapping(
         value = "/races",
         method = RequestMethod.GET,
@@ -14,20 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 )
 @RestController
 class RaceController {
+    private final EmbeddedRaceService embeddedRaceService;
     private final RaceService service;
 
     @Autowired
-    RaceController(final RaceService service) {
+    RaceController(final EmbeddedRaceService embeddedRaceService, final RaceService service) {
+        this.embeddedRaceService = embeddedRaceService;
         this.service = service;
     }
 
     @RequestMapping
     Resources<EmbeddedRaceResource> races() {
-        return service.findAll();
+        final List<EmbeddedRaceModel> raceModels = embeddedRaceService.findAll(Application.RACES);
+        return embeddedRaceService.toResource(raceModels);
     }
 
     @RequestMapping(value = "/{raceId}")
     RaceResource race(@PathVariable final int raceId) {
-        return service.findOne(raceId);
+        final RaceModel raceModel = service.findOne(Application.RACES, raceId);
+        return service.toResource(raceModel);
     }
 }

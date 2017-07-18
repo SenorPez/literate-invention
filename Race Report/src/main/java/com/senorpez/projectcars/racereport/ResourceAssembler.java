@@ -6,7 +6,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class ResourceAssembler<T extends Identifiable<?>, D extends ResourceSupport> extends IdentifiableResourceAssemblerSupport<T, D> {
+class ResourceAssembler<T extends Identifiable<?>, D extends ResourceSupport> extends IdentifiableResourceAssemblerSupport<T, D> {
     final private Supplier<D> supplier;
 
     ResourceAssembler(final Class<?> controllerClass, final Class<D> resourceType, final Supplier<D> supplier) {

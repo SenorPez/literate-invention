@@ -9,7 +9,7 @@ import org.springframework.hateoas.core.Relation;
 import java.util.Set;
 
 @Relation(value = "race", collectionRelation = "race")
-public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRaceModel> {
+class RaceModel implements Identifiable<Integer> {
     private final Integer id;
     private final Boolean completeRace;
     private final Float bestLapTime;
@@ -33,12 +33,6 @@ public class RaceModel implements Identifiable<Integer>, Embeddable<EmbeddedRace
         this.currentLapNumber = race.getCurrentLapNumber();
 
         this.drivers = race.getDrivers();
-    }
-
-    @JsonIgnore
-    @Override
-    public EmbeddedRaceModel getEmbeddable() {
-        return new EmbeddedRaceModel(this);
     }
 
     @Override

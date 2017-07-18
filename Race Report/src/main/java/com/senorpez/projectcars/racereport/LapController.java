@@ -16,12 +16,12 @@ import java.util.stream.IntStream;
 // See: https://github.com/spring-projects/spring-hateoas/issues/571
 
 @RequestMapping(
-        value = "/races/{raceId}/laps/",
+        value = "/races/{raceId}/laps",
         method = RequestMethod.GET,
         produces = "application/json; charset=UTF-8"
 )
 @RestController
-public class LapController {
+class LapController {
     private final LapService lapService;
     private final RaceService raceService;
 
@@ -33,7 +33,7 @@ public class LapController {
 
     @RequestMapping
     Resources<LapResource> laps(@PathVariable final int raceId) {
-        final RaceModel raceModel = raceService.findOneModel(raceId);
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);
         final List<LapModel> lapModels = lapService.findAll(IntStream
                 .rangeClosed(1, raceModel.getCurrentLapNumber())
                 .boxed()
@@ -43,8 +43,7 @@ public class LapController {
 
     @RequestMapping(value = "/{lapId}")
     LapResource laps(@PathVariable final Integer raceId, @PathVariable final Integer lapId) {
-        final RaceModel raceModel = raceService.findOneModel(raceId);
-        final LapModel lapModel = lapService.findOne(IntStream
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);        final LapModel lapModel = lapService.findOne(IntStream
                 .rangeClosed(1, raceModel.getCurrentLapNumber())
                 .boxed()
                 .collect(Collectors.toList()), lapId);

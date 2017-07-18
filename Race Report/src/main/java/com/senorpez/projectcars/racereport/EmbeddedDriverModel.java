@@ -5,7 +5,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "driver", collectionRelation = "driver")
-public class EmbeddedDriverModel implements Identifiable<Integer> {
+final class EmbeddedDriverModel implements Identifiable<Integer> {
     private final int id;
     private final String name;
 

@@ -29,14 +29,14 @@ class DriverController {
 
     @RequestMapping
     Resources<EmbeddedDriverResource> drivers(@PathVariable final int raceId) {
-        final RaceModel raceModel = raceService.findOneModel(raceId);
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);
         final List<EmbeddedDriverModel> driverModels = embeddedDriverService.findAll(raceModel.getDrivers());
         return embeddedDriverService.toResource(driverModels, raceId);
     }
 
     @RequestMapping(value = "/{driverId}")
     DriverResource driver(@PathVariable final int raceId, @PathVariable final int driverId) {
-        final RaceModel raceModel = raceService.findOneModel(raceId);
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);
         final DriverModel driverModel = driverService.findOne(
                 raceModel.getDrivers(),
                 driverId);

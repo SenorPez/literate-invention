@@ -12,31 +12,33 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @org.springframework.stereotype.Service
-final class RaceService implements Service<
-        RaceModel,
-        RaceResource,
+final class EmbeddedRaceService implements Service<
+        EmbeddedRaceModel,
+        EmbeddedRaceResource,
         Race, Integer> {
     @Override
-    public List<RaceModel> findAll(final Collection<Race> entities) {
+    public List<EmbeddedRaceModel> findAll(final Collection<Race> entities) {
         final AtomicInteger index = new AtomicInteger(0);
         return entities.stream()
                 .map(race -> new RaceModel(index.incrementAndGet(), race))
+                .map(EmbeddedRaceModel::new)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public RaceModel findOne(final Collection<Race> entities, final Integer entityId) {
+    public EmbeddedRaceModel findOne(final Collection<Race> entities, final Integer entityId) {
         final AtomicInteger index = new AtomicInteger(0);
         return entities.stream()
                 .map(race -> new RaceModel(index.incrementAndGet(), race))
+                .map(EmbeddedRaceModel::new)
                 .filter(model -> model.getId().equals(entityId))
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("Error."));
     }
 
     @Override
-    public Resources<RaceResource> toResource(final List<RaceModel> models, final Object... parameters) {
-        final Resources<RaceResource> resources = new Resources<>(models.stream()
+    public Resources<EmbeddedRaceResource> toResource(final List<EmbeddedRaceModel> models, final Object... parameters) {
+        final Resources<EmbeddedRaceResource> resources = new Resources<>(models.stream()
                 .map(model -> toResource(model, parameters))
                 .collect(Collectors.toList()));
         resources.add(linkTo(methodOn(RaceController.class).races()).withSelfRel());
@@ -44,14 +46,14 @@ final class RaceService implements Service<
     }
 
     @Override
-    public RaceResource toResource(final RaceModel model, final Object... parameters) {
+    public EmbeddedRaceResource toResource(final EmbeddedRaceModel model, final Object... parameters) {
         return makeResource(model,
-                () -> new RaceResource(
+                () -> new EmbeddedRaceResource(
                         model,
                         linkTo(methodOn(RaceController.class).races()).withRel("races"),
                         linkTo(methodOn(RootController.class).root()).withRel("index")),
                 RaceController.class,
-                RaceResource.class,
+                EmbeddedRaceResource.class,
                 parameters);
     }
 }
