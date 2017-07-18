@@ -1,6 +1,7 @@
 package com.senorpez.projectcars.racereport;
 
 import org.springframework.hateoas.Resources;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,8 +10,8 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@org.springframework.stereotype.Service
-final class LapService implements Service<
+@Service
+final class LapService implements GenericService<
         LapModel,
         LapResource,
         Integer, Integer> {

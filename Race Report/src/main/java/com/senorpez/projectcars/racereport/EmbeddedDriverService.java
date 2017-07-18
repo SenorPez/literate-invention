@@ -2,6 +2,7 @@ package com.senorpez.projectcars.racereport;
 
 import com.senorpez.projectcars.racedata.Driver;
 import org.springframework.hateoas.Resources;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@org.springframework.stereotype.Service
-class EmbeddedDriverService implements Service<
+@Service
+final class EmbeddedDriverService implements GenericService<
         EmbeddedDriverModel,
         EmbeddedDriverResource,
         Driver, Integer> {

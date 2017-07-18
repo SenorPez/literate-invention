@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-interface Service<
+interface GenericService<
         M extends Identifiable<?>,
         R extends ResourceSupport,
         T, U> {
