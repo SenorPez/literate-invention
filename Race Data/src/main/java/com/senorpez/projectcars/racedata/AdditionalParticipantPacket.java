@@ -15,7 +15,7 @@ public class AdditionalParticipantPacket extends Packet {
     private final Short offset;
     private final List<String> names;
 
-    AdditionalParticipantPacket(DataInputStream data) throws IOException, InvalidPacketException {
+    AdditionalParticipantPacket(final DataInputStream data) throws IOException, InvalidPacketException {
         super(data);
         if (!isCorrectPacketType(packetType)) {
             throw new InvalidPacketException();
@@ -23,14 +23,14 @@ public class AdditionalParticipantPacket extends Packet {
 
         this.offset = (short) data.readUnsignedByte();
 
-        byte[] nameBuffer = new byte[64];
+        final byte[] nameBuffer = new byte[64];
         this.names = Collections.unmodifiableList(
                 IntStream.range(0, 16)
                         .mapToObj(value -> {
                             try {
                                 data.readFully(nameBuffer);
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                return "";
                             }
                             return new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
                         })
