@@ -43,7 +43,8 @@ class LapController {
 
     @RequestMapping(value = "/{lapId}")
     LapResource laps(@PathVariable final Integer raceId, @PathVariable final Integer lapId) {
-        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);        final LapModel lapModel = lapService.findOne(IntStream
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);
+        final LapModel lapModel = lapService.findOne(IntStream
                 .rangeClosed(1, raceModel.getCurrentLapNumber())
                 .boxed()
                 .collect(Collectors.toList()), lapId);

@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-6/schema",
+  "title": "Project CARS Race Report Root",
+  "description": "JSON Representation of Project CARS Race Report root page.",
+  "definitions": {
+    "standardLink": {
+      "$ref": "common.schema.json#/definitions/standardLink"
+    },
+    "curies": {
+      "$ref": "common.schema.json#/definitions/curies"
+    },
+    "embeddedRace": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "completeRace": {
+          "type": "boolean"
+        },
+        "packetCount": {
+          "type": "integer"
+        },
+        "_links": {
+          "type": "object",
+          "properties": {
+            "self": {
+              "$ref": "#/definitions/standardLink"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "self"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "completeRace",
+        "packetCount",
+        "_links"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "pcars:race": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/embeddedRace"
+          }
+        }
+      }
+    },
+    "_links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "$ref": "#/definitions/standardLink"
+        },
+        "index": {
+          "$ref": "#/definitions/standardLink"
+        },
+        "curies": {
+          "$ref": "#/definitions/curies"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "_embedded",
+    "_links"
+  ]
+}

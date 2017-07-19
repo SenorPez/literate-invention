@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.InputStream;
+import java.net.URI;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.senorpez.projectcars.racereport.RootControllerTest.*;
@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
 
 @SpringBootTest
 public class RootControllerTest_Single {
@@ -40,7 +39,7 @@ public class RootControllerTest_Single {
 
     @Test
     public void GetRoot() throws Exception {
-        final InputStream jsonSchema = CLASS_LOADER.getResourceAsStream(OBJECT_SCHEMA);
+        final URI jsonSchema = CLASS_LOADER.getResource(OBJECT_SCHEMA).toURI();
 
         mockMvc.perform(get("/").accept(MEDIA_TYPE))
                 .andExpect(status().isOk())

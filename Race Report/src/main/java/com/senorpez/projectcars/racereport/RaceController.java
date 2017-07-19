@@ -17,12 +17,12 @@ import java.util.List;
 @RestController
 class RaceController {
     private final EmbeddedRaceService embeddedRaceService;
-    private final RaceService service;
+    private final RaceService raceService;
 
     @Autowired
-    RaceController(final EmbeddedRaceService embeddedRaceService, final RaceService service) {
+    RaceController(final EmbeddedRaceService embeddedRaceService, final RaceService raceService) {
         this.embeddedRaceService = embeddedRaceService;
-        this.service = service;
+        this.raceService = raceService;
     }
 
     @RequestMapping
@@ -33,7 +33,7 @@ class RaceController {
 
     @RequestMapping(value = "/{raceId}")
     RaceResource race(@PathVariable final int raceId) {
-        final RaceModel raceModel = service.findOne(Application.RACES, raceId);
-        return service.toResource(raceModel);
+        final RaceModel raceModel = raceService.findOne(Application.RACES, raceId);
+        return raceService.toResource(raceModel);
     }
 }
