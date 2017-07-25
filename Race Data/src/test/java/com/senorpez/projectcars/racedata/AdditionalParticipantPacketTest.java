@@ -104,7 +104,7 @@ public class AdditionalParticipantPacketTest {
     @Test
     public void getNames_MaxLengthGarbageAtEnd() throws Exception {
         final List<String> namesWithGarbage = expectedNames.stream()
-                .map(name -> name + "\u0000" + GarbageGenerator.generate(62 - name.length()))
+                .map(name -> name + "\u0000" + GarbageGenerator.generate(63 - name.getBytes(UTF_8).length))
                 .collect(Collectors.toList());
         packet = new Builder()
                 .setNames(namesWithGarbage)
@@ -172,5 +172,4 @@ public class AdditionalParticipantPacketTest {
                     .collect(Collectors.joining());
         }
     }
-
 }
