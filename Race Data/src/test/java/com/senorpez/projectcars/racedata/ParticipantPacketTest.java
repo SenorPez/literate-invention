@@ -18,9 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
 public class ParticipantPacketTest {
-    private final static Short maxUnsignedByte = Short.MAX_VALUE >>> 8;
-    private final static Short minUnsignedByte = 0;
-
     private final static Integer expectedBuildVersionNumber = 1000;
     private final static Short expectedPacketType = 1;
     private final static Short expectedCount = 0;
