@@ -7,19 +7,19 @@ import java.io.DataOutputStream;
 import java.util.Random;
 
 class PacketBuilder {
-    private final static Random random = new Random();
+    final static Random random = new Random();
 
     final static Integer MAX_UNSIGNED_SHORT = Integer.MAX_VALUE >>> 15;
     final static Integer MIN_UNSIGNED_SHORT = 0;
+    final static Short MAX_UNSIGNED_BYTE = Short.MAX_VALUE >>> 7;
+    final static Short MIN_UNSIGNED_BYTE = 0;
 
     final static Short MAX_COUNT = Byte.MAX_VALUE >>> 1;
     final static Short MIN_COUNT = 0;
 
     private Integer expectedBuildVersionNumber = random.nextInt(MAX_UNSIGNED_SHORT + 1);
-    private final static Short expectedPacketType = (short) random.nextInt(3);
+    private Short expectedPacketType = (short) random.nextInt(3);
     private Short expectedCount = (short) random.nextInt(MAX_COUNT + 1);
-
-    private Packet packet;
 
     PacketBuilder() {
     }
@@ -33,6 +33,11 @@ class PacketBuilder {
         return this;
     }
 
+    <T extends PacketBuilder> T setExpectedPacketType(final Short expectedPacketType) {
+        this.expectedPacketType = expectedPacketType;
+        return (T) this;
+    }
+
     Short getExpectedCount() {
         return expectedCount;
     }
@@ -43,13 +48,17 @@ class PacketBuilder {
     }
 
     DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1028);
-        final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-        final Integer packetTypeMask = 3; /* 0000 0011 */
+        final ByteArrayOutputStream byteArrayOutputStream = build(new ByteArrayOutputStream(1028));
+        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+    }
 
+    ByteArrayOutputStream build(final ByteArrayOutputStream stream) throws Exception {
+        final DataOutputStream dataOutputStream = new DataOutputStream(stream);
+
+        final Integer packetTypeMask = 3; /* 0000 0011 */
         dataOutputStream.writeShort(expectedBuildVersionNumber);
         dataOutputStream.writeByte((expectedCount << 2) | (packetTypeMask & expectedPacketType));
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        return stream;
     }
 }
 

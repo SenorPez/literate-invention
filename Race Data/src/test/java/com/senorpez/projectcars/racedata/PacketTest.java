@@ -59,7 +59,7 @@ public class PacketTest {
 
         builder.setExpectedCount((short) (PacketBuilder.MAX_COUNT + 1));
         packet = new PacketImpl(builder.build());
-        assertThat(packet.getCount(), is(not(PacketBuilder.MAX_COUNT + 1)));
+        assertThat(packet.getCount(), is(not((short) (PacketBuilder.MAX_COUNT + 1))));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class PacketTest {
 
         builder.setExpectedCount((short) (PacketBuilder.MIN_COUNT - 1));
         packet = new PacketImpl(builder.build());
-        assertThat(packet.getCount(), is(not(PacketBuilder.MIN_COUNT - 1)));
+        assertThat(packet.getCount(), is(not((short) (PacketBuilder.MIN_COUNT - 1))));
     }
 
     private class PacketImpl extends Packet {
