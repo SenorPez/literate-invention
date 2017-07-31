@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.senorpez.projectcars.racedata.PacketType.ADDITIONAL_PARTICIPANT;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -98,7 +97,7 @@ public class AdditionalParticipantPacketTest {
         final AdditionalParticipantPacketBuilder builder = new AdditionalParticipantPacketBuilder();
         final List<String> expectedNames = builder.getExpectedNames();
         final List<String> namesWithGarbage = builder.getExpectedNames().stream()
-                .map(name -> GarbageGenerator.trash(name, Math.min(63 - name.getBytes(UTF_8).length, name.getBytes(UTF_8).length + 10)))
+                .map(StringGenerator::GetStringWithGarbage)
                 .collect(Collectors.toList());
         builder.setExpectedNames(namesWithGarbage);
         packet = new AdditionalParticipantPacket(builder.build());
@@ -112,7 +111,7 @@ public class AdditionalParticipantPacketTest {
         final AdditionalParticipantPacketBuilder builder = new AdditionalParticipantPacketBuilder();
         final List<String> expectedNames = builder.getExpectedNames();
         final List<String> namesWithGarbage = builder.getExpectedNames().stream()
-                .map(name -> GarbageGenerator.trash(name, 63 - name.getBytes(UTF_8).length))
+                .map(StringGenerator::GetStringWithGarbage)
                 .collect(Collectors.toList());
         builder.setExpectedNames(namesWithGarbage);
         packet = new AdditionalParticipantPacket(builder.build());

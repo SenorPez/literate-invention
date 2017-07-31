@@ -15,7 +15,7 @@ class AdditionalParticipantPacketBuilder extends PacketBuilder {
     private List<String> expectedNames = Collections.unmodifiableList(
             IntStream.range(0, 16)
                     .mapToObj(value -> {
-                        int nameLength = random.nextInt(64);
+                        int nameLength = random.nextInt(62);
                         StringBuilder nameBuilder = new StringBuilder();
                         IntStream.rangeClosed(0, nameLength)
                                 .forEach(value1 -> nameBuilder.append(ALPHABET.charAt(random.nextInt(ALPHABET.length()))));
