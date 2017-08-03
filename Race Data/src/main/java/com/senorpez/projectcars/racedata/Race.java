@@ -90,7 +90,7 @@ public class Race implements Iterator<Packet> {
 
     private void populateSectorTimes(final TelemetryDataPacket packet) {
         drivers.forEach(driver -> {
-            final TelemetryDataPacket.ParticipantInfo participantInfo = packet.getParticipantInfo().get(driver.getIndex());
+            final ParticipantInfo participantInfo = packet.getParticipantInfo().get(driver.getIndex());
             driver.addSectorTime(participantInfo.getCurrentSector(), participantInfo.getLastSectorTime());
         });
     }
@@ -170,7 +170,7 @@ public class Race implements Iterator<Packet> {
 
     public Integer getCurrentLapNumber() {
         final Short leaderLap = Collections.max(currentPacket.getParticipantInfo().stream()
-                .map(TelemetryDataPacket.ParticipantInfo::getCurrentLap)
+                .map(ParticipantInfo::getCurrentLap)
                 .collect(Collectors.toList()));
         return Math.min(leaderLap, currentPacket.getLapsInEvent());
     }

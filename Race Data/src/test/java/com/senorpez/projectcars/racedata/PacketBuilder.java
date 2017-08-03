@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Random;
 
 class PacketBuilder {
@@ -59,6 +61,15 @@ class PacketBuilder {
         dataOutputStream.writeShort(expectedBuildVersionNumber);
         dataOutputStream.writeByte((expectedCount << 2) | (packetTypeMask & expectedPacketType));
         return stream;
+    }
+
+    static byte[] flipFloat(final Float input) {
+        final ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(input);
+        buffer.rewind();
+
+        final byte[] bytes = new byte[4];
+        buffer.get(bytes);
+        return bytes;
     }
 }
 

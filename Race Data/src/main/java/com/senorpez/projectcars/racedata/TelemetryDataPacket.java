@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TelemetryDataPacket extends Packet {
     enum State {
@@ -60,78 +59,6 @@ public class TelemetryDataPacket extends Packet {
 
         public Boolean raceFinishedTelemetryExhausted() {
             return false;
-        }
-    }
-
-    class ParticipantInfo {
-        private final List<Short> worldPosition;
-        private final Integer currentLapDistance;
-        private final Short racePosition;
-        private final Short lapsCompleted;
-        private final Short currentLap;
-        private final Short sector;
-        private final Float lastSectorTime;
-
-        ParticipantInfo(DataInputStream data) throws IOException {
-            this.worldPosition = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Short>) value -> data.readShort()).collect(Collectors.toList()));
-            this.currentLapDistance = data.readUnsignedShort();
-            this.racePosition = (short) data.readUnsignedByte();
-            this.lapsCompleted = (short) data.readUnsignedByte();
-            this.currentLap = (short) data.readUnsignedByte();
-            this.sector = (short) data.readUnsignedByte();
-            this.lastSectorTime = getLittleFloat(data);
-        }
-
-        public List<Float> getWorldPosition() {
-            return Collections.unmodifiableList(
-                    Stream
-                            .of(
-                                    worldPosition.get(0) + ((sector >>> 6) / 4.0f),
-                                    (float) worldPosition.get(1),
-                                    worldPosition.get(2) + (((48 & sector) >>> 4) / 4.0f))
-                            .collect(Collectors.toList()));
-        }
-
-        public Integer getCurrentLapDistance() {
-            return currentLapDistance;
-        }
-
-        public Short getRacePosition() {
-            Integer mask = 127; /* 0111 1111 */
-            return Integer.valueOf(mask & racePosition).shortValue();
-        }
-
-        public Boolean isActive() {
-            Integer mask = 128; /* 1000 0000 */
-            return (mask & racePosition) != 0;
-        }
-
-        public Short getLapsCompleted() {
-            Integer mask = 127; /* 0111 1111 */
-            return Integer.valueOf(mask * lapsCompleted).shortValue();
-        }
-
-        public Boolean isLapInvalidated() {
-            Integer mask = 128; /* 1000 0000 */
-            return (mask & lapsCompleted) != 0;
-        }
-
-        public Short getCurrentLap() {
-            return currentLap;
-        }
-
-        public CurrentSector getCurrentSector() {
-            Integer mask = 7; /* 0000 0111 */
-            return CurrentSector.valueOf(mask & sector);
-        }
-
-        public Boolean isSameClass() {
-            Integer mask = 8; /* 0000 1000 */
-            return (mask & sector) != 0;
-        }
-
-        public Float getLastSectorTime() {
-            return lastSectorTime;
         }
     }
 
@@ -250,7 +177,7 @@ public class TelemetryDataPacket extends Packet {
     private final List<Short> wings;
     private final Short dPad;
 
-    TelemetryDataPacket(DataInputStream data) throws IOException, InvalidPacketException {
+    TelemetryDataPacket(final DataInputStream data) throws IOException, InvalidPacketException {
         super(data);
         if (!isCorrectPacketType(packetType)) {
             throw new InvalidPacketException();
@@ -375,556 +302,556 @@ public class TelemetryDataPacket extends Packet {
         return packetType;
     }
 
-    public GameState getGameState() {
-        Integer mask = 15; /* 0000 1111 */
+    GameState getGameState() {
+        final Integer mask = 15; /* 0000 1111 */
         return GameState.valueOf(mask & gameSessionState);
     }
 
-    public SessionState getSessionState() {
+    SessionState getSessionState() {
         return SessionState.valueOf(gameSessionState >>> 4);
     }
 
-    public RaceState getRaceState() {
-        Integer mask = 7; /* 0000 0111 */
+    RaceState getRaceState() {
+        final Integer mask = 7; /* 0000 0111 */
         return RaceState.valueOf(mask & raceStateFlags);
     }
 
-    public Boolean isLapInvalidated() {
-        Integer mask = 8; /* 0000 1000 */
+    Boolean isLapInvalidated() {
+        final Integer mask = 8; /* 0000 1000 */
         return (mask & raceStateFlags) != 0;
     }
 
-    public Boolean isAntiLockActive() {
-        Integer mask = 16; /* 0001 0000 */
+    Boolean isAntiLockActive() {
+        final Integer mask = 16; /* 0001 0000 */
         return (mask & raceStateFlags) != 0;
     }
 
-    public Boolean isBoostActive() {
-        Integer mask = 32; /* 0010 0000 */
+    Boolean isBoostActive() {
+        final Integer mask = 32; /* 0010 0000 */
         return (mask & raceStateFlags) != 0;
     }
 
-    public Byte getViewedParticipantIndex() {
+    Byte getViewedParticipantIndex() {
         return viewedParticipantIndex;
     }
 
-    public Byte getNumParticipants() {
+    Byte getNumParticipants() {
         return numParticipants;
     }
 
-    public Float getUnfilteredThrottle() {
+    Float getUnfilteredThrottle() {
         return unfilteredThrottle / 255.0f;
     }
 
-    public Float getUnfilteredBrake() {
+    Float getUnfilteredBrake() {
         return unfilteredBrake / 255.0f;
     }
 
-    public Float getUnfilteredSteering() {
+    Float getUnfilteredSteering() {
         return unfilteredSteering / 127.0f;
     }
 
-    public Float getUnfilteredClutch() {
+    Float getUnfilteredClutch() {
         return unfilteredClutch / 255.0f;
     }
 
-    public Float getTrackLength() {
+    Float getTrackLength() {
         return trackLength;
     }
 
-    public Short getLapsInEvent() {
+    Short getLapsInEvent() {
         return lapsInEvent;
     }
 
-    public Float getBestLapTime() {
+    Float getBestLapTime() {
         return bestLapTime;
     }
 
-    public Float getLastLapTime() {
+    Float getLastLapTime() {
         return lastLapTime;
     }
 
-    public Float getCurrentTime() {
+    Float getCurrentTime() {
         return currentTime;
     }
 
-    public Float getSplitTimeAhead() {
+    Float getSplitTimeAhead() {
         return splitTimeAhead;
     }
 
-    public Float getSplitTimeBehind() {
+    Float getSplitTimeBehind() {
         return splitTimeBehind;
     }
 
-    public Float getSplitTime() {
+    Float getSplitTime() {
         return splitTime;
     }
 
-    public Float getEventTimeRemaining() {
+    Float getEventTimeRemaining() {
         return eventTimeRemaining;
     }
 
-    public Float getPersonalFastestLapTime() {
+    Float getPersonalFastestLapTime() {
         return personalFastestLapTime;
     }
 
-    public Float getWorldFastestLapTime() {
+    Float getWorldFastestLapTime() {
         return worldFastestLapTime;
     }
 
-    public Float getCurrentSector1Time() {
+    Float getCurrentSector1Time() {
         return currentSector1Time;
     }
 
-    public Float getCurrentSector2Time() {
+    Float getCurrentSector2Time() {
         return currentSector2Time;
     }
 
-    public Float getCurrentSector3Time() {
+    Float getCurrentSector3Time() {
         return currentSector3Time;
     }
 
-    public Float getFastestSector1Time() {
+    Float getFastestSector1Time() {
         return fastestSector1Time;
     }
 
-    public Float getFastestSector2Time() {
+    Float getFastestSector2Time() {
         return fastestSector2Time;
     }
 
-    public Float getFastestSector3Time() {
+    Float getFastestSector3Time() {
         return fastestSector3Time;
     }
 
-    public Float getPersonalFastestSector1Time() {
+    Float getPersonalFastestSector1Time() {
         return personalFastestSector1Time;
     }
 
-    public Float getPersonalFastestSector2Time() {
+    Float getPersonalFastestSector2Time() {
         return personalFastestSector2Time;
     }
 
-    public Float getPersonalFastestSector3Time() {
+    Float getPersonalFastestSector3Time() {
         return personalFastestSector3Time;
     }
 
-    public Float getWorldFastestSector1Time() {
+    Float getWorldFastestSector1Time() {
         return worldFastestSector1Time;
     }
 
-    public Float getWorldFastestSector2Time() {
+    Float getWorldFastestSector2Time() {
         return worldFastestSector2Time;
     }
 
-    public Float getWorldFastestSector3Time() {
+    Float getWorldFastestSector3Time() {
         return worldFastestSector3Time;
     }
 
-    public FlagColour getHighestFlagColor() {
-        Integer mask = 15; /* 0000 1111 */
+    FlagColour getHighestFlagColor() {
+        final Integer mask = 15; /* 0000 1111 */
         return FlagColour.valueOf(mask & highestFlag);
     }
 
-    public FlagReason getHighestFlagReason() {
+    FlagReason getHighestFlagReason() {
         return FlagReason.valueOf(highestFlag >>> 4);
     }
 
-    public PitMode getPitMode() {
-        Integer mask = 15; /* 0000 1111 */
+    PitMode getPitMode() {
+        final Integer mask = 15; /* 0000 1111 */
         return PitMode.valueOf(mask & pitModeSchedule);
     }
 
-    public PitSchedule getPitSchedule() {
+    PitSchedule getPitSchedule() {
         return PitSchedule.valueOf(pitModeSchedule >>> 4);
     }
 
-    public Boolean isHeadlight() {
+    Boolean isHeadlight() {
         return CarFlags.CAR_HEADLIGHT.isSet(carFlags);
     }
 
-    public Boolean isEngineActive() {
+    Boolean isEngineActive() {
         return CarFlags.CAR_ENGINE_ACTIVE.isSet(carFlags);
     }
 
-    public Boolean isEngineWarning() {
+    Boolean isEngineWarning() {
         return CarFlags.CAR_ENGINE_WARNING.isSet(carFlags);
     }
 
-    public Boolean isSpeedLimiter() {
+    Boolean isSpeedLimiter() {
         return CarFlags.CAR_SPEED_LIMITER.isSet(carFlags);
     }
 
-    public Boolean isAbs() {
+    Boolean isAbs() {
         return CarFlags.CAR_ABS.isSet(carFlags);
     }
 
-    public Boolean isHandbrake() {
+    Boolean isHandbrake() {
         return CarFlags.CAR_HANDBRAKE.isSet(carFlags);
     }
 
-    public Boolean isStability() {
+    Boolean isStability() {
         return CarFlags.CAR_STABILITY.isSet(carFlags);
     }
 
-    public Boolean isTractionControl() {
+    Boolean isTractionControl() {
         return CarFlags.CAR_TRACTION_CONTROL.isSet(carFlags);
     }
 
-    public Short getOilTemp() {
+    Short getOilTemp() {
         return oilTemp;
     }
 
-    public Integer getOilPressure() {
+    Integer getOilPressure() {
         return oilPressure;
     }
 
-    public Short getWaterTemp() {
+    Short getWaterTemp() {
         return waterTemp;
     }
 
-    public Integer getWaterPressure() {
+    Integer getWaterPressure() {
         return waterPressure;
     }
 
-    public Integer getFuelPressure() {
+    Integer getFuelPressure() {
         return fuelPressure;
     }
 
-    public Short getFuelCapacity() {
+    Short getFuelCapacity() {
         return fuelCapacity;
     }
 
-    public Float getBrake() {
+    Float getBrake() {
         return brake / 255.0f;
     }
 
-    public Float getFuelLevel() {
+    Float getFuelLevel() {
         return fuelLevel;
     }
 
-    public Float getSpeed() {
+    Float getSpeed() {
         return speed;
     }
 
-    public Integer getRpm() {
+    Integer getRpm() {
         return rpm;
     }
 
-    public Integer getMaxRpm() {
+    Integer getMaxRpm() {
         return maxRpm;
     }
 
-    public Float getThrottle() {
+    Float getThrottle() {
         return throttle / 255.0f;
     }
 
-    public Float getClutch() {
+    Float getClutch() {
         return clutch / 255.0f;
     }
 
-    public Float getSteering() {
+    Float getSteering() {
         return steering / 127.0f;
     }
 
-    public Short getGear() {
-        Integer mask = 15; /* 0000 1111 */
-        return Integer.valueOf(mask * gearNumGears).shortValue();
+    Short getGear() {
+        final Integer mask = 15; /* 0000 1111 */
+        return Integer.valueOf(mask & gearNumGears).shortValue();
     }
 
-    public Short getNumGears() {
+    Short getNumGears() {
         return Integer.valueOf(gearNumGears >>> 4).shortValue();
     }
 
-    public Float getOdometer() {
+    Float getOdometer() {
         return odometer;
     }
 
-    public Short getBoostAmount() {
+    Short getBoostAmount() {
         return boostAmount;
     }
 
-    public List<Float> getOrientation() {
+    List<Float> getOrientation() {
         return orientation;
     }
 
-    public List<Float> getLocalVelocity() {
+    List<Float> getLocalVelocity() {
         return localVelocity;
     }
 
-    public List<Float> getWorldVelocity() {
+    List<Float> getWorldVelocity() {
         return worldVelocity;
     }
 
-    public List<Float> getAngularVelocity() {
+    List<Float> getAngularVelocity() {
         return angularVelocity;
     }
 
-    public List<Float> getLocalAcceleration() {
+    List<Float> getLocalAcceleration() {
         return localAcceleration;
     }
 
-    public List<Float> getWorldAcceleration() {
+    List<Float> getWorldAcceleration() {
         return worldAcceleration;
     }
 
-    public List<Float> getExtentsCentre() {
+    List<Float> getExtentsCentre() {
         return extentsCentre;
     }
 
-    public List<Boolean> isTyreAttached() {
+    List<Boolean> isTyreAttached() {
         return Collections.unmodifiableList(tyreFlags.stream().map(TyreFlags.TYRE_ATTACHED::isSet).collect(Collectors.toList()));
     }
 
-    public List<Boolean> isTyreInflated() {
+    List<Boolean> isTyreInflated() {
         return Collections.unmodifiableList(tyreFlags.stream().map(TyreFlags.TYRE_INFLATED::isSet).collect(Collectors.toList()));
     }
 
-    public List<Boolean> isTyreIsOnGround() {
+    List<Boolean> isTyreIsOnGround() {
         return Collections.unmodifiableList(tyreFlags.stream().map(TyreFlags.TYRE_IS_ON_GROUND::isSet).collect(Collectors.toList()));
     }
 
-    public List<TerrainMaterial> getTerrain() {
+    List<TerrainMaterial> getTerrain() {
         return Collections.unmodifiableList(terrain.stream().map(TerrainMaterial::valueOf).collect(Collectors.toList()));
     }
 
-    public List<Float> getTyreY() {
+    List<Float> getTyreY() {
         return tyreY;
     }
 
-    public List<Float> getTyreRps() {
+    List<Float> getTyreRps() {
         return tyreRps;
     }
 
-    public List<Float> getTyreSlipSpeed() {
+    List<Float> getTyreSlipSpeed() {
         return tyreSlipSpeed;
     }
 
-    public List<Short> getTyreTemp() {
+    List<Short> getTyreTemp() {
         return tyreTemp;
     }
 
-    public List<Float> getTyreGrip() {
+    List<Float> getTyreGrip() {
         return Collections.unmodifiableList(tyreGrip.stream().map(tyreGrip -> tyreGrip / 255.0f).collect(Collectors.toList()));
     }
 
-    public List<Float> getTyreHeightAboveGround() {
+    List<Float> getTyreHeightAboveGround() {
         return tyreHeightAboveGround;
     }
 
-    public List<Float> getTyreLateralStiffness() {
+    List<Float> getTyreLateralStiffness() {
         return tyreLateralStiffness;
     }
 
-    public List<Float> getTyreWear() {
+    List<Float> getTyreWear() {
         return Collections.unmodifiableList(tyreWear.stream().map(tyreWear -> tyreWear / 255.0f).collect(Collectors.toList()));
     }
 
-    public List<Float> getBrakeDamage() {
+    List<Float> getBrakeDamage() {
         return Collections.unmodifiableList(brakeDamage.stream().map(brakeDamage -> brakeDamage / 255.0f).collect(Collectors.toList()));
     }
 
-    public List<Float> getSuspensionDamage() {
+    List<Float> getSuspensionDamage() {
         return Collections.unmodifiableList(suspensionDamage.stream().map(suspensionDamage -> suspensionDamage / 255.0f).collect(Collectors.toList()));
     }
 
-    public List<Short> getBrakeTemp() {
+    List<Short> getBrakeTemp() {
         return brakeTemp;
     }
 
-    public List<Integer> getTyreTreadTemp() {
+    List<Integer> getTyreTreadTemp() {
         return tyreTreadTemp;
     }
 
-    public List<Integer> getTyreLayerTemp() {
+    List<Integer> getTyreLayerTemp() {
         return tyreLayerTemp;
     }
 
-    public List<Integer> getTyreCarcassTemp() {
+    List<Integer> getTyreCarcassTemp() {
         return tyreCarcassTemp;
     }
 
-    public List<Integer> getTyreRimTemp() {
+    List<Integer> getTyreRimTemp() {
         return tyreRimTemp;
     }
 
-    public List<Integer> getTyreInternalAirTemp() {
+    List<Integer> getTyreInternalAirTemp() {
         return tyreInternalAirTemp;
     }
 
-    public List<Float> getWheelLocalPositionY() {
+    List<Float> getWheelLocalPositionY() {
         return wheelLocalPositionY;
     }
 
-    public List<Float> getRideHeight() {
+    List<Float> getRideHeight() {
         return rideHeight;
     }
 
-    public List<Float> getSuspensionTravel() {
+    List<Float> getSuspensionTravel() {
         return suspensionTravel;
     }
 
-    public List<Float> getSuspensionVelocity() {
+    List<Float> getSuspensionVelocity() {
         return suspensionVelocity;
     }
 
-    public List<Integer> getAirPressure() {
+    List<Integer> getAirPressure() {
         return airPressure;
     }
 
-    public Float getEngineSpeed() {
+    Float getEngineSpeed() {
         return engineSpeed;
     }
 
-    public Float getEngineTorque() {
+    Float getEngineTorque() {
         return engineTorque;
     }
 
-    public List<Short> getWings() {
+    List<Short> getWings() {
         return wings;
     }
 
-    public Byte getEnforcedPitStopLap() {
+    Byte getEnforcedPitStopLap() {
         return enforcedPitStopLap;
     }
 
-    public CrashDamageState getCrashState() {
-        Integer mask = 15; /* 0000 1111 */
+    CrashDamageState getCrashState() {
+        final Integer mask = 15; /* 0000 1111 */
         return CrashDamageState.valueOf(mask & crashState);
     }
 
-    public Float getAeroDamage() {
+    Float getAeroDamage() {
         return aeroDamage / 255.0f;
     }
 
-    public Float getEngineDamage() {
+    Float getEngineDamage() {
         return engineDamage / 255.0f;
     }
 
-    public Byte getAmbientTemperature() {
+    Byte getAmbientTemperature() {
         return ambientTemperature;
     }
 
-    public Byte getTrackTemperature() {
+    Byte getTrackTemperature() {
         return trackTemperature;
     }
 
-    public Short getRainDensity() {
+    Short getRainDensity() {
         return rainDensity;
     }
 
-    public Byte getWindSpeed() {
+    Byte getWindSpeed() {
         return windSpeed;
     }
 
-    public Byte getWindDirectionX() {
+    Byte getWindDirectionX() {
         return windDirectionX;
     }
 
-    public Byte getWindDirectionY() {
+    Byte getWindDirectionY() {
         return windDirectionY;
     }
 
-    public Boolean isJoyPadButton1() {
+    Boolean isJoyPadButton1() {
         return JoyPad.BUTTON_1.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton2() {
+    Boolean isJoyPadButton2() {
         return JoyPad.BUTTON_2.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton3() {
+    Boolean isJoyPadButton3() {
         return JoyPad.BUTTON_3.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton4() {
+    Boolean isJoyPadButton4() {
         return JoyPad.BUTTON_4.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton5() {
+    Boolean isJoyPadButton5() {
         return JoyPad.BUTTON_5.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton6() {
+    Boolean isJoyPadButton6() {
         return JoyPad.BUTTON_6.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton7() {
+    Boolean isJoyPadButton7() {
         return JoyPad.BUTTON_7.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton8() {
+    Boolean isJoyPadButton8() {
         return JoyPad.BUTTON_8.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton9() {
+    Boolean isJoyPadButton9() {
         return JoyPad.BUTTON_9.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton10() {
+    Boolean isJoyPadButton10() {
         return JoyPad.BUTTON_10.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton11() {
+    Boolean isJoyPadButton11() {
         return JoyPad.BUTTON_11.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton12() {
+    Boolean isJoyPadButton12() {
         return JoyPad.BUTTON_12.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton13() {
+    Boolean isJoyPadButton13() {
         return JoyPad.BUTTON_13.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton14() {
+    Boolean isJoyPadButton14() {
         return JoyPad.BUTTON_14.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton15() {
+    Boolean isJoyPadButton15() {
         return JoyPad.BUTTON_15.isSet(joyPad);
     }
 
-    public Boolean isJoyPadButton16() {
+    Boolean isJoyPadButton16() {
         return JoyPad.BUTTON_16.isSet(joyPad);
     }
 
-    public Boolean isDPadButton1() {
+    Boolean isDPadButton1() {
         return DPad.BUTTON_1.isSet((int) (dPad >>> 4));
     }
 
-    public Boolean isDPadButton2() {
+    Boolean isDPadButton2() {
         return DPad.BUTTON_2.isSet((int) (dPad >>> 4));
     }
 
-    public Boolean isDPadButton3() {
+    Boolean isDPadButton3() {
         return DPad.BUTTON_3.isSet((int) (dPad >>> 4));
     }
 
-    public Boolean isDPadButton4() {
+    Boolean isDPadButton4() {
         return DPad.BUTTON_4.isSet((int) (dPad >>> 4));
     }
 
-    public Boolean isDPadButton5() {
+    Boolean isDPadButton5() {
         return DPad.BUTTON_5.isSet((int) (crashState >>> 4));
     }
 
-    public Boolean isDPadButton6() {
+    Boolean isDPadButton6() {
         return DPad.BUTTON_6.isSet((int) (crashState >>> 4));
     }
 
-    public Boolean isDPadButton7() {
+    Boolean isDPadButton7() {
         return DPad.BUTTON_7.isSet((int) (crashState >>> 4));
     }
 
-    public Boolean isDPadButton8() {
+    Boolean isDPadButton8() {
         return DPad.BUTTON_8.isSet((int) (crashState >>> 4));
     }
 
-    public List<ParticipantInfo> getParticipantInfo() {
+    List<ParticipantInfo> getParticipantInfo() {
         return participantInfo;
     }
 
-    public State getState() {
+    State getState() {
         if (getRaceState() == RaceState.RACE_NOT_STARTED) {
             if (getGameState() == GameState.GAME_INGAME_PAUSED) {
                 return State.PRE_RACE_PAUSED;
@@ -947,10 +874,10 @@ public class TelemetryDataPacket extends Packet {
         return State.UNDEFINED;
     }
 
-    private static Float getLittleFloat(DataInputStream data) throws IOException {
-        byte[] bytes = new byte[4];
+    static Float getLittleFloat(final DataInputStream data) throws IOException {
+        final byte[] bytes = new byte[4];
         data.readFully(bytes);
-        int asInt = (bytes[0] & 0xFF)
+        final int asInt = (bytes[0] & 0xFF)
                 | ((bytes[1] & 0xFF) << 8)
                 | ((bytes[2] & 0xFF) << 16)
                 | ((bytes[3] & 0xFF) << 24);
