@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.file.StandardOpenOption.*;
 
 public class DirectoryConverter {
@@ -29,7 +30,7 @@ public class DirectoryConverter {
                             final byte[] fileData = Files.readAllBytes(path);
                             System.out.println(path.toString());
 
-                            final ByteBuffer buffer = ByteBuffer.allocate(2);
+                            final ByteBuffer buffer = ByteBuffer.allocate(2).order(LITTLE_ENDIAN);
                             buffer.putShort((short) fileData.length);
                             Files.write(outputFile, buffer.array(), APPEND);
                             Files.write(outputFile, fileData, APPEND);
