@@ -1,10 +1,12 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 class ParticipantInfoBuilder extends PacketBuilder {
     private List<Short> expectedWorldPosition = IntStream.range(0, 3).mapToObj(v -> (short) random.nextInt(Short.MAX_VALUE)).collect(Collectors.toList());
@@ -126,28 +128,22 @@ class ParticipantInfoBuilder extends PacketBuilder {
     }
 
     @Override
-    public DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(16);
-        final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+    ByteBuffer build() throws Exception {
+        final ByteBuffer data = ByteBuffer.allocate(16).order(LITTLE_ENDIAN);
 
-        expectedWorldPosition.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        dataOutputStream.writeShort(expectedCurrentLapDistance);
+        expectedWorldPosition.forEach(data::putShort);
+        writeUnsignedShort(expectedCurrentLapDistance, data);
         final Integer isActive = expectedIsActive ? 1 : 0;
-        dataOutputStream.writeByte((isActive << 7) | expectedRacePosition);
+        writeUnsignedByte((isActive << 7) | expectedRacePosition, data);
         final Integer isLapInvalidated = expectedIsLapInvalidated ? 1 : 0;
-        dataOutputStream.writeByte((isLapInvalidated << 7) | expectedLapsCompleted);
-        dataOutputStream.writeByte(expectedCurrentLap);
+        writeUnsignedByte((isLapInvalidated << 7) | expectedLapsCompleted, data);
+        writeUnsignedByte(expectedCurrentLap, data);
         final Integer currentSector = expectedCurrentSector.ordinal();
         final Integer isSameClass = expectedIsSameClass ? 1 : 0;
-        dataOutputStream.writeByte((byte) ((worldPositionX << 6) | (worldPositionZ << 4) | (isSameClass << 3) | currentSector));
-        dataOutputStream.write(flipFloat(expectedLastSectorTime));
+        writeUnsignedByte(((worldPositionX << 6) | (worldPositionZ << 4) | (isSameClass << 3) | currentSector), data);
+        data.putFloat(expectedLastSectorTime);
 
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        data.rewind();
+        return data;
     }
 }

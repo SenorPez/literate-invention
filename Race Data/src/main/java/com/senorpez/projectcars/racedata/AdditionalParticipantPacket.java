@@ -1,52 +1,44 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public class AdditionalParticipantPacket extends Packet {
+class AdditionalParticipantPacket extends Packet {
     private final static PacketType packetType = PacketType.ADDITIONAL_PARTICIPANT;
 
     private final Short offset;
     private final List<String> names;
 
-    AdditionalParticipantPacket(final DataInputStream data) throws IOException, InvalidPacketException {
+    AdditionalParticipantPacket(final ByteBuffer data) throws InvalidPacketException {
         super(data);
         if (!isCorrectPacketType(packetType)) {
             throw new InvalidPacketException();
         }
 
-        this.offset = (short) data.readUnsignedByte();
-
-        final byte[] nameBuffer = new byte[64];
+        this.offset = readUnsignedByte(data);
         this.names = Collections.unmodifiableList(
                 IntStream.range(0, 16)
-                        .mapToObj(value -> {
-                            try {
-                                data.readFully(nameBuffer);
-                            } catch (IOException e) {
-                                return "";
-                            }
-                            return new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
-                        })
+                        .mapToObj(value -> readString(data))
                         .collect(Collectors.toList()));
+
+        if (data.remaining() > 0) {
+            throw new InvalidPacketException();
+        }
     }
 
     @Override
-    public PacketType getPacketType() {
+    PacketType getPacketType() {
         return packetType;
     }
 
-    public Short getOffset() {
+    Short getOffset() {
         return offset;
     }
 
-    public List<String> getNames() {
+    List<String> getNames() {
         return names;
     }
 }

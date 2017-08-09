@@ -1,12 +1,12 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 class AdditionalParticipantPacketBuilder extends PacketBuilder {
     private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -47,21 +47,13 @@ class AdditionalParticipantPacketBuilder extends PacketBuilder {
     }
 
     @Override
-    DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = build(new ByteArrayOutputStream(1028));
+    ByteBuffer build() throws Exception {
+        final ByteBuffer data = build(ByteBuffer.allocate(1028).order(LITTLE_ENDIAN));
 
-        final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-        dataOutputStream.writeByte(expectedOffset);
-        expectedNames.forEach(name -> {
-            final byte[] nameBuffer = new byte[64];
-            final byte[] nameBytes = name.getBytes(UTF_8);
-            System.arraycopy(nameBytes, 0, nameBuffer, 0, nameBytes.length);
-            try {
-                dataOutputStream.write(nameBuffer);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        writeUnsignedByte(expectedOffset, data);
+        expectedNames.forEach(name -> writeString(name, data));
+
+        data.rewind();
+        return data;
     }
 }

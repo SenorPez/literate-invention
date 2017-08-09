@@ -2,8 +2,8 @@ package com.senorpez.projectcars.racedata;
 
 import org.junit.Test;
 
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -75,12 +75,12 @@ public class PacketTest {
     }
 
     private class PacketImpl extends Packet {
-        private PacketImpl(final DataInputStream data) throws IOException {
+        private PacketImpl(final ByteBuffer data) throws IOException {
             super(data);
         }
 
         @Override
-        public PacketType getPacketType() {
+        PacketType getPacketType() {
             return null;
         }
     }

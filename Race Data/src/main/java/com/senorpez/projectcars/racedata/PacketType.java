@@ -1,8 +1,7 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public enum PacketType {
@@ -13,35 +12,28 @@ public enum PacketType {
     private final Short packetLength;
     private final Class<? extends Packet> clazz;
 
-    PacketType(int packetLength, Class<? extends Packet> clazz) {
+    PacketType(final int packetLength, final Class<? extends Packet> clazz) {
         this.packetLength = (short) packetLength;
         this.clazz = clazz;
     }
 
-    static PacketType valueOf(Integer packetTypeNumeric) {
+    static PacketType valueOf(final Integer packetTypeNumeric) {
         return PacketType.values()[packetTypeNumeric];
     }
 
-    static PacketType fromLength(Short packetLength) {
+    static PacketType fromLength(final Short packetLength) {
         return Arrays.stream(PacketType.values())
                 .filter(packetType -> packetType.packetLength.equals(packetLength))
                 .findAny()
                 .orElse(null);
     }
 
-    Packet getPacket(DataInputStream telemetryData) {
+    Packet getPacket(final ByteBuffer data) {
         try {
-            if (telemetryData.available() > 0) {
-                return clazz.getDeclaredConstructor(DataInputStream.class).newInstance(telemetryData);
-
-            }
-        } catch (IOException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+            return clazz.getDeclaredConstructor(ByteBuffer.class).newInstance(data);
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
-    }
-
-    public Short getPacketLength() {
-        return packetLength;
     }
 }

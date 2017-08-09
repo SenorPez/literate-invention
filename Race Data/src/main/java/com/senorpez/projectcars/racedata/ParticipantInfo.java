@@ -1,7 +1,6 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,14 +16,14 @@ class ParticipantInfo {
     private final Short sector;
     private final Float lastSectorTime;
 
-    ParticipantInfo(final DataInputStream data) throws IOException {
-        this.worldPosition = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Short>) value -> data.readShort()).collect(Collectors.toList()));
-        this.currentLapDistance = data.readUnsignedShort();
-        this.racePosition = (short) data.readUnsignedByte();
-        this.lapsCompleted = (short) data.readUnsignedByte();
-        this.currentLap = (short) data.readUnsignedByte();
-        this.sector = (short) data.readUnsignedByte();
-        this.lastSectorTime = TelemetryDataPacket.getLittleFloat(data);
+    ParticipantInfo(final ByteBuffer data) {
+        this.worldPosition = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getShort()).collect(Collectors.toList()));
+        this.currentLapDistance = Packet.readUnsignedShort(data);
+        this.racePosition = Packet.readUnsignedByte(data);
+        this.lapsCompleted = Packet.readUnsignedByte(data);
+        this.currentLap = Packet.readUnsignedByte(data);
+        this.sector = Packet.readUnsignedByte(data);
+        this.lastSectorTime = data.getFloat();
     }
 
     List<Float> getWorldPosition() {

@@ -1,9 +1,11 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 class TelemetryDataPacketBuilder extends PacketBuilder {
     private GameState expectedGameState = GameState.valueOf(random.nextInt(GameState.GAME_MAX.ordinal()));
@@ -1057,321 +1059,127 @@ class TelemetryDataPacketBuilder extends PacketBuilder {
     }
 
     @Override
-    DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = build(new ByteArrayOutputStream(1367));
+    ByteBuffer build() throws Exception {
+        final ByteBuffer data = build(ByteBuffer.allocate(1367).order(LITTLE_ENDIAN));
 
-        final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+        writeUnsignedByte((expectedSessionState.ordinal() << 4) | (expectedGameState.ordinal()), data);
 
-        final Byte gameSessionState = (byte) ((expectedSessionState.ordinal() << 4) | (expectedGameState.ordinal()));
-        dataOutputStream.writeByte(gameSessionState);
+        data.put(expectedViewedParticipantIndex);
+        data.put(expectedNumParticipants);
 
-        dataOutputStream.writeByte(expectedViewedParticipantIndex);
-        dataOutputStream.writeByte(expectedNumParticipants);
-
-        dataOutputStream.writeByte(expectedUnfilteredThrottle);
-        dataOutputStream.writeByte(expectedUnfilteredBrake);
-        dataOutputStream.writeByte(expectedUnfilteredSteering);
-        dataOutputStream.writeByte(expectedUnfilteredClutch);
-        final Byte raceStateFlags = (byte) (
+        writeUnsignedByte(expectedUnfilteredThrottle, data);
+        writeUnsignedByte(expectedUnfilteredBrake, data);
+        data.put(expectedUnfilteredSteering);
+        writeUnsignedByte(expectedUnfilteredClutch, data);
+        writeUnsignedByte(
                 (expectedIsBoostActive ? 1 << 5 : 0)
                         | (expectedIsAntiLockActive ? 1 << 4 : 0)
                         | (expectedIsLapInvalidated ? 1 << 3 : 0)
-                        | (expectedRaceState.ordinal()));
-        dataOutputStream.writeByte(raceStateFlags);
+                        | (expectedRaceState.ordinal()), data);
 
-        dataOutputStream.writeByte(expectedLapsInEvent);
+        writeUnsignedByte(expectedLapsInEvent, data);
 
-        dataOutputStream.write(flipFloat(expectedBestLapTime));
-        dataOutputStream.write(flipFloat(expectedLastLapTime));
-        dataOutputStream.write(flipFloat(expectedCurrentTime));
-        dataOutputStream.write(flipFloat(expectedSplitTimeAhead));
-        dataOutputStream.write(flipFloat(expectedSplitTimeBehind));
-        dataOutputStream.write(flipFloat(expectedSplitTime));
-        dataOutputStream.write(flipFloat(expectedEventTimeRemaining));
-        dataOutputStream.write(flipFloat(expectedPersonalFastestLapTime));
-        dataOutputStream.write(flipFloat(expectedWorldFastestLapTime));
-        dataOutputStream.write(flipFloat(expectedCurrentSector1Time));
-        dataOutputStream.write(flipFloat(expectedCurrentSector2Time));
-        dataOutputStream.write(flipFloat(expectedCurrentSector3Time));
-        dataOutputStream.write(flipFloat(expectedFastestSector1Time));
-        dataOutputStream.write(flipFloat(expectedFastestSector2Time));
-        dataOutputStream.write(flipFloat(expectedFastestSector3Time));
-        dataOutputStream.write(flipFloat(expectedPersonalFastestSector1Time));
-        dataOutputStream.write(flipFloat(expectedPersonalFastestSector2Time));
-        dataOutputStream.write(flipFloat(expectedPersonalFastestSector3Time));
-        dataOutputStream.write(flipFloat(expectedWorldFastestSector1Time));
-        dataOutputStream.write(flipFloat(expectedWorldFastestSector2Time));
-        dataOutputStream.write(flipFloat(expectedWorldFastestSector3Time));
+        data.putFloat(expectedBestLapTime);
+        data.putFloat(expectedLastLapTime);
+        data.putFloat(expectedCurrentTime);
+        data.putFloat(expectedSplitTimeAhead);
+        data.putFloat(expectedSplitTimeBehind);
+        data.putFloat(expectedSplitTime);
+        data.putFloat(expectedEventTimeRemaining);
+        data.putFloat(expectedPersonalFastestLapTime);
+        data.putFloat(expectedWorldFastestLapTime);
+        data.putFloat(expectedCurrentSector1Time);
+        data.putFloat(expectedCurrentSector2Time);
+        data.putFloat(expectedCurrentSector3Time);
+        data.putFloat(expectedFastestSector1Time);
+        data.putFloat(expectedFastestSector2Time);
+        data.putFloat(expectedFastestSector3Time);
+        data.putFloat(expectedPersonalFastestSector1Time);
+        data.putFloat(expectedPersonalFastestSector2Time);
+        data.putFloat(expectedPersonalFastestSector3Time);
+        data.putFloat(expectedWorldFastestSector1Time);
+        data.putFloat(expectedWorldFastestSector2Time);
+        data.putFloat(expectedWorldFastestSector3Time);
 
-        dataOutputStream.writeShort(expectedJoyPad);
+        writeUnsignedShort(expectedJoyPad, data);
 
-        final Byte highestFlagColor = (byte) ((expectedFlagReason.ordinal() << 4) | (expectedFlagColour.ordinal()));
-        dataOutputStream.writeByte(highestFlagColor);
+        writeUnsignedByte((expectedFlagReason.ordinal() << 4) | expectedFlagColour.ordinal(), data);
 
-        final Byte pitModeSchedule = (byte) ((expectedPitSchedule.ordinal() << 4) | (expectedPitMode.ordinal()));
-        dataOutputStream.writeByte(pitModeSchedule);
+        writeUnsignedByte((expectedPitSchedule.ordinal() << 4) | expectedPitMode.ordinal(), data);
 
-        dataOutputStream.writeShort(expectedOilTemp);
-        dataOutputStream.writeShort(expectedOilPressure);
-        dataOutputStream.writeShort(expectedWaterTemp);
-        dataOutputStream.writeShort(expectedWaterPressure);
-        dataOutputStream.writeShort(expectedFuelPressure);
-        dataOutputStream.writeByte(expectedCarFlags);
-        dataOutputStream.writeByte(expectedFuelCapacity);
-        dataOutputStream.writeByte(expectedBrake);
-        dataOutputStream.writeByte(expectedThrottle);
-        dataOutputStream.writeByte(expectedClutch);
-        dataOutputStream.writeByte(expectedSteering);
-        dataOutputStream.write(flipFloat(expectedFuelLevel));
-        dataOutputStream.write(flipFloat(expectedSpeed));
-        dataOutputStream.writeShort(expectedRpm);
-        dataOutputStream.writeShort(expectedMaxRpm);
-        final Byte gearNumGears = (byte) ((expectedNumGears << 4) | (expectedGear));
-        dataOutputStream.writeByte(gearNumGears);
-        dataOutputStream.writeByte(expectedBoostAmount);
-        dataOutputStream.writeByte(expectedEnforcedPitStopLap);
-        dataOutputStream.writeByte(expectedCrashState);
+        data.putShort(expectedOilTemp);
+        writeUnsignedShort(expectedOilPressure, data);
+        data.putShort(expectedWaterTemp);
+        writeUnsignedShort(expectedWaterPressure, data);
+        writeUnsignedShort(expectedFuelPressure, data);
+        writeUnsignedByte(expectedCarFlags, data);
+        writeUnsignedByte(expectedFuelCapacity, data);
+        writeUnsignedByte(expectedBrake, data);
+        writeUnsignedByte(expectedThrottle, data);
+        writeUnsignedByte(expectedClutch, data);
+        data.put(expectedSteering);
+        data.putFloat(expectedFuelLevel);
+        data.putFloat(expectedSpeed);
+        writeUnsignedShort(expectedRpm, data);
+        writeUnsignedShort(expectedMaxRpm, data);
+        writeUnsignedByte((expectedNumGears << 4) | expectedGear, data);
+        writeUnsignedByte(expectedBoostAmount, data);
+        data.put(expectedEnforcedPitStopLap);
+        writeUnsignedByte(expectedCrashState, data);
 
-        dataOutputStream.write(flipFloat(expectedOdometer));
-        expectedOrientation.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedLocalVelocity.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedWorldVelocity.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedAngularVelocity.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedLocalAcceleration.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedWorldAcceleration.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedExtentsCentre.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
+        data.putFloat(expectedOdometer);
+        expectedOrientation.forEach(data::putFloat);
+        expectedLocalVelocity.forEach(data::putFloat);
+        expectedWorldVelocity.forEach(data::putFloat);
+        expectedAngularVelocity.forEach(data::putFloat);
+        expectedLocalAcceleration.forEach(data::putFloat);
+        expectedWorldAcceleration.forEach(data::putFloat);
+        expectedExtentsCentre.forEach(data::putFloat);
 
-        expectedTyreFlags.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTerrain.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreY.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreRps.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreSlipSpeed.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreGrip.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreHeightAboveGround.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreLateralStiffness.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreWear.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedBrakeDamage.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedSuspensionDamage.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedBrakeTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreTreadTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreLayerTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreCarcassTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreRimTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedTyreInternalAirTemp.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedWheelLocalPositionY.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedRideHeight.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedSuspensionTravel.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedSuspensionVelocity.forEach(v -> {
-            try {
-                dataOutputStream.write(flipFloat(v));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedAirPressure.forEach(v -> {
-            try {
-                dataOutputStream.writeShort(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
+        expectedTyreFlags.forEach(v -> writeUnsignedByte(v, data));
+        expectedTerrain.forEach(v -> writeUnsignedByte(v, data));
+        expectedTyreY.forEach(data::putFloat);
+        expectedTyreRps.forEach(data::putFloat);
+        expectedTyreSlipSpeed.forEach(data::putFloat);
+        expectedTyreTemp.forEach(v -> writeUnsignedByte(v, data));
+        expectedTyreGrip.forEach(v -> writeUnsignedByte(v, data));
+        expectedTyreHeightAboveGround.forEach(data::putFloat);
+        expectedTyreLateralStiffness.forEach(data::putFloat);
+        expectedTyreWear.forEach(v -> writeUnsignedByte(v, data));
+        expectedBrakeDamage.forEach(v -> writeUnsignedByte(v, data));
+        expectedSuspensionDamage.forEach(v -> writeUnsignedByte(v, data));
+        expectedBrakeTemp.forEach(data::putShort);
+        expectedTyreTreadTemp.forEach(v -> writeUnsignedShort(v, data));
+        expectedTyreLayerTemp.forEach(v -> writeUnsignedShort(v, data));
+        expectedTyreCarcassTemp.forEach(v -> writeUnsignedShort(v, data));
+        expectedTyreRimTemp.forEach(v -> writeUnsignedShort(v, data));
+        expectedTyreInternalAirTemp.forEach(v -> writeUnsignedShort(v, data));
+        expectedWheelLocalPositionY.forEach(data::putFloat);
+        expectedRideHeight.forEach(data::putFloat);
+        expectedSuspensionTravel.forEach(data::putFloat);
+        expectedSuspensionVelocity.forEach(data::putFloat);
+        expectedAirPressure.forEach(v -> writeUnsignedShort(v, data));
 
-        dataOutputStream.write(flipFloat(expectedEngineSpeed));
-        dataOutputStream.write(flipFloat(expectedEngineTorque));
+        data.putFloat(expectedEngineSpeed);
+        data.putFloat(expectedEngineTorque);
 
-        dataOutputStream.writeByte(expectedAeroDamage);
-        dataOutputStream.writeByte(expectedEngineDamage);
+        writeUnsignedByte(expectedAeroDamage, data);
+        writeUnsignedByte(expectedEngineDamage, data);
 
-        dataOutputStream.writeByte(expectedAmbientTemperature);
-        dataOutputStream.writeByte(expectedTrackTemperature);
-        dataOutputStream.writeByte(expectedRainDensity);
-        dataOutputStream.writeByte(expectedWindSpeed);
-        dataOutputStream.writeByte(expectedWindDirectionX);
-        dataOutputStream.writeByte(expectedWindDirectionY);
+        data.put(expectedAmbientTemperature);
+        data.put(expectedTrackTemperature);
+        writeUnsignedByte(expectedRainDensity, data);
+        data.put(expectedWindSpeed);
+        data.put(expectedWindDirectionX);
+        data.put(expectedWindDirectionY);
 
-        final byte[] participantData = new byte[896];
-        random.nextBytes(participantData);
-        dataOutputStream.write(participantData);
+        data.put(new byte[56 * 16]);
 
-        dataOutputStream.write(flipFloat(expectedTrackLength));
-        expectedWings.forEach(v -> {
-            try {
-                dataOutputStream.writeByte(v);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        dataOutputStream.writeByte(expectedDPad << 4);
+        data.putFloat(expectedTrackLength);
+        expectedWings.forEach(v -> writeUnsignedByte(v, data));
+        writeUnsignedByte(expectedDPad << 4, data);
 
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        data.rewind();
+        return data;
     }
 }

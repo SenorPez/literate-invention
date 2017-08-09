@@ -1,6 +1,7 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,29 +78,18 @@ class ParticipantPacketBuilder extends PacketBuilder {
     }
 
     @Override
-    DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = build(new ByteArrayOutputStream(1347));
+    ByteBuffer build() throws Exception {
+        final ByteBuffer data = build(ByteBuffer.allocate(1347).order(ByteOrder.LITTLE_ENDIAN));
 
-        final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-        dataOutputStream.write(toBytes(expectedCarName));
-        dataOutputStream.write(toBytes(expectedCarClass));
-        dataOutputStream.write(toBytes(expectedTrackLocation));
-        dataOutputStream.write(toBytes(expectedTrackVariation));
-        expectedNames.forEach(name -> {
-            try {
-                dataOutputStream.write(toBytes(name));
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        expectedFastestLapTimes.forEach(lapTime -> {
-            try {
-                dataOutputStream.writeFloat(lapTime);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        writeString(expectedCarName, data);
+        writeString(expectedCarClass, data);
+        writeString(expectedTrackLocation, data);
+        writeString(expectedTrackVariation, data);
+        expectedNames.forEach(name -> writeString(name, data));
+        expectedFastestLapTimes.forEach(data::putFloat);
+
+        data.rewind();
+        return data;
     }
 
     private byte[] toBytes(final String input) {

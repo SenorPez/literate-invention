@@ -1,15 +1,12 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public class ParticipantPacket extends Packet {
+class ParticipantPacket extends Packet {
     private final static PacketType packetType = PacketType.PARTICIPANT;
 
     private final String carName;
@@ -19,65 +16,58 @@ public class ParticipantPacket extends Packet {
     private final List<String> names;
     private final List<Float> fastestLapTimes;
 
-    public ParticipantPacket(DataInputStream data) throws IOException, InvalidPacketException {
+    ParticipantPacket(final ByteBuffer data) throws InvalidPacketException {
         super(data);
         if (!isCorrectPacketType(packetType)) {
             throw new InvalidPacketException();
         }
 
-        byte[] nameBuffer = new byte[64];
-
-        data.readFully(nameBuffer);
-        this.carName = new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
-        data.readFully(nameBuffer);
-        this.carClass = new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
-        data.readFully(nameBuffer);
-        this.trackLocation = new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
-        data.readFully(nameBuffer);
-        this.trackVariation = new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
+        this.carName = readString(data);
+        this.carClass = readString(data);
+        this.trackLocation = readString(data);
+        this.trackVariation = readString(data);
 
         this.names = Collections.unmodifiableList(
                 IntStream.range(0, 16)
-                        .mapToObj(value -> {
-                            try {
-                                data.readFully(nameBuffer);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            return new String(nameBuffer, UTF_8).split("\u0000", 2)[0];
-                        }).collect(Collectors.toList()));
+                        .mapToObj(value -> readString(data))
+                        .collect(Collectors.toList()));
+
         this.fastestLapTimes = Collections.unmodifiableList(
                 IntStream.range(0, 16)
-                        .mapToObj((IntFunctionThrows<Float>) value -> data.readFloat())
+                        .mapToObj(value -> data.getFloat())
                         .collect(Collectors.toList()));
+
+        if (data.remaining() > 0) {
+            throw new InvalidPacketException();
+        }
     }
 
     @Override
-    public PacketType getPacketType() {
+    PacketType getPacketType() {
         return packetType;
     }
 
-    public String getCarName() {
+    String getCarName() {
         return carName;
     }
 
-    public String getCarClass() {
+    String getCarClass() {
         return carClass;
     }
 
-    public String getTrackLocation() {
+    String getTrackLocation() {
         return trackLocation;
     }
 
-    public String getTrackVariation() {
+    String getTrackVariation() {
         return trackVariation;
     }
 
-    public List<String> getNames() {
+    List<String> getNames() {
         return names;
     }
 
-    public List<Float> getFastestLapTimes() {
+    List<Float> getFastestLapTimes() {
         return fastestLapTimes;
     }
 }

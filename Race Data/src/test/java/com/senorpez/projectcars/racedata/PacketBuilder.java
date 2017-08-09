@@ -1,12 +1,10 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Random;
+
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 class PacketBuilder {
     final static Random random = new Random();
@@ -49,27 +47,34 @@ class PacketBuilder {
         return this;
     }
 
-    DataInputStream build() throws Exception {
-        final ByteArrayOutputStream byteArrayOutputStream = build(new ByteArrayOutputStream(1028));
-        return new DataInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+    ByteBuffer build() throws Exception {
+        final ByteBuffer data = build(ByteBuffer.allocate(3).order(LITTLE_ENDIAN));
+        data.rewind();
+        return data;
     }
 
-    ByteArrayOutputStream build(final ByteArrayOutputStream stream) throws Exception {
-        final DataOutputStream dataOutputStream = new DataOutputStream(stream);
-
+    ByteBuffer build(final ByteBuffer data) throws Exception {
         final Integer packetTypeMask = 3; /* 0000 0011 */
-        dataOutputStream.writeShort(expectedBuildVersionNumber);
-        dataOutputStream.writeByte((expectedCount << 2) | (packetTypeMask & expectedPacketType));
-        return stream;
+        writeUnsignedShort(expectedBuildVersionNumber, data);
+        writeUnsignedByte((expectedCount << 2) | (packetTypeMask & expectedPacketType), data);
+        return data;
     }
 
-    static byte[] flipFloat(final Float input) {
-        final ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putFloat(input);
-        buffer.rewind();
+    static void writeUnsignedByte(final int value, final ByteBuffer data) {
+        final byte[] valueBytes = ByteBuffer.allocate(Integer.BYTES).order(LITTLE_ENDIAN).putInt(value).array();
+        data.put(valueBytes, 0, Byte.BYTES);
+    }
 
-        final byte[] bytes = new byte[4];
-        buffer.get(bytes);
-        return bytes;
+    static void writeUnsignedShort(final int value, final ByteBuffer data) {
+        final byte[] valueBytes = ByteBuffer.allocate(Integer.BYTES).order(LITTLE_ENDIAN).putInt(value).array();
+        data.put(valueBytes, 0, Short.BYTES);
+    }
+
+    static void writeString(final String value, final ByteBuffer data) {
+        final byte[] nameBuffer = new byte[64];
+        final byte[] nameBytes = value.getBytes(UTF_8);
+        System.arraycopy(nameBytes, 0, nameBuffer, 0, nameBytes.length);
+        data.put(nameBuffer);
     }
 }
 

@@ -1,27 +1,26 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-public class Telemetry implements Iterator<Packet> {
-    private final DataInputStream telemetryData;
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
+import static java.nio.file.StandardOpenOption.READ;
 
-    public Telemetry(Path telemetryFile) {
-        DataInputStream telemetryData = null;
-        try {
-            telemetryData = new DataInputStream(new BufferedInputStream(new FileInputStream(telemetryFile.toFile())));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        this.telemetryData = telemetryData;
+public class Telemetry implements Iterator<Packet> {
+    private final FileChannel telemetryData;
+
+    private Telemetry (final Path telemetryFile) throws IOException {
+        this.telemetryData = FileChannel.open(telemetryFile, READ);
     }
 
     @Override
     public boolean hasNext() {
         try {
-            return telemetryData.available() > 0;
-        } catch (IOException e) {
+            return telemetryData.position() < telemetryData.size();
+        } catch (final IOException e) {
             return false;
         }
     }
@@ -29,22 +28,18 @@ public class Telemetry implements Iterator<Packet> {
     @Override
     public Packet next() {
         try {
-            PacketType packetType = PacketType.fromLength(telemetryData.readShort());
-            return packetType.getPacket(telemetryData);
-        } catch (IOException e) {
+            final ByteBuffer sizeBuffer = ByteBuffer.allocate(2).order(LITTLE_ENDIAN);
+            telemetryData.read(sizeBuffer);
+            sizeBuffer.flip();
+            final Short length = sizeBuffer.getShort();
+
+            final ByteBuffer packetBuffer = ByteBuffer.allocate(length).order(LITTLE_ENDIAN);
+            telemetryData.read(packetBuffer);
+            packetBuffer.flip();
+            final PacketType packetType = PacketType.fromLength(length);
+            return packetType.getPacket(packetBuffer);
+        } catch (final IOException e) {
             return null;
-        }
-    }
-
-    public void mark() {
-        telemetryData.mark(Integer.MAX_VALUE);
-    }
-
-    public void reset() {
-        try {
-            telemetryData.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

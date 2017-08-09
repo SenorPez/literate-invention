@@ -1,13 +1,12 @@
 package com.senorpez.projectcars.racedata;
 
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TelemetryDataPacket extends Packet {
+class TelemetryDataPacket extends Packet {
     enum State {
         /*
         State transition graph:
@@ -177,128 +176,132 @@ public class TelemetryDataPacket extends Packet {
     private final List<Short> wings;
     private final Short dPad;
 
-    TelemetryDataPacket(final DataInputStream data) throws IOException, InvalidPacketException {
+    TelemetryDataPacket(final ByteBuffer data) throws InvalidPacketException {
         super(data);
-        if (!isCorrectPacketType(packetType)) {
+        if(!isCorrectPacketType(packetType)) {
             throw new InvalidPacketException();
         }
 
-        this.gameSessionState = (short) data.readUnsignedByte();
+        this.gameSessionState = readUnsignedByte(data);
 
-        this.viewedParticipantIndex = data.readByte();
-        this.numParticipants = data.readByte();
+        this.viewedParticipantIndex = data.get();
+        this.numParticipants = data.get();
 
-        this.unfilteredThrottle = (short) data.readUnsignedByte();
-        this.unfilteredBrake = (short) data.readUnsignedByte();
-        this.unfilteredSteering = data.readByte();
-        this.unfilteredClutch = (short) data.readUnsignedByte();
-        this.raceStateFlags = (short) data.readUnsignedByte();
+        this.unfilteredThrottle = readUnsignedByte(data);
+        this.unfilteredBrake = readUnsignedByte(data);
+        this.unfilteredSteering = data.get();
+        this.unfilteredClutch = readUnsignedByte(data);
+        this.raceStateFlags = readUnsignedByte(data);
 
-        this.lapsInEvent = (short) data.readUnsignedByte();
+        this.lapsInEvent = readUnsignedByte(data);
 
-        this.bestLapTime = getLittleFloat(data);
-        this.lastLapTime = getLittleFloat(data);
-        this.currentTime = getLittleFloat(data);
-        this.splitTimeAhead = getLittleFloat(data);
-        this.splitTimeBehind = getLittleFloat(data);
-        this.splitTime = getLittleFloat(data);
-        this.eventTimeRemaining = getLittleFloat(data);
-        this.personalFastestLapTime = getLittleFloat(data);
-        this.worldFastestLapTime = getLittleFloat(data);
-        this.currentSector1Time = getLittleFloat(data);
-        this.currentSector2Time = getLittleFloat(data);
-        this.currentSector3Time = getLittleFloat(data);
-        this.fastestSector1Time = getLittleFloat(data);
-        this.fastestSector2Time = getLittleFloat(data);
-        this.fastestSector3Time = getLittleFloat(data);
-        this.personalFastestSector1Time = getLittleFloat(data);
-        this.personalFastestSector2Time = getLittleFloat(data);
-        this.personalFastestSector3Time = getLittleFloat(data);
-        this.worldFastestSector1Time = getLittleFloat(data);
-        this.worldFastestSector2Time = getLittleFloat(data);
-        this.worldFastestSector3Time = getLittleFloat(data);
+        this.bestLapTime = data.getFloat();
+        this.lastLapTime = data.getFloat();
+        this.currentTime = data.getFloat();
+        this.splitTimeAhead = data.getFloat();
+        this.splitTimeBehind = data.getFloat();
+        this.splitTime = data.getFloat();
+        this.eventTimeRemaining = data.getFloat();
+        this.personalFastestLapTime = data.getFloat();
+        this.worldFastestLapTime = data.getFloat();
+        this.currentSector1Time = data.getFloat();
+        this.currentSector2Time = data.getFloat();
+        this.currentSector3Time = data.getFloat();
+        this.fastestSector1Time = data.getFloat();
+        this.fastestSector2Time = data.getFloat();
+        this.fastestSector3Time = data.getFloat();
+        this.personalFastestSector1Time = data.getFloat();
+        this.personalFastestSector2Time = data.getFloat();
+        this.personalFastestSector3Time = data.getFloat();
+        this.worldFastestSector1Time = data.getFloat();
+        this.worldFastestSector2Time = data.getFloat();
+        this.worldFastestSector3Time = data.getFloat();
 
-        this.joyPad = data.readUnsignedShort();
+        this.joyPad = readUnsignedShort(data);
 
-        this.highestFlag = (short) data.readUnsignedByte();
+        this.highestFlag = readUnsignedByte(data);
 
-        this.pitModeSchedule = (short) data.readUnsignedByte();
+        this.pitModeSchedule = readUnsignedByte(data);
 
-        this.oilTemp = data.readShort();
-        this.oilPressure = data.readUnsignedShort();
-        this.waterTemp = data.readShort();
-        this.waterPressure = data.readUnsignedShort();
-        this.fuelPressure = data.readUnsignedShort();
-        this.carFlags = (short) data.readUnsignedByte();
-        this.fuelCapacity = (short) data.readUnsignedByte();
-        this.brake = (short) data.readUnsignedByte();
-        this.throttle = (short) data.readUnsignedByte();
-        this.clutch = (short) data.readUnsignedByte();
-        this.steering = data.readByte();
-        this.fuelLevel = getLittleFloat(data);
-        this.speed = getLittleFloat(data);
-        this.rpm = data.readUnsignedShort();
-        this.maxRpm = data.readUnsignedShort();
-        this.gearNumGears = (short) data.readUnsignedByte();
-        this.boostAmount = (short) data.readUnsignedByte();
-        this.enforcedPitStopLap = data.readByte();
-        this.crashState = (short) data.readUnsignedByte();
+        this.oilTemp = data.getShort();
+        this.oilPressure = readUnsignedShort(data);
+        this.waterTemp = data.getShort();
+        this.waterPressure = readUnsignedShort(data);
+        this.fuelPressure = readUnsignedShort(data);
+        this.carFlags = readUnsignedByte(data);
+        this.fuelCapacity = readUnsignedByte(data);
+        this.brake = readUnsignedByte(data);
+        this.throttle = readUnsignedByte(data);
+        this.clutch = readUnsignedByte(data);
+        this.steering = data.get();
+        this.fuelLevel = data.getFloat();
+        this.speed = data.getFloat();
+        this.rpm = readUnsignedShort(data);
+        this.maxRpm = readUnsignedShort(data);
+        this.gearNumGears = readUnsignedByte(data);
+        this.boostAmount = readUnsignedByte(data);
+        this.enforcedPitStopLap = data.get();
+        this.crashState = readUnsignedByte(data);
 
-        this.odometer = getLittleFloat(data);
-        this.orientation = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.localVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.worldVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.angularVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.localAcceleration = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.worldAcceleration = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.extentsCentre = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
+        this.odometer = data.getFloat();
+        this.orientation = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.localVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.worldVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.angularVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.localAcceleration = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.worldAcceleration = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.extentsCentre = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
 
-        this.tyreFlags = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.terrain = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.tyreY = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.tyreRps = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.tyreSlipSpeed = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.tyreTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.tyreGrip = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.tyreHeightAboveGround = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.tyreLateralStiffness = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.tyreWear = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.brakeDamage = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.suspensionDamage = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.brakeTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Short>) value -> data.readShort()).collect(Collectors.toList()));
-        this.tyreTreadTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
-        this.tyreLayerTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
-        this.tyreCarcassTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
-        this.tyreRimTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
-        this.tyreInternalAirTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
-        this.wheelLocalPositionY = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.rideHeight = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.suspensionTravel = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.suspensionVelocity = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Float>) value -> getLittleFloat(data)).collect(Collectors.toList()));
-        this.airPressure = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj((IntFunctionThrows<Integer>) value -> data.readUnsignedShort()).collect(Collectors.toList()));
+        this.tyreFlags = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.terrain = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.tyreY = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.tyreRps = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.tyreSlipSpeed = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.tyreTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.tyreGrip = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.tyreHeightAboveGround = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.tyreLateralStiffness = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.tyreWear = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.brakeDamage = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.suspensionDamage = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.brakeTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getShort()).collect(Collectors.toList()));
+        this.tyreTreadTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
+        this.tyreLayerTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
+        this.tyreCarcassTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
+        this.tyreRimTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
+        this.tyreInternalAirTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
+        this.wheelLocalPositionY = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.rideHeight = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.suspensionTravel = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.suspensionVelocity = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
+        this.airPressure = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedShort(data)).collect(Collectors.toList()));
 
-        this.engineSpeed = getLittleFloat(data);
-        this.engineTorque = getLittleFloat(data);
+        this.engineSpeed = data.getFloat();
+        this.engineTorque = data.getFloat();
 
-        this.aeroDamage = (short) data.readUnsignedByte();
-        this.engineDamage = (short) data.readUnsignedByte();
+        this.aeroDamage = readUnsignedByte(data);
+        this.engineDamage = readUnsignedByte(data);
 
-        this.ambientTemperature = data.readByte();
-        this.trackTemperature = data.readByte();
-        this.rainDensity = (short) data.readUnsignedByte();
-        this.windSpeed = data.readByte();
-        this.windDirectionX = data.readByte();
-        this.windDirectionY = data.readByte();
+        this.ambientTemperature = data.get();
+        this.trackTemperature = data.get();
+        this.rainDensity = readUnsignedByte(data);
+        this.windSpeed = data.get();
+        this.windDirectionX = data.get();
+        this.windDirectionY = data.get();
 
-        this.participantInfo = Collections.unmodifiableList(IntStream.range(0, 56).mapToObj((IntFunctionThrows<ParticipantInfo>) value -> new ParticipantInfo(data)).collect(Collectors.toList()));
+        this.participantInfo = Collections.unmodifiableList(IntStream.range(0, 56).mapToObj(value -> new ParticipantInfo(data)).collect(Collectors.toList()));
 
-        this.trackLength = getLittleFloat(data);
-        this.wings = Collections.unmodifiableList(IntStream.range(0, 2).mapToObj((IntFunctionThrows<Short>) value -> (short) data.readUnsignedByte()).collect(Collectors.toList()));
-        this.dPad = (short) data.readUnsignedByte();
+        this.trackLength = data.getFloat();
+        this.wings = Collections.unmodifiableList(IntStream.range(0, 2).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+        this.dPad = readUnsignedByte(data);
+
+        if (data.remaining() > 0) {
+            throw new InvalidPacketException();
+        }
     }
 
     @Override
-    public PacketType getPacketType() {
+    PacketType getPacketType() {
         return packetType;
     }
 
@@ -872,15 +875,5 @@ public class TelemetryDataPacket extends Packet {
                 getSessionState(),
                 getRaceState());
         return State.UNDEFINED;
-    }
-
-    static Float getLittleFloat(final DataInputStream data) throws IOException {
-        final byte[] bytes = new byte[4];
-        data.readFully(bytes);
-        final int asInt = (bytes[0] & 0xFF)
-                | ((bytes[1] & 0xFF) << 8)
-                | ((bytes[2] & 0xFF) << 16)
-                | ((bytes[3] & 0xFF) << 24);
-        return Float.intBitsToFloat(asInt);
     }
 }
