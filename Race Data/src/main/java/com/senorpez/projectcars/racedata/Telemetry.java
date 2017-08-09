@@ -12,7 +12,7 @@ import static java.nio.file.StandardOpenOption.READ;
 public class Telemetry implements Iterator<Packet> {
     private final FileChannel telemetryData;
 
-    private Telemetry (final Path telemetryFile) throws IOException {
+    public Telemetry (final Path telemetryFile) throws IOException {
         this.telemetryData = FileChannel.open(telemetryFile, READ);
     }
 

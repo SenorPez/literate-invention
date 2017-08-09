@@ -15,6 +15,7 @@ import org.springframework.hateoas.hal.DefaultCurieProvider;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,11 +31,15 @@ public class Application {
     private BeanFactory beanFactory;
 
     public static void main(final String[] args) {
-        final Telemetry telemetry = new Telemetry(Paths.get(args[0]));
-        while (telemetry.hasNext()) {
-            RACES.add(new Race(telemetry));
+        try {
+            final Telemetry telemetry = new Telemetry(Paths.get(args[0]));
+            while (telemetry.hasNext()) {
+                RACES.add(new Race(telemetry));
+            }
+            SpringApplication.run(Application.class, args);
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
-        SpringApplication.run(Application.class, args);
     }
 
     @Bean
