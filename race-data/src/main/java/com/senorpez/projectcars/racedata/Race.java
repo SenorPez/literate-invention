@@ -26,8 +26,8 @@ public class Race implements Iterator<Packet> {
         } while(!(packet instanceof TelemetryDataPacket)
                 || ((TelemetryDataPacket) packet).getState() != PRE_RACE);
 
-        while (!(packet instanceof TelemetryDataPacket)
-                || ((TelemetryDataPacket) packet).getState() != LOADING) {
+        while (telemetry.hasNext() && (!(packet instanceof TelemetryDataPacket)
+                || ((TelemetryDataPacket) packet).getState() != LOADING)) {
             racePackets.add(packet);
             packet = telemetry.next();
             if (packet == null) break;

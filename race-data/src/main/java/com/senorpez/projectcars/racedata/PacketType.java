@@ -21,19 +21,16 @@ public enum PacketType {
         return PacketType.values()[packetTypeNumeric];
     }
 
-    static PacketType fromLength(final Short packetLength) {
-        return Arrays.stream(PacketType.values())
-                .filter(packetType -> packetType.packetLength.equals(packetLength))
+    static Packet getPacket(final ByteBuffer data) throws InvalidPacketException {
+        final PacketType packetType = Arrays.stream(values())
+                .filter(type -> type.packetLength.equals((short) data.remaining()))
                 .findAny()
-                .orElse(null);
-    }
-
-    Packet getPacket(final ByteBuffer data) {
+                .orElseThrow(InvalidPacketException::new);
         try {
-            return clazz.getDeclaredConstructor(ByteBuffer.class).newInstance(data);
+            return packetType.clazz.getDeclaredConstructor(ByteBuffer.class).newInstance(data);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
-            return null;
+            throw new InvalidPacketException();
         }
     }
 }

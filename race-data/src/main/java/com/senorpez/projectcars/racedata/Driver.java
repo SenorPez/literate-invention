@@ -1,6 +1,9 @@
 package com.senorpez.projectcars.racedata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -77,7 +80,7 @@ public class Driver {
     }
 
     public Float getBestSector3Time() {
-        return getBestSector(SECTOR_START);
+        return getBestSector(SECTOR_START) == null ? getBestSector(SECTOR_FINISH): getBestSector(SECTOR_START);
     }
 
     Float getBestSector(final CurrentSector currentSector) {

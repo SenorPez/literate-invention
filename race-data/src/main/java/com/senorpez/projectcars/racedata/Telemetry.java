@@ -36,9 +36,8 @@ public class Telemetry implements Iterator<Packet> {
             final ByteBuffer packetBuffer = ByteBuffer.allocate(length).order(LITTLE_ENDIAN);
             telemetryData.read(packetBuffer);
             packetBuffer.flip();
-            final PacketType packetType = PacketType.fromLength(length);
-            return packetType.getPacket(packetBuffer);
-        } catch (final IOException e) {
+            return PacketType.getPacket(packetBuffer);
+        } catch (final IOException | InvalidPacketException e) {
             return null;
         }
     }
