@@ -6,11 +6,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" group="literate-invention" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" group="literate-invention" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data.iml" group="race-data" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data_main.iml" group="race-data" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Data/race-data_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Data/race-data_test.iml" group="race-data" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report.iml" group="race-report" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report_main.iml" group="race-report" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Race Report/race-report_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Race Report/race-report_test.iml" group="race-report" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/static-data-api.iml" filepath="$PROJECT_DIR$/.idea/modules/static-data-api.iml" group="static-data-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/static-data-api/static-data-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/static-data-api/static-data-api_main.iml" group="static-data-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/static-data-api/static-data-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/static-data-api/static-data-api_test.iml" group="static-data-api" />
     </modules>
   </component>
 </project>
