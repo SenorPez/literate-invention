@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(
         value = "/cars",
-        method = RequestMethod.GET
+        method = RequestMethod.GET,
+        produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
 )
 @RestController
 public class Car2Controller {
