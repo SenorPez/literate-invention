@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ public class Car2ControllerTest {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Test
-    public void GetAllCars() throws Exception {
+    public void GetAllCars_ValidAcceptHeader() throws Exception {
         final Car2Service car2ServiceMock = mock(Car2Service.class);
 
         final EmbeddedCar2Model firstCar = new EmbeddedCar2Model(
@@ -62,7 +62,7 @@ public class Car2ControllerTest {
 
         final EmbeddedCar2Model secondCar = new EmbeddedCar2Model(
                 new Car2Model(
-                        1, new Car2Builder()
+                        2, new Car2Builder()
                         .setName("Second Car")
                         .build()));
 
@@ -71,7 +71,29 @@ public class Car2ControllerTest {
         mockMvc.perform(get("/cars").accept(MEDIA_TYPE))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MEDIA_TYPE))
-                .andExpect(content().string(matchesJsonSchema(COLLECTION_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(COLLECTION_SCHEMA)))
+
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(hasEntry("id", 1))))
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(hasEntry("name", "First Car"))))
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(
+                        hasEntry(is("_links"),
+                                hasEntry(is("self"),
+                                        hasEntry("href", "http://localhost/cars/1"))))))
+
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(hasEntry("id", 2))))
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(hasEntry("name", "Second Car"))))
+                .andExpect(jsonPath("$._embedded.pcars:car", hasItem(
+                        hasEntry(is("_links"),
+                                hasEntry(is("self"),
+                                        hasEntry("href", "http://localhost/cars/2"))))))
+
+                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost/cars")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.curies", everyItem(
+                        allOf(
+                                hasEntry("href", (Object) "http://localhost/{rel}"),
+                                hasEntry("name", (Object) "pcars"),
+                                hasEntry("templated", (Object) true)))));
     }
 
     @Test
