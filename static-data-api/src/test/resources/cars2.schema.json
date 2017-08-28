@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Root",
-  "description": "JSON Representation of Project CARS Static Data API root page.",
+  "title": "Project CARS 2 Static Data API Cars",
+  "description": "JSON Representation of Project CARS 2 Static Data API cars list.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,19 +41,50 @@
   },
   "type": "object",
   "properties": {
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "pcars:car": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "$ref": "#/definitions/standardLink"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "_links"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pcars:car"
+      ]
+    },
     "_links": {
       "type": "object",
       "properties": {
         "self": {
           "$ref": "#/definitions/standardLink"
         },
-        "pcars:cars": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+        "index": {
+          "$ref": "#/definitions/standardLink"
         },
         "curies": {
           "$ref": "#/definitions/curies"
@@ -62,13 +93,14 @@
       "additionalProperties": false,
       "required": [
         "self",
-        "pcars:cars",
+        "index",
         "curies"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
+    "_embedded",
     "_links"
   ]
 }
