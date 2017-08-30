@@ -13,11 +13,18 @@ import org.springframework.hateoas.hal.DefaultCurieProvider;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @SpringBootApplication
 public class Application {
     private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
+
+    static final List<Car2> CARS2 = Arrays.asList(
+            new Car2("Ferrari", "LaFerrari", 2015, "RDA"),
+            new Car2("McLaren", "720S", 2017, "RDA")
+    );
 
     @Autowired
     private BeanFactory beanFactory;
@@ -54,6 +61,6 @@ public class Application {
 
     @Bean
     public CurieProvider curieProvider() {
-        return new DefaultCurieProvider("pcars", new UriTemplate("/{rel}"));
+        return new DefaultCurieProvider("pcars", new UriTemplate("/docs/{rel}"));
     }
 }

@@ -13,12 +13,6 @@ import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 
 @RestControllerAdvice
 public class APIExceptionHandler {
-//    @ResponseStatus(NOT_FOUND)
-//    @ExceptionHandler(NoHandlerFoundException.class)
-//    ErrorResponse handle404NotFound() {
-//        return new ErrorResponse(NOT_FOUND);
-//    }
-
     @ResponseStatus(METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     ErrorResponse handle405MethodNotAllowed() {

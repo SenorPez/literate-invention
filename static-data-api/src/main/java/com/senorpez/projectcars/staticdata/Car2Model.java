@@ -1,6 +1,42 @@
 package com.senorpez.projectcars.staticdata;
 
-class Car2Model {
-    Car2Model(final int i, final Car2 first_car) {
+import org.springframework.hateoas.Identifiable;
+import org.springframework.hateoas.core.Relation;
+
+@Relation(value = "car", collectionRelation = "car")
+class Car2Model implements Identifiable<Integer> {
+    private final int id;
+    private final String manufacturer;
+    private final String model;
+    private final int year;
+    private final String carClass;
+
+    Car2Model(final Integer id, final Car2 car) {
+        this.id = id;
+        this.manufacturer = car.getManufacturer();
+        this.model = car.getModel();
+        this.year = car.getYear();
+        this.carClass = car.getCarClass();
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public String getCarClass() {
+        return carClass;
     }
 }
