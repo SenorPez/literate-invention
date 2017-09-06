@@ -11,12 +11,17 @@ class Car2Model implements Identifiable<Integer> {
     private final int year;
     private final String carClass;
 
-    Car2Model(final Integer id, final Car2 car) {
-        this.id = id;
+    Car2Model(final Car2 car) {
+        this.id = car.getId();
         this.manufacturer = car.getManufacturer();
         this.model = car.getModel();
         this.year = car.getYear();
         this.carClass = car.getCarClass();
+    }
+
+    Car2Resource toResource() {
+        final Car2ResourceAssembler assembler = new Car2ResourceAssembler(() -> new Car2Resource(this));
+        return assembler.toResource(this);
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping(
         value = "/cars",
@@ -18,20 +19,20 @@ import java.util.List;
 @RestController
 public class Car2Controller {
     @Autowired
-    private EmbeddedCar2Service embeddedCar2Service;
-
-    @Autowired
     private Car2Service car2Service;
 
     @RequestMapping
     ResponseEntity<Resources<EmbeddedCar2Resource>> cars() {
-        final List<EmbeddedCar2Model> carModels = embeddedCar2Service.findAll(Application.CARS2);
-        return ResponseEntity.ok(embeddedCar2Service.toResource(carModels));
+        final List<EmbeddedCar2Model> carModels = car2Service.findAll(Application.CARS2);
+        final Resources<EmbeddedCar2Resource> carResources = new Resources<>(carModels.stream()
+                .map(EmbeddedCar2Model::toResource)
+                .collect(Collectors.toList()));
+        return ResponseEntity.ok(carResources);
     }
 
     @RequestMapping("/{id}")
-    ResponseEntity<Car2Resource> cars(@PathVariable int id) {
+    ResponseEntity<Car2Resource> cars(@PathVariable final int id) {
         final Car2Model carModel = car2Service.findOne(Application.CARS2, id);
-        return ResponseEntity.ok(car2Service.toResource(carModel));
+        return ResponseEntity.ok(carModel.toResource());
     }
 }

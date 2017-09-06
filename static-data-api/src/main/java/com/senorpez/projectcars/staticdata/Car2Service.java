@@ -3,23 +3,22 @@ package com.senorpez.projectcars.staticdata;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class Car2Service {
-    private static Car2ResourceAssembler assembler;
-
-    Car2Model findOne(final Collection<Car2> entities, int findId) {
-        final AtomicInteger id = new AtomicInteger(0);
+class Car2Service {
+    Car2Model findOne(final Collection<Car2> entities, final int searchId) {
         return entities.stream()
-                .map(car -> new Car2Model(id.incrementAndGet(), car))
-                .filter(car -> car.getId().equals(findId))
-                .findAny()
+                .filter(car -> car.getId() == searchId)
+                .findFirst()
+                .map(Car2Model::new)
                 .orElse(null);
     }
 
-    Car2Resource toResource(final Car2Model model, final Object... parameters) {
-        assembler = new Car2ResourceAssembler(() -> new Car2Resource(model));
-        return assembler.toResource(model);
+    List<EmbeddedCar2Model> findAll(final Collection<Car2> entities) {
+       return entities.stream()
+               .map(EmbeddedCar2Model::new)
+               .collect(Collectors.toList());
     }
 }

@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 
 @RestControllerAdvice
-public class APIExceptionHandler {
+class APIExceptionHandler {
     @ResponseStatus(METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     ErrorResponse handle405MethodNotAllowed() {
