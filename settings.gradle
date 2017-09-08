@@ -1,6 +1,1 @@
 rootProject.name = 'literate-invention'
-include 'Race Data'
-findProject(':Race Data')?.name = 'race-data'
-include 'Race Report'
-findProject(':Race Report')?.name = 'race-report'
-
