@@ -10,7 +10,9 @@ public class PacketCapture {
     public static void main(final String[] args) throws IOException {
         final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(10000);
 
+        final Writer writer = new SimplePCAPNGWriter(Paths.get(args[0]));
+
         new PacketCaptureThread(queue).start();
-        new PacketCaptureThread(queue, Paths.get(args[0])).start();
+        new PacketCaptureThread(queue, writer).start();
     }
 }

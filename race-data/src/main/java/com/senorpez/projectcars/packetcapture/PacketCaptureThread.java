@@ -2,7 +2,6 @@ package com.senorpez.projectcars.packetcapture;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.nio.file.Path;
 import java.util.concurrent.BlockingQueue;
 
 class PacketCaptureThread extends Thread {
@@ -10,7 +9,7 @@ class PacketCaptureThread extends Thread {
         super(new PacketReader(queue));
     }
 
-    PacketCaptureThread(final BlockingQueue<DatagramPacket> queue, final Path outputFile) throws IOException {
-        super(new FileWriter(queue, outputFile));
+    PacketCaptureThread(final BlockingQueue<DatagramPacket> queue, final Writer writer) throws IOException {
+        super(new PacketWriter(queue, writer));
     }
 }
