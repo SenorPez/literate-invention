@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_main.iml" group="literate-invention" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" filepath="$PROJECT_DIR$/.idea/modules/literate-invention_test.iml" group="literate-invention" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/race-data.iml" filepath="$PROJECT_DIR$/.idea/modules/race-data.iml" group="race-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/race-data/race-data_main.iml" filepath="$PROJECT_DIR$/.idea/modules/race-data/race-data_main.iml" group="race-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/race-data/race-data_test.iml" filepath="$PROJECT_DIR$/.idea/modules/race-data/race-data_test.iml" group="race-data" />
     </modules>
   </component>
 </project>
