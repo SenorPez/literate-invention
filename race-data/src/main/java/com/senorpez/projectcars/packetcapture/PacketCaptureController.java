@@ -86,8 +86,8 @@ public class PacketCaptureController {
     private void menuAbout() {
         final Alert about = new Alert(Alert.AlertType.INFORMATION);
         about.setTitle("About");
-        about.setHeaderText("Project CARS UDP Packet Capture");
-        about.setContentText("Version TBD");
+        about.setHeaderText(ApplicationInfo.getImplementationTitle());
+        about.setContentText("Version: " + ApplicationInfo.getImplementationVersion());
         about.showAndWait();
     }
 
