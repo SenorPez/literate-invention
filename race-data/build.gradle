@@ -1,17 +1,15 @@
 plugins {
-    id 'application'
     id 'java'
-    id 'jacoco'
-    id 'idea'
+    id 'application'
 }
 
 group 'com.senorpez.projectcars'
+def applicationTitle = 'Project CARS UDP Packet Capture'
 version '0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
-mainClassName = "com.senorpez.projectcars.racedata.DirectoryConverter"
-applicationName = "directory-converter"
+mainClassName = "com.senorpez.projectcars.packetcapture.PacketCapture"
 
 repositories {
     mavenCentral()
@@ -19,24 +17,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled = true
-        html.enabled = false
-    }
-}
-
-test {
-    maxParallelForks 4
-    testLogging {
-        displayGranularity 0
-        events "started", "failed"
-        exceptionFormat "short"
-        maxGranularity 2
-        minGranularity 2
+jar {
+    manifest {
+        attributes 'Implementation-Title': applicationTitle,
+                'Implementation-Version': version
     }
 }
