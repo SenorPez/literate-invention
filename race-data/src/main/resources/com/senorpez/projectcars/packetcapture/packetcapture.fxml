@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.senorpez.projectcars.packetcapture.PacketCaptureController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#menuExit" text="Exit">
+                     <accelerator>
+                        <KeyCodeCombination alt="DOWN" code="Q" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#menuAbout" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <HBox spacing="2.0">
+         <children>
+            <TextField fx:id="textFieldOutputFile" editable="false" prefHeight="25.0" prefWidth="250.0" />
+            <Button fx:id="buttonOutputFile" mnemonicParsing="false" onAction="#buttonOutputFile" text="Output File..." />
+         </children>
+         <VBox.margin>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox spacing="2.0">
+         <VBox.margin>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </VBox.margin>
+         <children>
+          <Button fx:id="buttonBeginCapture" disable="true" mnemonicParsing="false" onAction="#buttonBeginCapture" text="Begin Capture" />
+            <Button fx:id="buttonEndCapture" disable="true" mnemonicParsing="false" onAction="#buttonEndCapture" text="End Capture" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

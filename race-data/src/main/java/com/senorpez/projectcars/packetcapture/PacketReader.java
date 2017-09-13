@@ -6,18 +6,22 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
-public class PacketReader implements Runnable {
-    private static DatagramSocket socket;
+class PacketReader implements Runnable {
+    private static final DatagramSocket SOCKET;
     private static final byte[] buf = new byte[Short.MAX_VALUE];
+
     private final BlockingQueue<DatagramPacket> queue;
+    private boolean cancelled = false;
 
     static {
+        DatagramSocket newSocket = null;
         try {
-            socket = new DatagramSocket(5606);
-            socket.setReuseAddress(true);
+            newSocket = new DatagramSocket(5606);
+            newSocket.setReuseAddress(true);
         } catch (final SocketException e) {
             e.printStackTrace();
         }
+        SOCKET = newSocket;
     }
 
     PacketReader(final BlockingQueue<DatagramPacket> queue) {
@@ -26,16 +30,18 @@ public class PacketReader implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!cancelled) {
             final DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
-                socket.receive(packet);
+                SOCKET.receive(packet);
                 queue.add(packet);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            } catch (final IllegalStateException e) {
+            } catch (final IOException | IllegalStateException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    void cancel() {
+        cancelled = true;
     }
 }

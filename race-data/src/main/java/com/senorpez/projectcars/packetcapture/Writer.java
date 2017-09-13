@@ -2,6 +2,6 @@ package com.senorpez.projectcars.packetcapture;
 
 import java.net.DatagramPacket;
 
-public interface Writer {
+interface Writer {
     void writePacket(DatagramPacket packet);
 }

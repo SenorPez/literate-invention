@@ -6,21 +6,18 @@ import java.net.DatagramPacket;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.file.StandardOpenOption.*;
 
 public class SimplePCAPNGWriter implements PCAPNGWriter {
     private final OutputStream outputStream;
-    private final AtomicInteger packetIndex = new AtomicInteger(0);
     private int bytesWritten = 0;
 
     SimplePCAPNGWriter(final Path outputFile) throws IOException {
         this.outputStream = Files.newOutputStream(outputFile, CREATE, TRUNCATE_EXISTING, WRITE);
         writeSectionHeaderBlock();
         writeInterfaceDescriptionBlock();
-        System.out.println("Wrote header information. Bytes Written: " + bytesWritten);
     }
 
     @Override
@@ -92,8 +89,6 @@ public class SimplePCAPNGWriter implements PCAPNGWriter {
     @Override
     public void writePacket(final DatagramPacket packet) {
         writeSimplePacketBlock(packet);
-        System.out.println("Write Packet #" + packetIndex.getAndIncrement() +
-                " Bytes Written: " + bytesWritten);
     }
 
     private int getPacketPaddedLength(final int length) {
