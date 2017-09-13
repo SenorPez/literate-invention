@@ -10,7 +10,7 @@ import java.util.concurrent.BlockingQueue;
 
 class PacketReader implements Runnable {
     private static final DatagramChannel CHANNEL;
-    private static final byte[] buf = new byte[Short.MAX_VALUE];
+    private static final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
 
     private final BlockingQueue<DatagramPacket> queue;
     private boolean cancelled = false;
@@ -37,8 +37,10 @@ class PacketReader implements Runnable {
     public void run() {
         while (!cancelled) {
             try {
-                CHANNEL.receive(ByteBuffer.wrap(buf));
-                final DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                buf.clear();
+                CHANNEL.receive(buf);
+                buf.flip();
+                final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
                 queue.add(packet);
             } catch (final IOException | IllegalStateException e) {
                 try {
