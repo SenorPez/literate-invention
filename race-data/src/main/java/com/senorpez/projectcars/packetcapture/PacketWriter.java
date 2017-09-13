@@ -20,7 +20,11 @@ class PacketWriter implements Runnable {
                 final DatagramPacket packet = queue.take();
                 writer.writePacket(packet);
             } catch (final InterruptedException e) {
-                e.printStackTrace();
+                while (queue.size() > 0) {
+                    final DatagramPacket packet = queue.remove();
+                    writer.writePacket(packet);
+                    cancelled = true;
+                }
             }
         }
     }

@@ -27,6 +27,8 @@ public class PacketCaptureController {
 
     private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(10000);
 
+    private Thread captureThread;
+    private Thread writerThread;
     private PacketReader packetReader;
     private PacketWriter packetWriter;
 
@@ -68,7 +70,14 @@ public class PacketCaptureController {
     }
 
     @FXML
-    private void menuExit() {
+    void menuExit() {
+        capturing.set(false);
+
+        if (captureThread != null) captureThread.interrupt();
+        if (writerThread != null) writerThread.interrupt();
+        if (packetReader != null) packetReader.cancel();
+        if (packetWriter != null) packetWriter.cancel();
+
         final Stage stage = (Stage) root.getScene().getWindow();
         stage.close();
     }
@@ -101,12 +110,12 @@ public class PacketCaptureController {
 
         try {
             packetReader = new PacketReader(queue);
-            final Thread captureThread = new Thread(packetReader);
+            captureThread = new Thread(packetReader);
             captureThread.start();
 
             final Writer writer = new SimplePCAPNGWriter(outputFile.get().map(File::toPath).orElseThrow(IOException::new));
             packetWriter = new PacketWriter(queue, writer);
-            final Thread writerThread = new Thread(packetWriter);
+            writerThread = new Thread(packetWriter);
             writerThread.start();
         } catch (final IOException e) {
             e.printStackTrace();

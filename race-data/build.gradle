@@ -1,9 +1,14 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
 group 'com.senorpez.projectcars'
 version '0.1-SNAPSHOT'
 
-apply plugin: 'java'
-
 sourceCompatibility = 1.8
+
+mainClassName = "com.senorpez.projectcars.packetcapture.PacketCapture"
 
 repositories {
     mavenCentral()

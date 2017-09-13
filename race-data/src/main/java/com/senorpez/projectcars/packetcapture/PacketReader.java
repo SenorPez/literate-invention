@@ -2,26 +2,31 @@ package com.senorpez.projectcars.packetcapture;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.util.concurrent.BlockingQueue;
 
 class PacketReader implements Runnable {
-    private static final DatagramSocket SOCKET;
+    private static final DatagramChannel CHANNEL;
     private static final byte[] buf = new byte[Short.MAX_VALUE];
 
     private final BlockingQueue<DatagramPacket> queue;
     private boolean cancelled = false;
 
     static {
-        DatagramSocket newSocket = null;
+        DatagramChannel newChannel = null;
         try {
-            newSocket = new DatagramSocket(5606);
-            newSocket.setReuseAddress(true);
-        } catch (final SocketException e) {
+            newChannel = DatagramChannel.open();
+            newChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            newChannel.setOption(StandardSocketOptions.SO_BROADCAST, true);
+            newChannel.bind(new InetSocketAddress(5606));
+        } catch (final IOException e) {
             e.printStackTrace();
         }
-        SOCKET = newSocket;
+
+        CHANNEL = newChannel;
     }
 
     PacketReader(final BlockingQueue<DatagramPacket> queue) {
@@ -31,12 +36,14 @@ class PacketReader implements Runnable {
     @Override
     public void run() {
         while (!cancelled) {
-            final DatagramPacket packet = new DatagramPacket(buf, buf.length);
             try {
-                SOCKET.receive(packet);
+                CHANNEL.receive(ByteBuffer.wrap(buf));
+                final DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 queue.add(packet);
             } catch (final IOException | IllegalStateException e) {
-                e.printStackTrace();
+                try {
+                    CHANNEL.close();
+                } catch (final IOException ignored) {}
             }
         }
     }

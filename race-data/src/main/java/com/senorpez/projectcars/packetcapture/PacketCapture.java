@@ -18,14 +18,23 @@ import javafx.stage.Stage;
 //}
 
 public class PacketCapture extends Application {
+    private PacketCaptureController controller;
+
     @Override
     public void start(final Stage stage) throws Exception {
-        final Parent root = FXMLLoader.load(getClass().getResource("packetcapture.fxml"));
+        final FXMLLoader loader = new FXMLLoader(getClass().getResource("packetcapture.fxml"));
+        final Parent root = loader.load();
+        controller = loader.getController();
         final Scene scene = new Scene(root);
 
         stage.setTitle("Project CARS UDP Packet Capture");
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        controller.menuExit();
     }
 
     public static void main(final String[] args) {
