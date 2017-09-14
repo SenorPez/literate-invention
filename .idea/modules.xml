@@ -8,6 +8,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture.iml" group="packetcapture" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_main.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_main.iml" group="packetcapture" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_test.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_test.iml" group="packetcapture" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata.iml" group="racedata" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata/racedata_main.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata/racedata_main.iml" group="racedata" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata/racedata_test.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata/racedata_test.iml" group="racedata" />
     </modules>
   </component>
 </project>
