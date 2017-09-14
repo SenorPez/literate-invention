@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="literate-invention_main" target="1.8" />
       <module name="literate-invention_test" target="1.8" />
+      <module name="packetcapture_main" target="1.8" />
+      <module name="packetcapture_test" target="1.8" />
       <module name="race-data_main" target="1.8" />
       <module name="race-data_test" target="1.8" />
       <module name="race-report_main" target="1.8" />

@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.senorpez.projectcars'
+def applicationTitle = 'Project CARS UDP Packet Capture'
+version '0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+mainClassName = "com.senorpez.projectcars.packetcapture.PacketCapture"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': applicationTitle,
+                'Implementation-Version': version
+    }
+}
