@@ -14,26 +14,25 @@ import java.util.stream.Collectors;
 @RequestMapping(
         value = "/cars",
         method = RequestMethod.GET,
-        produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
-
+        produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
 )
 @RestController
-public class Car2Controller {
+class CarController {
     @Autowired
-    private Car2Service car2Service;
+    private CarService carService;
 
     @RequestMapping
-    ResponseEntity<Resources<EmbeddedCar2Resource>> cars() {
-        final List<EmbeddedCar2Model> car2Models = car2Service.findAll(Application.CARS2);
-        final Resources<EmbeddedCar2Resource> car2Resources = new Resources<>(car2Models.stream()
-                .map(EmbeddedCar2Model::toResource)
+    ResponseEntity<Resources<EmbeddedCarResource>> cars() {
+        final List<EmbeddedCarModel> carModels = carService.findAll(Application.CARS);
+        final Resources<EmbeddedCarResource> carResources = new Resources<>(carModels.stream()
+                .map(EmbeddedCarModel::toResource)
                 .collect(Collectors.toList()));
-        return ResponseEntity.ok(car2Resources);
+        return ResponseEntity.ok(carResources);
     }
 
     @RequestMapping("/{id}")
-    ResponseEntity<Car2Resource> cars(@PathVariable final int id) {
-        final Car2Model car2Model = car2Service.findOne(Application.CARS2, id);
-        return ResponseEntity.ok(car2Model.toResource());
+    ResponseEntity<CarResource> cars(@PathVariable final int id) {
+        final CarModel carModel = carService.findOne(Application.CARS, id);
+        return ResponseEntity.ok(carModel.toResource());
     }
 }

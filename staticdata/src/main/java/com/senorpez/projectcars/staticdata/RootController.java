@@ -11,16 +11,30 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/",
-        method = RequestMethod.GET,
-        produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
+        method = RequestMethod.GET
 )
 @RestController
 public class RootController {
-    @RequestMapping
+    @RequestMapping(
+            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+    )
     ResponseEntity<ResourceSupport> root() {
         final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
-        root.add(linkTo(methodOn(Car2Controller.class).cars()).withRel("cars"));
+        root.add(linkTo(methodOn(CarController.class).cars()).withRel("cars"));
+        root.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
+        root.add(linkTo(methodOn(EventController.class).events()).withRel("events"));
+        root.add(linkTo(methodOn(TrackController.class).tracks()).withRel("tracks"));
+        return ResponseEntity.ok(root);
+    }
+
+    @RequestMapping(
+            produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
+    )
+    ResponseEntity<ResourceSupport> root2() {
+        final ResourceSupport root = new ResourceSupport();
+        root.add(linkTo(methodOn(RootController.class).root2()).withSelfRel());
+//        root.add(linkTo(methodOn(Car2Controller.class).cars2()).withRel("cars"));
         return ResponseEntity.ok(root);
     }
 }

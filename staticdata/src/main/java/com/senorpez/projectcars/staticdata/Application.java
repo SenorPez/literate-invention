@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.BeanFactory;
@@ -24,13 +25,51 @@ import java.util.Set;
 public class Application {
     private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
 
-    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getData(Car2.class));
+    static final Set<Track> TRACKS = Collections.unmodifiableSet(getProjectCarsData(Track.class, "tracks"));
+    static final Set<CarClass> CAR_CLASSES = Collections.unmodifiableSet(getProjectCarsData(CarClass.class, "classes"));
+    static final Set<Car> CARS = Collections.unmodifiableSet(getProjectCarsData(Car.class, "cars"));
+    static final Set<Event> EVENTS = Collections.unmodifiableSet(getProjectCarsData(Event.class, "events"));
+
+    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class, "cars"));
 
     @Autowired
     private BeanFactory beanFactory;
 
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
+    }
+
+    private static <T> Set<T> getProjectCarsData(final Class objectClass, final String field) {
+        final String resourceFileName = "projectcars.json";
+        return getData(resourceFileName, objectClass, field);
+    }
+
+    private static <T> Set<T> getProjectCars2Data(final Class objectClass, final String field) {
+        final String resourceFileName = "projectcars2.json";
+        return getData(resourceFileName, objectClass, field);
+    }
+
+    static <T> Set<T> getData(final Class objectClass, final JsonNode jsonData) {
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(jsonData.toString(), mapper.getTypeFactory().constructCollectionType(Set.class, objectClass));
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return new HashSet<>();
+    }
+
+    private static <T> Set<T> getData(final String resourceFileName, final Class objectClass, final String field) {
+        final ObjectMapper mapper = new ObjectMapper();
+        final ClassLoader classLoader = Application.class.getClassLoader();
+        final InputStream inputStream = classLoader.getResourceAsStream(resourceFileName);
+        try {
+            final ObjectNode jsonData = mapper.readValue(inputStream, ObjectNode.class);
+            return mapper.readValue(jsonData.get(field).toString(), mapper.getTypeFactory().constructCollectionType(Set.class, objectClass));
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return new HashSet<>();
     }
 
     @Bean
@@ -62,18 +101,5 @@ public class Application {
     @Bean
     public CurieProvider curieProvider() {
         return new DefaultCurieProvider("pcars", new UriTemplate("/docs/{rel}"));
-    }
-
-    private static <T> Set<T> getData(final Class objectClass) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final ClassLoader classLoader = Application.class.getClassLoader();
-            final InputStream inputStream = classLoader.getResourceAsStream("projectcars2.json");
-            final ObjectNode jsonData = mapper.readValue(inputStream, ObjectNode.class);
-            return mapper.readValue(jsonData.get("cars").toString(), mapper.getTypeFactory().constructCollectionType(Set.class, objectClass));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return new HashSet<>();
     }
 }

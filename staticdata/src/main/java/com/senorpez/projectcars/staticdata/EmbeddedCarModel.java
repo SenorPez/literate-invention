@@ -4,17 +4,17 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "car", collectionRelation = "car")
-public class EmbeddedCar2Model implements Identifiable<Integer> {
+public class EmbeddedCarModel implements Identifiable<Integer> {
     private final int id;
     private final String name;
 
-    EmbeddedCar2Model(final Car2 car) {
+    EmbeddedCarModel(final Car car) {
         this.id = car.getId();
         this.name = car.getManufacturer() + " " + car.getModel();
     }
 
-    EmbeddedCar2Resource toResource() {
-        final EmbeddedCar2ResourceAssembler assembler = new EmbeddedCar2ResourceAssembler(() -> new EmbeddedCar2Resource(this));
+    EmbeddedCarResource toResource() {
+        final EmbeddedCarResourceAssembler assembler = new EmbeddedCarResourceAssembler(() -> new EmbeddedCarResource(this));
         return assembler.toResource(this);
     }
 

@@ -3,8 +3,8 @@ package com.senorpez.projectcars.staticdata;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 
-public class EmbeddedCar2Resource extends Resource<EmbeddedCar2Model> {
-    EmbeddedCar2Resource(final EmbeddedCar2Model content, final Link... links) {
+class CarResource extends Resource<CarModel> {
+    CarResource(final CarModel content, final Link... links) {
         super(content, links);
     }
 }

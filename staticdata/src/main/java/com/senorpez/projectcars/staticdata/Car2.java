@@ -1,11 +1,10 @@
 package com.senorpez.projectcars.staticdata;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-class Car2 {
+public class Car2 {
     private final int id;
     private final String manufacturer;
     private final String model;
@@ -14,12 +13,11 @@ class Car2 {
 
     private static final AtomicInteger idCounter = new AtomicInteger(0);
 
-    @JsonCreator
-    Car2(
-            @JsonProperty("manufacturer") final String manufacturer,
-            @JsonProperty("model") final String model,
-            @JsonProperty("year") final int year,
-            @JsonProperty("class") final String carClass) {
+    public Car2(
+            @JsonProperty("manufacturer") String manufacturer,
+            @JsonProperty("model") String model,
+            @JsonProperty("year") int year,
+            @JsonProperty("class") String carClass) {
         this.id = idCounter.getAndIncrement();
         this.manufacturer = manufacturer;
         this.model = model;
@@ -27,23 +25,23 @@ class Car2 {
         this.carClass = carClass;
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    String getManufacturer() {
+    public String getManufacturer() {
         return manufacturer;
     }
 
-    String getModel() {
+    public String getModel() {
         return model;
     }
 
-    int getYear() {
+    public int getYear() {
         return year;
     }
 
-    String getCarClass() {
+    public String getCarClass() {
         return carClass;
     }
 }

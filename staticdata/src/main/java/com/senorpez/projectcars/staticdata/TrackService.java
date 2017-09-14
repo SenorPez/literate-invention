@@ -7,18 +7,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class Car2Service {
-    Car2Model findOne(final Collection<Car2> entities, final int searchId) {
+public class TrackService {
+    TrackModel findOne(final Collection<Track> entities, final int searchId) {
         return entities.stream()
-                .filter(car -> car.getId() == searchId)
+                .filter(track -> track.getId() == searchId)
                 .findFirst()
-                .map(Car2Model::new)
+                .map(TrackModel::new)
                 .orElse(null);
     }
 
-    List<EmbeddedCar2Model> findAll(final Collection<Car2> entities) {
+    List<EmbeddedTrackModel> findAll(final Collection<Track> entities) {
         return entities.stream()
-                .map(EmbeddedCar2Model::new)
+                .map(EmbeddedTrackModel::new)
                 .collect(Collectors.toList());
     }
 }
