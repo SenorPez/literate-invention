@@ -14,6 +14,8 @@
       <module name="racedata_test" target="1.8" />
       <module name="static-data-api_main" target="1.8" />
       <module name="static-data-api_test" target="1.8" />
+      <module name="staticdata_main" target="1.8" />
+      <module name="staticdata_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
