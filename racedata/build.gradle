@@ -1,17 +1,15 @@
 plugins {
-    id 'application'
     id 'java'
     id 'jacoco'
     id 'idea'
+    id 'maven'
+    id 'signing'
 }
 
 group 'com.senorpez.projectcars'
 version '0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
-
-mainClassName = "com.senorpez.projectcars.racedata.DirectoryConverter"
-applicationName = "directory-converter"
 
 repositories {
     mavenCentral()
@@ -27,5 +25,71 @@ jacocoTestReport {
     reports {
         xml.enabled = true
         html.enabled = false
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = 'racedata'
+
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+                proxy(host: "3.20.109.242", port: 9400, type:"http")
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+                proxy(host: "3.20.109.242", port: 9400, type:"http")
+            }
+
+            pom.project {
+                name 'Project CARS Race Data'
+                packaging 'jar'
+                description 'Project CARS race data java interface'
+                url 'https://github.com/SenorPez/literate-invention'
+
+                scm {
+                    connection 'scm:git:git://github.com/SenorPez/literate-invention.git'
+                    developerConnection 'scm:git:ssh://github.com/SenorPez/literate-invention.git'
+                    url 'https://github.com/SenorPez/literate-invention/tree/master'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'SenorPez'
+                        name 'M. Francois'
+                        email 'senorpez@senorpez.com'
+                    }
+                }
+            }
+        }
     }
 }
