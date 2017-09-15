@@ -13,12 +13,12 @@ class CarResourceAssembler extends IdentifiableResourceAssemblerSupport<CarModel
     }
 
     @Override
-    public CarResource toResource(CarModel entity) {
+    public CarResource toResource(final CarModel entity) {
         return createResource(entity);
     }
 
     @Override
-    protected CarResource instantiateResource(CarModel entity) {
+    protected CarResource instantiateResource(final CarModel entity) {
         return supplier.get();
     }
 }

@@ -26,7 +26,7 @@ public class TrackController {
 
     @RequestMapping
     ResponseEntity<Resources<EmbeddedTrackResource>> tracks() {
-        final List<EmbeddedTrackModel> trackModels = trackService.findAll(Application.TRACKS);
+        final List<EmbeddedTrackModel> trackModels = trackService.findAll();
         final Resources<EmbeddedTrackResource> trackResources = new Resources<>(trackModels.stream()
                 .map(EmbeddedTrackModel::toResource)
                 .collect(Collectors.toList()));
@@ -37,7 +37,7 @@ public class TrackController {
 
     @RequestMapping("/{id}")
     ResponseEntity<TrackResource> tracks(@PathVariable final int id) {
-        final TrackModel trackModel = trackService.findOne(Application.TRACKS, id);
+        final TrackModel trackModel = trackService.findOne(id);
         final TrackResource trackResource = trackModel.toResource();
         trackResource.add(linkTo(methodOn(TrackController.class).tracks()).withRel("tracks"));
         trackResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));

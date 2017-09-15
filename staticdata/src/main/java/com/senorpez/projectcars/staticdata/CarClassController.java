@@ -26,7 +26,7 @@ public class CarClassController {
 
     @RequestMapping
     ResponseEntity<Resources<CarClassResource>> carClasses() {
-        final List<CarClassModel> carClassModels = carClassService.findAll(Application.CAR_CLASSES);
+        final List<CarClassModel> carClassModels = carClassService.findAll();
         final Resources<CarClassResource> carClassResources = new Resources<>(carClassModels.stream()
                 .map(CarClassModel::toResource)
                 .collect(Collectors.toList()));
@@ -37,7 +37,7 @@ public class CarClassController {
 
     @RequestMapping("/{id}")
     ResponseEntity<CarClassResource> carClasses(@PathVariable final int id) {
-        final CarClassModel carClassModel = carClassService.findOne(Application.CAR_CLASSES, id);
+        final CarClassModel carClassModel = carClassService.findOne(id);
         final CarClassResource carClassResource = carClassModel.toResource();
         carClassResource.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
         carClassResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));

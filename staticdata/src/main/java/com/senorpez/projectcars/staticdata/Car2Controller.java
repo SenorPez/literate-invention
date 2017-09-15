@@ -24,7 +24,7 @@ public class Car2Controller {
 
     @RequestMapping
     ResponseEntity<Resources<EmbeddedCar2Resource>> cars() {
-        final List<EmbeddedCar2Model> car2Models = car2Service.findAll(Application.CARS2);
+        final List<EmbeddedCar2Model> car2Models = car2Service.findAll();
         final Resources<EmbeddedCar2Resource> car2Resources = new Resources<>(car2Models.stream()
                 .map(EmbeddedCar2Model::toResource)
                 .collect(Collectors.toList()));
@@ -33,7 +33,7 @@ public class Car2Controller {
 
     @RequestMapping("/{id}")
     ResponseEntity<Car2Resource> cars(@PathVariable final int id) {
-        final Car2Model car2Model = car2Service.findOne(Application.CARS2, id);
+        final Car2Model car2Model = car2Service.findOne(id);
         return ResponseEntity.ok(car2Model.toResource());
     }
 }

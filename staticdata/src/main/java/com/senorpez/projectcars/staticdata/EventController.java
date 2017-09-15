@@ -32,7 +32,7 @@ public class EventController {
 
     @RequestMapping
     ResponseEntity<Resources<EmbeddedEventResource>> events() {
-        final List<EmbeddedEventModel> eventModels = eventService.findAll(Application.EVENTS);
+        final List<EmbeddedEventModel> eventModels = eventService.findAll();
         final Resources<EmbeddedEventResource> eventResources = new Resources<>(eventModels.stream()
                 .map(EmbeddedEventModel::toResource)
                 .collect(Collectors.toList()));
@@ -43,7 +43,7 @@ public class EventController {
 
     @RequestMapping("/{id}")
     ResponseEntity<EventResource> events(@PathVariable final int id) {
-        final EventModel eventModel = eventService.findOne(Application.EVENTS, id);
+        final EventModel eventModel = eventService.findOne(id);
         final EventResource eventResource = eventModel.toResource();
         eventResource.add(linkTo(methodOn(EventController.class).events()).withRel("events"));
         eventResource.add(linkTo(methodOn(EventController.class).eventCars(id)).withRel("cars"));
@@ -57,7 +57,7 @@ public class EventController {
         final List<EmbeddedCarModel> carModels = carService.findAll(Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getCars());
         final Resources<EmbeddedCarResource> carResources = new Resources<>(carModels.stream()
                 .map(EmbeddedCarModel::toResource)
@@ -74,7 +74,7 @@ public class EventController {
         final CarModel carModel = carService.findOne(Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getCars(), carId);
         final CarResource carResource = carModel.toResource();
         carResource.add(linkTo(methodOn(EventController.class).eventCars(eventId, carId)).withSelfRel());
@@ -92,12 +92,12 @@ public class EventController {
         final CarModel carModel = carService.findOne(Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getCars(), carId);
         final CarClassResource carClassResource = new CarClassModel(Application.CARS.stream()
                 .filter(car -> car.getId() == carId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new CarNotFoundException(carId))
                 .getCarClass()).toResource();
         carClassResource.add(linkTo(methodOn(EventController.class).eventCarClass(eventId, carId)).withSelfRel());
         carClassResource.add(linkTo(methodOn(CarController.class).carClass(carId)).withSelfRel());
@@ -113,7 +113,7 @@ public class EventController {
         final List<LiveryModel> liveryModels = liveryService.findAll(Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getCars(), carId);
         final Resources<LiveryResource> liveryResources = new Resources<>(liveryModels.stream()
                 .map(liveryModel -> liveryModel.toResource(carId))

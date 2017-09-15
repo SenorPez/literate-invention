@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "round", collectionRelation = "round")
-public class RoundModel implements Identifiable<Integer> {
+class RoundModel implements Identifiable<Integer> {
     private final int id;
     private final String track;
 

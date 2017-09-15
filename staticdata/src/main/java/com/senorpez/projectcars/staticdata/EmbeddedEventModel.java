@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "event", collectionRelation = "event")
-public class EmbeddedEventModel implements Identifiable<Integer> {
+class EmbeddedEventModel implements Identifiable<Integer> {
     private final int id;
     private final String name;
 

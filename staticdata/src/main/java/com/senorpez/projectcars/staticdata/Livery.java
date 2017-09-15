@@ -2,22 +2,22 @@ package com.senorpez.projectcars.staticdata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Livery {
+class Livery {
     private final int id;
     private final String name;
 
-    public Livery(
-            @JsonProperty("id") int id,
-            @JsonProperty("name") String name) {
+    Livery(
+            @JsonProperty("id") final int id,
+            @JsonProperty("name") final String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 }

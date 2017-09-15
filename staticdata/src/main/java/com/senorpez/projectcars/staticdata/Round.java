@@ -6,38 +6,38 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Round {
+class Round {
     private final int id;
     private final Track track;
     private final Set<Race> races;
 
     private final static AtomicInteger roundId = new AtomicInteger(0);
 
-    public Round(
-            @JsonProperty("location") String location,
-            @JsonProperty("variation") String variation,
-            @JsonProperty("races")JsonNode races) {
+    Round(
+            @JsonProperty("location") final String location,
+            @JsonProperty("variation") final String variation,
+            @JsonProperty("races") final JsonNode races) {
         this.id = roundId.incrementAndGet();
         this.track = Application.TRACKS.stream()
                 .filter(foundTrack ->
                         foundTrack.getLocation().equalsIgnoreCase(location)
                                 && foundTrack.getVariation().equalsIgnoreCase(variation))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new TrackNotFoundException(location, variation));
 
         Race.resetId();
         this.races = Application.getData(Race.class, races);
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public Track getTrack() {
+    Track getTrack() {
         return track;
     }
 
-    public Set<Race> getRaces() {
+    Set<Race> getRaces() {
         return races;
     }
 

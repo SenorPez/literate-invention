@@ -4,14 +4,14 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "car", collectionRelation = "car")
-public class Car2Model implements Identifiable<Integer> {
+class Car2Model implements Identifiable<Integer> {
     private final int id;
     private final String manufacturer;
     private final String model;
     private final int year;
     private final String carClass;
 
-    public Car2Model(final Car2 car) {
+    Car2Model(final Car2 car) {
         this.id = car.getId();
         this.manufacturer = car.getManufacturer();
         this.model = car.getModel();

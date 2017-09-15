@@ -147,7 +147,7 @@ class CarModel implements Identifiable<Integer> {
     }
 
     @JsonIgnore
-    public int getCarClassId() {
+    int getCarClassId() {
         return carClassId;
     }
 }

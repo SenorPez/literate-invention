@@ -2,22 +2,21 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class TrackService {
-    TrackModel findOne(final Collection<Track> entities, final int searchId) {
-        return entities.stream()
+class TrackService {
+    TrackModel findOne(final int searchId) {
+        return Application.TRACKS.stream()
                 .filter(track -> track.getId() == searchId)
                 .findFirst()
                 .map(TrackModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new TrackNotFoundException(searchId));
     }
 
-    List<EmbeddedTrackModel> findAll(final Collection<Track> entities) {
-        return entities.stream()
+    List<EmbeddedTrackModel> findAll() {
+        return Application.TRACKS.stream()
                 .map(EmbeddedTrackModel::new)
                 .collect(Collectors.toList());
     }

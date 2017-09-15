@@ -2,22 +2,22 @@ package com.senorpez.projectcars.staticdata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CarClass {
+class CarClass {
     private final int id;
     private final String name;
 
-    public CarClass(
-            @JsonProperty("id") int id,
-            @JsonProperty("name") String name) {
+    CarClass(
+            @JsonProperty("id") final int id,
+            @JsonProperty("name") final String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 }

@@ -4,7 +4,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class RaceResourceAssembler extends IdentifiableResourceAssemblerSupport<RaceModel, RaceResource> {
+class RaceResourceAssembler extends IdentifiableResourceAssemblerSupport<RaceModel, RaceResource> {
     final private Supplier<RaceResource> supplier;
 
     RaceResourceAssembler(final Supplier<RaceResource> supplier) {
@@ -13,16 +13,16 @@ public class RaceResourceAssembler extends IdentifiableResourceAssemblerSupport<
     }
 
     @Override
-    public RaceResource toResource(RaceModel entity) {
+    public RaceResource toResource(final RaceModel entity) {
         return createResource(entity);
     }
 
-    public RaceResource toResource(RaceModel entity, final int eventId, final int roundId) {
+    RaceResource toResource(final RaceModel entity, final int eventId, final int roundId) {
         return createResource(entity, eventId, roundId);
     }
 
     @Override
-    protected RaceResource instantiateResource(RaceModel entity) {
+    protected RaceResource instantiateResource(final RaceModel entity) {
         return supplier.get();
     }
 }

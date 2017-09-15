@@ -56,7 +56,7 @@ class CarController {
         final CarClassResource carClassResource = new CarClassModel(Application.CARS.stream()
                 .filter(car -> car.getId() == id)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new CarNotFoundException(id))
                 .getCarClass()).toResource();
         carClassResource.add(linkTo(methodOn(CarController.class).carClass(carModel.getCarClassId())).withSelfRel());
         carClassResource.add(linkTo(methodOn(CarController.class).cars(id)).withRel("car"));

@@ -2,22 +2,21 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CarClassService {
-    CarClassModel findOne(final Collection<CarClass> entities, final int searchId) {
-        return entities.stream()
+class CarClassService {
+    CarClassModel findOne(final int searchId) {
+        return Application.CAR_CLASSES.stream()
                 .filter(carClass -> carClass.getId() == searchId)
                 .findFirst()
                 .map(CarClassModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new CarClassNotFoundException(searchId));
     }
 
-    List<CarClassModel> findAll(final Collection<CarClass> entities) {
-        return entities.stream()
+    List<CarClassModel> findAll() {
+        return Application.CAR_CLASSES.stream()
                 .map(CarClassModel::new)
                 .collect(Collectors.toList());
     }

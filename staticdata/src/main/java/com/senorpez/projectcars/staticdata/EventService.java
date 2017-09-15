@@ -2,22 +2,21 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class EventService {
-    EventModel findOne(final Collection<Event> entities, final int searchId) {
-        return entities.stream()
+class EventService {
+    EventModel findOne(final int searchId) {
+        return Application.EVENTS.stream()
                 .filter(event -> event.getId() == searchId)
                 .findFirst()
                 .map(EventModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new EventNotFoundException(searchId));
     }
 
-    List<EmbeddedEventModel> findAll(final Collection<Event> entities) {
-        return entities.stream()
+    List<EmbeddedEventModel> findAll() {
+        return Application.EVENTS.stream()
                 .map(EmbeddedEventModel::new)
                 .collect(Collectors.toList());
     }

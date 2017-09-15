@@ -30,7 +30,7 @@ public class Application {
     static final Set<Car> CARS = Collections.unmodifiableSet(getProjectCarsData(Car.class, "cars"));
     static final Set<Event> EVENTS = Collections.unmodifiableSet(getProjectCarsData(Event.class, "events"));
 
-    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class, "cars"));
+    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class));
 
     @Autowired
     private BeanFactory beanFactory;
@@ -44,9 +44,9 @@ public class Application {
         return getData(resourceFileName, objectClass, field);
     }
 
-    private static <T> Set<T> getProjectCars2Data(final Class objectClass, final String field) {
+    private static <T> Set<T> getProjectCars2Data(final Class objectClass) {
         final String resourceFileName = "projectcars2.json";
-        return getData(resourceFileName, objectClass, field);
+        return getData(resourceFileName, objectClass, "cars");
     }
 
     static <T> Set<T> getData(final Class objectClass, final JsonNode jsonData) {

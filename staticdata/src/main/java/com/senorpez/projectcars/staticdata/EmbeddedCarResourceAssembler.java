@@ -4,7 +4,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class EmbeddedCarResourceAssembler extends IdentifiableResourceAssemblerSupport<EmbeddedCarModel, EmbeddedCarResource> {
+class EmbeddedCarResourceAssembler extends IdentifiableResourceAssemblerSupport<EmbeddedCarModel, EmbeddedCarResource> {
     final private Supplier<EmbeddedCarResource> supplier;
 
     EmbeddedCarResourceAssembler(final Supplier<EmbeddedCarResource> supplier) {
@@ -13,12 +13,12 @@ public class EmbeddedCarResourceAssembler extends IdentifiableResourceAssemblerS
     }
 
     @Override
-    public EmbeddedCarResource toResource(EmbeddedCarModel entity) {
+    public EmbeddedCarResource toResource(final EmbeddedCarModel entity) {
         return createResource(entity);
     }
 
     @Override
-    protected EmbeddedCarResource instantiateResource(EmbeddedCarModel entity) {
+    protected EmbeddedCarResource instantiateResource(final EmbeddedCarModel entity) {
         return supplier.get();
     }
 }

@@ -13,7 +13,7 @@ class CarService {
                 .filter(car -> car.getId() == searchId)
                 .findFirst()
                 .map(CarModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new CarNotFoundException(searchId));
     }
 
     List<EmbeddedCarModel> findAll(final Collection<Car> entities) {

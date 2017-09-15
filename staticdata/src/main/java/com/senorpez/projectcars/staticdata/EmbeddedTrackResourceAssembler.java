@@ -4,7 +4,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class EmbeddedTrackResourceAssembler extends IdentifiableResourceAssemblerSupport<EmbeddedTrackModel, EmbeddedTrackResource> {
+class EmbeddedTrackResourceAssembler extends IdentifiableResourceAssemblerSupport<EmbeddedTrackModel, EmbeddedTrackResource> {
     final private Supplier<EmbeddedTrackResource> supplier;
 
     EmbeddedTrackResourceAssembler(final Supplier<EmbeddedTrackResource> supplier) {
@@ -13,12 +13,12 @@ public class EmbeddedTrackResourceAssembler extends IdentifiableResourceAssemble
     }
 
     @Override
-    public EmbeddedTrackResource toResource(EmbeddedTrackModel entity) {
+    public EmbeddedTrackResource toResource(final EmbeddedTrackModel entity) {
         return createResource(entity);
     }
 
     @Override
-    protected EmbeddedTrackResource instantiateResource(EmbeddedTrackModel entity) {
+    protected EmbeddedTrackResource instantiateResource(final EmbeddedTrackModel entity) {
         return supplier.get();
     }
 }

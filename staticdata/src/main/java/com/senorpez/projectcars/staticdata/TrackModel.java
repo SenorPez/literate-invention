@@ -6,7 +6,7 @@ import org.springframework.hateoas.core.Relation;
 import java.util.List;
 
 @Relation(value = "track", collectionRelation = "track")
-public class TrackModel implements Identifiable<Integer> {
+class TrackModel implements Identifiable<Integer> {
     private final int id;
     private final String name;
     private final String location;

@@ -26,7 +26,7 @@ public class RaceController {
 
     @RequestMapping
     ResponseEntity<Resources<RaceResource>> races(@PathVariable final int eventId, @PathVariable final int roundId) {
-        final List<RaceModel> raceModels = raceService.findAll(Application.EVENTS, eventId, roundId);
+        final List<RaceModel> raceModels = raceService.findAll(eventId, roundId);
         final Resources<RaceResource> raceResources = new Resources<>(raceModels.stream()
                 .map(raceModel -> raceModel.toResource(eventId, roundId))
                 .collect(Collectors.toList()));
@@ -38,7 +38,7 @@ public class RaceController {
 
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
-        final RaceModel raceModel = raceService.findOne(Application.EVENTS, eventId, roundId, raceId);
+        final RaceModel raceModel = raceService.findOne(eventId, roundId, raceId);
         final RaceResource raceResource = raceModel.toResource(eventId, roundId);
         raceResource.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
         raceResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));

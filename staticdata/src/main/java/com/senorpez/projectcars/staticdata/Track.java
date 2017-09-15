@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Track {
+class Track {
     private final int id;
     private final String name;
     private final String location;
@@ -16,17 +16,17 @@ public class Track {
     private final List<Float> pitExit;
     private final int gridSize;
 
-    public Track(
-            @JsonProperty("id") int id,
-            @JsonProperty("name") String name,
-            @JsonProperty("location") String location,
-            @JsonProperty("variation") String variation,
-            @JsonProperty("length") float length,
-            @JsonProperty("pitEntryX") Float pitEntryX,
-            @JsonProperty("pitEntryZ") Float pitEntryZ,
-            @JsonProperty("pitExitX") Float pitExitX,
-            @JsonProperty("pitExitZ") Float pitExitZ,
-            @JsonProperty("gridSize") int gridSize) {
+    Track(
+            @JsonProperty("id") final int id,
+            @JsonProperty("name") final String name,
+            @JsonProperty("location") final String location,
+            @JsonProperty("variation") final String variation,
+            @JsonProperty("length") final float length,
+            @JsonProperty("pitEntryX") final Float pitEntryX,
+            @JsonProperty("pitEntryZ") final Float pitEntryZ,
+            @JsonProperty("pitExitX") final Float pitExitX,
+            @JsonProperty("pitExitZ") final Float pitExitZ,
+            @JsonProperty("gridSize") final int gridSize) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -44,35 +44,35 @@ public class Track {
        this.gridSize = gridSize;
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getLocation() {
+    String getLocation() {
         return location;
     }
 
-    public String getVariation() {
+    String getVariation() {
         return variation;
     }
 
-    public float getLength() {
+    float getLength() {
         return length;
     }
 
-    public List<Float> getPitEntry() {
+    List<Float> getPitEntry() {
         return pitEntry;
     }
 
-    public List<Float> getPitExit() {
+    List<Float> getPitExit() {
         return pitExit;
     }
 
-    public int getGridSize() {
+    int getGridSize() {
         return gridSize;
     }
 }

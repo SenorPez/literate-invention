@@ -4,7 +4,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class LiveryResourceAssembler extends IdentifiableResourceAssemblerSupport<LiveryModel, LiveryResource> {
+class LiveryResourceAssembler extends IdentifiableResourceAssemblerSupport<LiveryModel, LiveryResource> {
     final private Supplier<LiveryResource> supplier;
 
     LiveryResourceAssembler(final Supplier<LiveryResource> supplier) {
@@ -13,16 +13,16 @@ public class LiveryResourceAssembler extends IdentifiableResourceAssemblerSuppor
     }
 
     @Override
-    public LiveryResource toResource(LiveryModel entity) {
+    public LiveryResource toResource(final LiveryModel entity) {
         return createResource(entity);
     }
 
-    public LiveryResource toResource(LiveryModel entity, final int carId) {
+    LiveryResource toResource(final LiveryModel entity, final int carId) {
         return createResource(entity, carId);
     }
 
     @Override
-    protected LiveryResource instantiateResource(LiveryModel entity) {
+    protected LiveryResource instantiateResource(final LiveryModel entity) {
         return supplier.get();
     }
 }

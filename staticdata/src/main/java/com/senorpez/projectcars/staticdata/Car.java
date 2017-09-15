@@ -43,7 +43,7 @@ class Car {
 
         private final String displayString;
 
-        EnginePosition(String displayString) {
+        EnginePosition(final String displayString) {
             this.displayString = displayString;
         }
 
@@ -59,7 +59,7 @@ class Car {
 
         private final String displayString;
 
-        ShiftPattern(String displayString) {
+        ShiftPattern(final String displayString) {
             this.displayString = displayString;
         }
 
@@ -75,7 +75,7 @@ class Car {
 
         private final String displayString;
 
-        Shifter(String displayString) {
+        Shifter(final String displayString) {
             this.displayString = displayString;
         }
 
@@ -86,28 +86,28 @@ class Car {
     }
 
     public Car(
-            @JsonProperty("id") int id,
-            @JsonProperty("manufacturer") String manufacturer,
-            @JsonProperty("model") String model,
-            @JsonProperty("country") String country,
-            @JsonProperty("class") String carClass,
-            @JsonProperty("year") int year,
-            @JsonProperty("drivetrain") Drivetrain drivetrain,
-            @JsonProperty("enginePosition") EnginePosition enginePosition,
-            @JsonProperty("engineType") String engineType,
-            @JsonProperty("topSpeed") int topSpeed,
-            @JsonProperty("horsepower") int horsepower,
-            @JsonProperty("acceleration") float acceleration,
-            @JsonProperty("braking") float braking,
-            @JsonProperty("weight") int weight,
-            @JsonProperty("torque") int torque,
-            @JsonProperty("weightBalance") int weightBalance,
-            @JsonProperty("wheelbase") float wheelbase,
-            @JsonProperty("shiftPattern") ShiftPattern shiftPattern,
-            @JsonProperty("shifter") Shifter shifter,
-            @JsonProperty("gears") int gears,
-            @JsonProperty("dlc") String dlc,
-            @JsonProperty("liveries") JsonNode liveries) {
+            @JsonProperty("id") final int id,
+            @JsonProperty("manufacturer") final String manufacturer,
+            @JsonProperty("model") final String model,
+            @JsonProperty("country") final String country,
+            @JsonProperty("class") final String carClass,
+            @JsonProperty("year") final int year,
+            @JsonProperty("drivetrain") final Drivetrain drivetrain,
+            @JsonProperty("enginePosition") final EnginePosition enginePosition,
+            @JsonProperty("engineType") final String engineType,
+            @JsonProperty("topSpeed") final int topSpeed,
+            @JsonProperty("horsepower") final int horsepower,
+            @JsonProperty("acceleration") final float acceleration,
+            @JsonProperty("braking") final float braking,
+            @JsonProperty("weight") final int weight,
+            @JsonProperty("torque") final int torque,
+            @JsonProperty("weightBalance") final int weightBalance,
+            @JsonProperty("wheelbase") final float wheelbase,
+            @JsonProperty("shiftPattern") final ShiftPattern shiftPattern,
+            @JsonProperty("shifter") final Shifter shifter,
+            @JsonProperty("gears") final int gears,
+            @JsonProperty("dlc") final String dlc,
+            @JsonProperty("liveries") final JsonNode liveries) {
         this.id = id;
         this.manufacturer = manufacturer;
         this.model = model;
@@ -132,91 +132,91 @@ class Car {
         this.liveries = Application.getData(Livery.class, liveries);
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getManufacturer() {
+    String getManufacturer() {
         return manufacturer;
     }
 
-    public String getModel() {
+    String getModel() {
         return model;
     }
 
-    public String getCountry() {
+    String getCountry() {
         return country;
     }
 
-    public CarClass getCarClass() {
+    CarClass getCarClass() {
         return carClass;
     }
 
-    public int getYear() {
+    int getYear() {
         return year;
     }
 
-    public Drivetrain getDrivetrain() {
+    Drivetrain getDrivetrain() {
         return drivetrain;
     }
 
-    public EnginePosition getEnginePosition() {
+    EnginePosition getEnginePosition() {
         return enginePosition;
     }
 
-    public String getEngineType() {
+    String getEngineType() {
         return engineType;
     }
 
-    public int getTopSpeed() {
+    int getTopSpeed() {
         return topSpeed;
     }
 
-    public int getHorsepower() {
+    int getHorsepower() {
         return horsepower;
     }
 
-    public float getAcceleration() {
+    float getAcceleration() {
         return acceleration;
     }
 
-    public float getBraking() {
+    float getBraking() {
         return braking;
     }
 
-    public int getWeight() {
+    int getWeight() {
         return weight;
     }
 
-    public int getTorque() {
+    int getTorque() {
         return torque;
     }
 
-    public int getWeightBalance() {
+    int getWeightBalance() {
         return weightBalance;
     }
 
-    public float getWheelbase() {
+    float getWheelbase() {
         return wheelbase;
     }
 
-    public ShiftPattern getShiftPattern() {
+    ShiftPattern getShiftPattern() {
         return shiftPattern;
     }
 
-    public Shifter getShifter() {
+    Shifter getShifter() {
         return shifter;
     }
 
-    public int getGears() {
+    int getGears() {
         return gears;
     }
 
-    public String getDlc() {
+    String getDlc() {
         return dlc;
     }
 
-    public Set<Livery> getLiveries() {
+    Set<Livery> getLiveries() {
         return liveries;
     }
 }

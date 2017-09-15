@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "race", collectionRelation = "race")
-public class RaceModel implements Identifiable<Integer> {
+class RaceModel implements Identifiable<Integer> {
     private final int id;
     private final int laps;
     private final int time;

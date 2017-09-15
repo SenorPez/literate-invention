@@ -4,7 +4,7 @@ import org.springframework.hateoas.mvc.IdentifiableResourceAssemblerSupport;
 
 import java.util.function.Supplier;
 
-public class EventResourceAssembler extends IdentifiableResourceAssemblerSupport<EventModel, EventResource> {
+class EventResourceAssembler extends IdentifiableResourceAssemblerSupport<EventModel, EventResource> {
     final private Supplier<EventResource> supplier;
 
     EventResourceAssembler(final Supplier<EventResource> supplier) {
@@ -13,12 +13,12 @@ public class EventResourceAssembler extends IdentifiableResourceAssemblerSupport
     }
 
     @Override
-    public EventResource toResource(EventModel entity) {
+    public EventResource toResource(final EventModel entity) {
         return createResource(entity);
     }
 
     @Override
-    protected EventResource instantiateResource(EventModel entity) {
+    protected EventResource instantiateResource(final EventModel entity) {
         return supplier.get();
     }
 }

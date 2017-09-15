@@ -29,7 +29,7 @@ public class RoundController {
 
     @RequestMapping
     ResponseEntity<Resources<RoundResource>> rounds(@PathVariable final int eventId) {
-        final List<RoundModel> roundModels = roundService.findAll(Application.EVENTS, eventId);
+        final List<RoundModel> roundModels = roundService.findAll(eventId);
         final Resources<RoundResource> roundResources = new Resources<>(roundModels.stream()
                 .map(roundModel -> roundModel.toResource(eventId))
                 .collect(Collectors.toList()));
@@ -44,13 +44,13 @@ public class RoundController {
         final Track track = Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getRounds().stream()
                 .filter(round -> round.getId() == roundId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new RoundNotFoundException(roundId))
                 .getTrack();
-        final RoundModel roundModel = roundService.findOne(Application.EVENTS, eventId, roundId);
+        final RoundModel roundModel = roundService.findOne(eventId, roundId);
         final RoundResource roundResource = roundModel.toResource(eventId);
         roundResource.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withRel("rounds"));
         roundResource.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
@@ -65,11 +65,11 @@ public class RoundController {
         final TrackModel trackModel = new TrackModel(Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getRounds().stream()
                 .filter(round -> round.getId() == roundId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new RoundNotFoundException(roundId))
                 .getTrack());
         final TrackResource trackResource = trackModel.toResource();
         trackResource.add(linkTo(methodOn(RoundController.class).roundTrack(eventId, roundId)).withSelfRel());

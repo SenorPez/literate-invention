@@ -23,22 +23,22 @@ public class CarFilter {
 
         private final String jsonString;
 
-        Operation(String jsonString) {
+        Operation(final String jsonString) {
             this.jsonString = jsonString;
         }
 
-        public static Operation fromJsonString(String jsonString) {
-            for (Operation operation : values()) {
+        private static Operation fromJsonString(final String jsonString) {
+            for (final Operation operation : values()) {
                 if (operation.jsonString.equalsIgnoreCase(jsonString)) return operation;
             }
             return null;
         }
 
-        public Predicate<Car> predicate(CarFilter carFilter) {
+        private Predicate<Car> predicate(final CarFilter carFilter) {
             return car -> {
                 if (carFilter.operation == null) return true;
                 try {
-                    Field classField = Car.class.getDeclaredField(carFilter.field);
+                    final Field classField = Car.class.getDeclaredField(carFilter.field);
                     classField.setAccessible(true);
                     switch (carFilter.operation) {
                         case EQUAL:
@@ -72,10 +72,10 @@ public class CarFilter {
     }
 
     public CarFilter(
-            @JsonProperty("field") String field,
-            @JsonProperty("operation") String operation,
-            @JsonProperty("value") String value,
-            @JsonProperty("orValues") List<String> orValues) {
+            @JsonProperty("field") final String field,
+            @JsonProperty("operation") final String operation,
+            @JsonProperty("value") final String value,
+            @JsonProperty("orValues") final List<String> orValues) {
                 this.field = field;
         this.operation = Operation.fromJsonString(operation);
                 this.value = value;

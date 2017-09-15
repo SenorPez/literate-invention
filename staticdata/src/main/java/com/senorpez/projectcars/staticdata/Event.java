@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Event {
+class Event {
     private final int id;
     private final String name;
     private final int tier;
@@ -17,12 +17,12 @@ public class Event {
 
     private final static AtomicInteger eventId = new AtomicInteger(0);
 
-    public Event(
-            @JsonProperty("name") String name,
-            @JsonProperty("tier") int tier,
-            @JsonProperty("rounds")JsonNode rounds,
-            @JsonProperty("verified") boolean verified,
-            @JsonProperty("carFilter") JsonNode carFilter) {
+    Event(
+            @JsonProperty("name") final String name,
+            @JsonProperty("tier") final int tier,
+            @JsonProperty("rounds") final JsonNode rounds,
+            @JsonProperty("verified") final boolean verified,
+            @JsonProperty("carFilter") final JsonNode carFilter) {
         this.id = eventId.incrementAndGet();
         this.name = name;
         this.tier = tier;
@@ -30,8 +30,8 @@ public class Event {
         if (carFilter.isNull()) {
             this.cars = null;
         } else {
-            Set<Car> cars = new HashSet<>(Application.CARS);
-            Set<CarFilter> carFilters = Application.getData(CarFilter.class, carFilter);
+            final Set<Car> cars = new HashSet<>(Application.CARS);
+            final Set<CarFilter> carFilters = Application.getData(CarFilter.class, carFilter);
             carFilters.forEach(filter -> cars.removeIf(filter.getOperation().negate()));
             this.cars = cars;
         }
@@ -42,27 +42,27 @@ public class Event {
         this.rounds = Application.getData(Round.class, rounds);
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public int getTier() {
+    int getTier() {
         return tier;
     }
 
-    public Set<Car> getCars() {
+    Set<Car> getCars() {
         return cars;
     }
 
-    public Set<Round> getRounds() {
+    Set<Round> getRounds() {
         return rounds;
     }
 
-    public Boolean getVerified() {
+    Boolean getVerified() {
         return verified;
     }
 }

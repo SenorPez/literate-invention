@@ -7,24 +7,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class LiveryService {
-    LiveryModel findOne(final Collection<Car> entities, final int carId, final int liveryId) {
-        return entities.stream()
+class LiveryService {
+    LiveryModel findOne(final int carId, final int liveryId) {
+        return Application.CARS.stream()
                 .filter(car -> car.getId() == carId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new CarNotFoundException(carId))
                 .getLiveries().stream()
                 .filter(livery -> livery.getId() == liveryId)
                 .findFirst()
                 .map(LiveryModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new LiveryNotFoundException(liveryId));
     }
 
     List<LiveryModel> findAll(final Collection<Car> entities, final int carId) {
         return entities.stream()
                 .filter(car -> car.getId() == carId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new CarNotFoundException(carId))
                 .getLiveries().stream()
                 .map(LiveryModel::new)
                 .collect(Collectors.toList());

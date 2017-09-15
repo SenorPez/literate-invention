@@ -2,37 +2,36 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RaceService {
-    RaceModel findOne(final Collection<Event> entities, final int eventId, final int roundId, final int raceId) {
-        return entities.stream()
+class RaceService {
+    RaceModel findOne(final int eventId, final int roundId, final int raceId) {
+        return Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getRounds().stream()
                 .filter(round -> round.getId() == roundId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new RoundNotFoundException(roundId))
                 .getRaces().stream()
                 .filter(race -> race.getId() == raceId)
                 .findFirst()
                 .map(RaceModel::new)
-                .orElse(null);
+                .orElseThrow(() -> new RaceNotFoundException(raceId));
     }
 
-    List<RaceModel> findAll(final Collection<Event> entities, final int eventId, final int roundId) {
-        return entities.stream()
+    List<RaceModel> findAll(final int eventId, final int roundId) {
+        return Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getRounds().stream()
                 .filter(round -> round.getId() == roundId)
                 .findFirst()
-                .orElse(null)
+                .orElseThrow(() -> new RoundNotFoundException(roundId))
                 .getRaces().stream()
                 .map(RaceModel::new)
                 .collect(Collectors.toList());

@@ -32,7 +32,7 @@ public class LiveryController {
 
     @RequestMapping("/{liveryId}")
     ResponseEntity<LiveryResource> liveries(@PathVariable final int carId, @PathVariable final int liveryId) {
-        final LiveryModel liveryModel = liveryService.findOne(Application.CARS, carId, liveryId);
+        final LiveryModel liveryModel = liveryService.findOne(carId, liveryId);
         return ResponseEntity.ok(liveryModel.toResource(carId));
     }
 }
