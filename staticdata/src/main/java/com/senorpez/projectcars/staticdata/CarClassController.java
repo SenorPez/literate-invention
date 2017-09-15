@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 @RequestMapping(
         value = "/classes",
         method = RequestMethod.GET,
@@ -27,12 +30,17 @@ public class CarClassController {
         final Resources<CarClassResource> carClassResources = new Resources<>(carClassModels.stream()
                 .map(CarClassModel::toResource)
                 .collect(Collectors.toList()));
+        carClassResources.add(linkTo(methodOn(CarClassController.class).carClasses()).withSelfRel());
+        carClassResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(carClassResources);
     }
 
     @RequestMapping("/{id}")
     ResponseEntity<CarClassResource> carClasses(@PathVariable final int id) {
         final CarClassModel carClassModel = carClassService.findOne(Application.CAR_CLASSES, id);
-        return ResponseEntity.ok(carClassModel.toResource());
+        final CarClassResource carClassResource = carClassModel.toResource();
+        carClassResource.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
+        carClassResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
+        return ResponseEntity.ok(carClassResource);
     }
 }

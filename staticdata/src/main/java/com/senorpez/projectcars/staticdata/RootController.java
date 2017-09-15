@@ -34,7 +34,7 @@ public class RootController {
     ResponseEntity<ResourceSupport> root2() {
         final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root2()).withSelfRel());
-//        root.add(linkTo(methodOn(Car2Controller.class).cars2()).withRel("cars"));
+        root.add(linkTo(methodOn(Car2Controller.class).cars()).withRel("cars"));
         return ResponseEntity.ok(root);
     }
 }

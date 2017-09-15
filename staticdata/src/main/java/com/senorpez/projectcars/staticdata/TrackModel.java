@@ -40,4 +40,28 @@ public class TrackModel implements Identifiable<Integer> {
     public String getName() {
         return name;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getVariation() {
+        return variation;
+    }
+
+    public float getLength() {
+        return length;
+    }
+
+    public List<Float> getPitEntry() {
+        return pitEntry;
+    }
+
+    public List<Float> getPitExit() {
+        return pitExit;
+    }
+
+    public int getGridSize() {
+        return gridSize;
+    }
 }

@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
@@ -27,6 +28,8 @@ class CarModel implements Identifiable<Integer> {
     private final int gears;
     private final String dlc;
 
+    private final int carClassId;
+
     CarModel(final Car car) {
         this.id = car.getId();
         this.manufacturer = car.getManufacturer();
@@ -49,6 +52,8 @@ class CarModel implements Identifiable<Integer> {
         this.shifter = car.getShifter().getDisplayString();
         this.gears = car.getGears();
         this.dlc = car.getDlc();
+
+        this.carClassId = car.getCarClass().getId();
     }
 
     CarResource toResource() {
@@ -139,5 +144,10 @@ class CarModel implements Identifiable<Integer> {
 
     public String getDlc() {
         return dlc;
+    }
+
+    @JsonIgnore
+    public int getCarClassId() {
+        return carClassId;
     }
 }

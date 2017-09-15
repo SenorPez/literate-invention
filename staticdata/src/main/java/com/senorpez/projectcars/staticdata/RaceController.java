@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 @RequestMapping(
         value = "/events/{eventId}/rounds/{roundId}/races",
         method = RequestMethod.GET,
@@ -27,12 +30,18 @@ public class RaceController {
         final Resources<RaceResource> raceResources = new Resources<>(raceModels.stream()
                 .map(raceModel -> raceModel.toResource(eventId, roundId))
                 .collect(Collectors.toList()));
+        raceResources.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withSelfRel());
+        raceResources.add(linkTo(methodOn(RoundController.class).rounds(eventId, roundId)).withRel("round"));
+        raceResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(raceResources);
     }
 
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
         final RaceModel raceModel = raceService.findOne(Application.EVENTS, eventId, roundId, raceId);
-        return ResponseEntity.ok(raceModel.toResource(eventId, roundId));
+        final RaceResource raceResource = raceModel.toResource(eventId, roundId);
+        raceResource.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
+        raceResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
+        return ResponseEntity.ok(raceResource);
     }
 }
