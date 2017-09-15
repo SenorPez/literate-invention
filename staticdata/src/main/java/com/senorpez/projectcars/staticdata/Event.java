@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Event {
     private final int id;
     private final String name;
-    private final int tier;
+    private final Integer tier;
     private final Set<Car> cars;
     private final Set<Round> rounds;
     private final Boolean verified;
@@ -50,7 +50,7 @@ class Event {
         return name;
     }
 
-    int getTier() {
+    Integer getTier() {
         return tier;
     }
 

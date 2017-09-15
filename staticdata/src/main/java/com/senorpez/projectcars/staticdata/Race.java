@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class Race {
     private final int id;
-    private final int laps;
-    private final int time;
+    private final Integer laps;
+    private final Integer time;
     private final String type;
 
     private final static AtomicInteger raceId = new AtomicInteger(0);
@@ -26,11 +26,11 @@ class Race {
         return id;
     }
 
-    int getLaps() {
+    Integer getLaps() {
         return laps;
     }
 
-    int getTime() {
+    Integer getTime() {
         return time;
     }
 

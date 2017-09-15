@@ -40,26 +40,36 @@ public class CarFilter {
                 try {
                     final Field classField = Car.class.getDeclaredField(carFilter.field);
                     classField.setAccessible(true);
+
+                    // TODO: 09/14/17 This feels hacky, and should probably be made more elegant.
+                    final String fieldValue;
+                    if (carFilter.field.equalsIgnoreCase("carClass")) {
+                        final CarClass carClass = (CarClass) classField.get(car);
+                        fieldValue = carClass.getName();
+                    } else {
+                        fieldValue = classField.get(car).toString().toLowerCase();
+                    }
+
                     switch (carFilter.operation) {
                         case EQUAL:
                             if (carFilter.value == null) {
-                                return carFilter.orValues.contains(classField.get(car).toString().toLowerCase());
+                                return carFilter.orValues.contains(fieldValue);
                             } else {
-                                return classField.get(car).toString().equalsIgnoreCase(carFilter.value);
+                                return fieldValue.equalsIgnoreCase(carFilter.value);
                             }
 
                         case NOTEQUAL:
                             if (carFilter.value == null) {
-                                return !carFilter.orValues.contains(classField.get(car).toString().toLowerCase());
+                                return !carFilter.orValues.contains(fieldValue);
                             } else {
-                                return !classField.get(car).toString().equalsIgnoreCase(carFilter.value);
+                                return !fieldValue.equalsIgnoreCase(carFilter.value);
                             }
 
                         case GREATERTHAN:
-                            return carFilter.value != null && Integer.valueOf(classField.get(car).toString()) > Integer.valueOf(carFilter.value);
+                            return carFilter.value != null && Integer.valueOf(fieldValue) > Integer.valueOf(carFilter.value);
 
                         case LESSTHAN:
-                            return carFilter.value != null && Integer.valueOf(classField.get(car).toString()) < Integer.valueOf(carFilter.value);
+                            return carFilter.value != null && Integer.valueOf(fieldValue) < Integer.valueOf(carFilter.value);
 
                         default:
                             return false;
