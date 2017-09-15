@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.HashSet;
 import java.util.Set;
 
 class Car {
@@ -130,8 +129,7 @@ class Car {
         this.shifter = shifter;
         this.gears = gears;
         this.dlc = dlc;
-//        this.liveries = Application.getData(Livery.class, liveries);
-        this.liveries = new HashSet<>();
+        this.liveries = Application.getData(Livery.class, liveries);
     }
 
     public int getId() {

@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 @RestController
 public class EventController {
     @Autowired
+    private CarService carService;
+
+    @Autowired
     private EventService eventService;
 
     @RequestMapping
@@ -34,5 +37,28 @@ public class EventController {
     ResponseEntity<EventResource> events(@PathVariable final int id) {
         final EventModel eventModel = eventService.findOne(Application.EVENTS, id);
         return ResponseEntity.ok(eventModel.toResource());
+    }
+
+    @RequestMapping("/{eventId}/cars")
+    ResponseEntity<Resources<EmbeddedCarResource>> eventCars(@PathVariable final int eventId) {
+        final List<EmbeddedCarModel> carModels = carService.findAll(Application.EVENTS.stream()
+                .filter(event -> event.getId() == eventId)
+                .findFirst()
+                .orElse(null)
+                .getCars());
+        final Resources<EmbeddedCarResource> carResources = new Resources<>(carModels.stream()
+                .map(EmbeddedCarModel::toResource)
+                .collect(Collectors.toList()));
+        return ResponseEntity.ok(carResources);
+    }
+
+    @RequestMapping("/{eventId}/cars/{carId}")
+    ResponseEntity<CarResource> eventCars(@PathVariable final int eventId, @PathVariable final int carId) {
+        final CarModel carModel = carService.findOne(Application.EVENTS.stream()
+                .filter(event -> event.getId() == eventId)
+                .findFirst()
+                .orElse(null)
+                .getCars(), carId);
+        return ResponseEntity.ok(carModel.toResource());
     }
 }
