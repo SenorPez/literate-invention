@@ -118,11 +118,23 @@ public class EventController {
         final Resources<LiveryResource> liveryResources = new Resources<>(liveryModels.stream()
                 .map(liveryModel -> liveryModel.toResource(carId))
                 .collect(Collectors.toList()));
+        liveryResources.forEach(liveryResource -> liveryResource.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withSelfRel()));
         liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(CarController.class).cars(carId)).withRel("car"));
         liveryResources.add(linkTo(methodOn(EventController.class).eventCars(eventId, carId)).withRel("car"));
         liveryResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(liveryResources);
+    }
+
+    @RequestMapping("/{eventId}/cars/{carId}/liveries/{liveryId}")
+    ResponseEntity<LiveryResource> eventCarLiveries(@PathVariable final int eventId, @PathVariable final int carId, @PathVariable final int liveryId) {
+        final LiveryModel liveryModel = liveryService.findOne(carId, liveryId);
+        final LiveryResource liveryResource = liveryModel.toResource(carId);
+        liveryResource.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId, liveryId)).withSelfRel());
+        liveryResource.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withRel("liveries"));
+        liveryResource.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withRel("liveries"));
+        liveryResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
+        return ResponseEntity.ok(liveryResource);
     }
 }

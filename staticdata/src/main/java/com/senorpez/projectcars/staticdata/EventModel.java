@@ -7,7 +7,7 @@ import org.springframework.hateoas.core.Relation;
 class EventModel implements Identifiable<Integer> {
     private final int id;
     private final String name;
-    private final int tier;
+    private final Integer tier;
     private final Boolean verified;
 
     EventModel(final Event event) {
@@ -31,7 +31,7 @@ class EventModel implements Identifiable<Integer> {
         return name;
     }
 
-    public int getTier() {
+    public Integer getTier() {
         return tier;
     }
 

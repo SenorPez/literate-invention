@@ -6,8 +6,8 @@ import org.springframework.hateoas.core.Relation;
 @Relation(value = "race", collectionRelation = "race")
 class RaceModel implements Identifiable<Integer> {
     private final int id;
-    private final int laps;
-    private final int time;
+    private final Integer laps;
+    private final Integer time;
     private final String type;
 
     RaceModel(final Race race) {
@@ -32,11 +32,11 @@ class RaceModel implements Identifiable<Integer> {
         return id;
     }
 
-    public int getLaps() {
+    public Integer getLaps() {
         return laps;
     }
 
-    public int getTime() {
+    public Integer getTime() {
         return time;
     }
 
