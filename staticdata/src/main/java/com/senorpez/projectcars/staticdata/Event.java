@@ -19,7 +19,7 @@ class Event {
 
     Event(
             @JsonProperty("name") final String name,
-            @JsonProperty("tier") final int tier,
+            @JsonProperty("tier") final Integer tier,
             @JsonProperty("rounds") final JsonNode rounds,
             @JsonProperty("verified") final boolean verified,
             @JsonProperty("carFilter") final JsonNode carFilter) {

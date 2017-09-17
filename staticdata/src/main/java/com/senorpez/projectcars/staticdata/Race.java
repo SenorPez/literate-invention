@@ -13,8 +13,8 @@ class Race {
     private final static AtomicInteger raceId = new AtomicInteger(0);
 
     Race(
-            @JsonProperty("laps") final int laps,
-            @JsonProperty("time") final int time,
+            @JsonProperty("laps") final Integer laps,
+            @JsonProperty("time") final Integer time,
             @JsonProperty("type") final String type) {
         this.id = raceId.incrementAndGet();
         this.laps = laps;
