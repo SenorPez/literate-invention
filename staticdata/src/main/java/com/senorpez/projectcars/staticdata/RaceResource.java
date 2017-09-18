@@ -4,7 +4,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 
-import java.util.List;
+import java.util.Collection;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -15,7 +15,7 @@ class RaceResource extends Resource<RaceModel> {
         this.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
     }
 
-    static Resources<RaceResource> makeResources(final List<RaceResource> resources, final int eventId, final int roundId) {
+    static Resources<RaceResource> makeResources(final Collection<RaceResource> resources, final int eventId, final int roundId) {
         final Resources<RaceResource> raceResources = new Resources<>(resources);
         raceResources.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withSelfRel());
         raceResources.add(linkTo(methodOn(RoundController.class).rounds(eventId, roundId)).withRel("round"));

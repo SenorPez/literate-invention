@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -19,20 +19,27 @@ import java.util.stream.Collectors;
 @RestController
 public class TrackController {
     @Autowired
-    private TrackService trackService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<EmbeddedTrackResources> tracks() {
-        final List<EmbeddedTrackModel> trackModels = trackService.findAll();
-        final List<Resource<EmbeddedTrackModel>> trackResources = trackModels.stream()
+        final Collection<Track> tracks = Application.TRACKS;
+        final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
+                .map(EmbeddedTrackModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedTrackModel>> trackResources = trackModels.stream()
                 .map(EmbeddedTrackModel::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new EmbeddedTrackResources(trackResources));
     }
 
-    @RequestMapping("/{id}")
-    ResponseEntity<TrackResource> tracks(@PathVariable final int id) {
-        final TrackModel trackModel = trackService.findOne(id);
+    @RequestMapping("/{trackId}")
+    ResponseEntity<TrackResource> tracks(@PathVariable final int trackId) {
+        final Track track = apiService.findOne(
+                Application.TRACKS,
+                findTrack -> findTrack.getId() == trackId,
+                () -> new TrackNotFoundException(trackId));
+        final TrackModel trackModel = new TrackModel(track);
         final TrackResource trackResource = trackModel.toResource();
         return ResponseEntity.ok(trackResource);
     }

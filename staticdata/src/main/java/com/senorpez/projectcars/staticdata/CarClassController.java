@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -20,12 +20,15 @@ import java.util.stream.Collectors;
 @RestController
 public class CarClassController {
     @Autowired
-    private CarClassService carClassService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<Resources<Resource<CarClassModel>>> carClasses() {
-        final List<CarClassModel> carClassModels = carClassService.findAll();
-        final List<Resource<CarClassModel>> carClassResources = carClassModels.stream()
+        final Collection<CarClass> carClasses = Application.CAR_CLASSES;
+        final Collection<CarClassModel> carClassModels = carClasses.stream()
+                .map(CarClassModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<CarClassModel>> carClassResources = carClassModels.stream()
                 .map(CarClassModel::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new Resources<>(carClassResources));
@@ -33,7 +36,11 @@ public class CarClassController {
 
     @RequestMapping("/{carClassId}")
     ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
-        final CarClassModel carClassModel = carClassService.findOne(carClassId);
+        final CarClass carClass = apiService.findOne(
+                Application.CAR_CLASSES,
+                findCarClass -> findCarClass.getId() == carClassId,
+                () -> new CarClassNotFoundException(carClassId));
+        final CarClassModel carClassModel = new CarClassModel(carClass);
         final CarClassResource carClassResource = carClassModel.toResource();
         return ResponseEntity.ok(carClassResource);
     }

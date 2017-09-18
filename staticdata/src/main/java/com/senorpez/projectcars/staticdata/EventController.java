@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -20,34 +20,42 @@ import java.util.stream.Collectors;
 @RestController
 public class EventController {
     @Autowired
-    private CarService carService;
-
-    @Autowired
-    private EventService eventService;
-
-    @Autowired
-    private LiveryService liveryService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<EmbeddedEventResources> events() {
-        final List<EmbeddedEventModel> eventModels = eventService.findAll();
-        final List<Resource<EmbeddedEventModel>> eventResources = eventModels.stream()
+        final Collection<Event> events = Application.EVENTS;
+        final Collection<EmbeddedEventModel> eventModels = events.stream()
+                .map(EmbeddedEventModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedEventModel>> eventResources = eventModels.stream()
                 .map(EmbeddedEventModel::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new EmbeddedEventResources(eventResources));
     }
 
-    @RequestMapping("/{id}")
-    ResponseEntity<EventResource> events(@PathVariable final int id) {
-        final EventModel eventModel = eventService.findOne(id);
+    @RequestMapping("/{eventId}")
+    ResponseEntity<EventResource> events(@PathVariable final int eventId) {
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final EventModel eventModel = new EventModel(event);
         final EventResource eventResource = eventModel.toResource();
         return ResponseEntity.ok(eventResource);
     }
 
     @RequestMapping("/{eventId}/cars")
     ResponseEntity<Resources<Resource<EmbeddedCarModel>>> eventCars(@PathVariable final int eventId) {
-        final List<EmbeddedCarModel> carModels = carService.findEventCars(eventId);
-        final List<Resource<EmbeddedCarModel>> carResources = carModels.stream()
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Collection<Car> cars = event.getCars();
+        final Collection<EmbeddedCarModel> carModels = cars.stream()
+                .map(EmbeddedCarModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedCarModel>> carResources = carModels.stream()
                 .map(car -> car.toResource(eventId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new EmbeddedCarResources(carResources, eventId));
@@ -55,22 +63,49 @@ public class EventController {
 
     @RequestMapping("/{eventId}/cars/{carId}")
     ResponseEntity<CarResource> eventCars(@PathVariable final int eventId, @PathVariable final int carId) {
-        final CarModel carModel = carService.findEventCar(eventId, carId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Car car = apiService.findOne(
+                event.getCars(),
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final CarModel carModel = new CarModel(car);
         final CarResource carResource = carModel.toResource(eventId);
         return ResponseEntity.ok(carResource);
     }
 
     @RequestMapping("/{eventId}/cars/{carId}/class")
     ResponseEntity<CarClassResource> eventCarClass(@PathVariable final int eventId, @PathVariable final int carId) {
-        final CarClassModel carClassModel = carService.findCarClass(carId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Car car = apiService.findOne(
+                event.getCars(),
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final CarClassModel carClassModel = new CarClassModel(car.getCarClass());
         final CarClassResource carClassResource = carClassModel.toResource(eventId, carId);
         return ResponseEntity.ok(carClassResource);
     }
 
     @RequestMapping("/{eventId}/cars/{carId}/liveries")
     ResponseEntity<Resources<LiveryResource>> eventCarLiveries(@PathVariable final int eventId, @PathVariable final int carId) {
-        final List<LiveryModel> liveryModels = carService.findEventCarLiveries(eventId, carId);
-        final List<LiveryResource> liveryResources = liveryModels.stream()
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Car car = apiService.findOne(
+                event.getCars(),
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Collection<Livery> liveries = car.getLiveries();
+        final Collection<LiveryModel> liveryModels = liveries.stream()
+                .map(LiveryModel::new)
+                .collect(Collectors.toList());
+        final Collection<LiveryResource> liveryResources = liveryModels.stream()
                 .map(liveryModel -> liveryModel.toResource(eventId, carId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(LiveryResource.makeResources(liveryResources, eventId, carId));
@@ -78,7 +113,19 @@ public class EventController {
 
     @RequestMapping("/{eventId}/cars/{carId}/liveries/{liveryId}")
     ResponseEntity<LiveryResource> eventCarLiveries(@PathVariable final int eventId, @PathVariable final int carId, @PathVariable final int liveryId) {
-        final LiveryModel liveryModel = liveryService.findOne(eventId, carId, liveryId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Car car = apiService.findOne(
+                event.getCars(),
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Livery livery = apiService.findOne(
+                car.getLiveries(),
+                findLivery -> findLivery.getId() == liveryId,
+                () -> new LiveryNotFoundException(liveryId));
+        final LiveryModel liveryModel = new LiveryModel(livery);
         final LiveryResource liveryResource = liveryModel.toResource(carId);
         return ResponseEntity.ok(liveryResource);
     }

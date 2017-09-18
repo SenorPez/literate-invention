@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -19,15 +19,19 @@ import java.util.stream.Collectors;
 @RestController
 public class RoundController {
     @Autowired
-    private RoundService roundService;
-
-    @Autowired
-    private TrackService trackService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<Resources<RoundResource>> rounds(@PathVariable final int eventId) {
-        final List<RoundModel> roundModels = roundService.findAll(eventId);
-        final List<RoundResource> roundResources = roundModels.stream()
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Collection<Round> rounds = event.getRounds();
+        final Collection<RoundModel> roundModels = rounds.stream()
+                .map(RoundModel::new)
+                .collect(Collectors.toList());
+        final Collection<RoundResource> roundResources = roundModels.stream()
                 .map(roundModel -> roundModel.toResource(eventId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(RoundResource.makeResources(roundResources, eventId));
@@ -35,7 +39,15 @@ public class RoundController {
 
     @RequestMapping("/{roundId}")
     ResponseEntity<RoundResource> rounds(@PathVariable final int eventId, @PathVariable final int roundId) {
-        final RoundModel roundModel = roundService.findOne(eventId, roundId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final RoundModel roundModel = new RoundModel(round);
         final RoundResource roundResource = roundModel.toResource(eventId);
         return ResponseEntity.ok(roundResource);
     }

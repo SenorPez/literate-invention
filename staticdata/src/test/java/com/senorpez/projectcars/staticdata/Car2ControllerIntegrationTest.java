@@ -42,7 +42,6 @@
 //    private WebApplicationContext webApplicationContext;
 //
 //    @SpyBean
-//    private Car2Service car2ServiceMock;
 //
 //    @InjectMocks
 //    private Car2Controller car2Controller;

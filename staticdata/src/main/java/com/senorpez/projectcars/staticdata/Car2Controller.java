@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -20,12 +20,15 @@ import java.util.stream.Collectors;
 @RestController
 public class Car2Controller {
     @Autowired
-    private Car2Service car2Service;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<EmbeddedCar2Resources> cars() {
-        final List<EmbeddedCar2Model> car2Models = car2Service.findAll();
-        final List<Resource<EmbeddedCar2Model>> car2Resources = car2Models.stream()
+        final Collection<Car2> car2s = Application.CARS2;
+        final Collection<EmbeddedCar2Model> car2Models = car2s.stream()
+                .map(EmbeddedCar2Model::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedCar2Model>> car2Resources = car2Models.stream()
                 .map(EmbeddedCar2Model::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new EmbeddedCar2Resources(car2Resources));
@@ -33,7 +36,11 @@ public class Car2Controller {
 
     @RequestMapping("/{id}")
     ResponseEntity<Car2Resource> cars(@PathVariable final int id) {
-        final Car2Model car2Model = car2Service.findOne(id);
+        final Car2 car2 = apiService.findOne(
+                Application.CARS2,
+                findCar -> findCar.getId() == id,
+                () -> new CarNotFoundException(id));
+        final Car2Model car2Model = new Car2Model(car2);
         return ResponseEntity.ok(car2Model.toResource());
     }
 }

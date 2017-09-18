@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -19,12 +19,23 @@ import java.util.stream.Collectors;
 @RestController
 public class RaceController {
     @Autowired
-    private RaceService raceService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<Resources<RaceResource>> races(@PathVariable final int eventId, @PathVariable final int roundId) {
-        final List<RaceModel> raceModels = raceService.findAll(eventId, roundId);
-        final List<RaceResource> raceResources = raceModels.stream()
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final Collection<Race> races = round.getRaces();
+        final Collection<RaceModel> raceModels = races.stream()
+                .map(RaceModel::new)
+                .collect(Collectors.toList());
+        final Collection<RaceResource> raceResources = raceModels.stream()
                 .map(raceModel -> raceModel.toResource(eventId, roundId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(RaceResource.makeResources(raceResources, eventId, roundId));
@@ -32,7 +43,19 @@ public class RaceController {
 
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
-        final RaceModel raceModel = raceService.findOne(eventId, roundId, raceId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final Race race = apiService.findOne(
+                round.getRaces(),
+                findRace -> findRace.getId() == raceId,
+                () -> new RaceNotFoundException(raceId));
+        final RaceModel raceModel = new RaceModel(race);
         final RaceResource raceResource = raceModel.toResource(eventId, roundId);
         return ResponseEntity.ok(raceResource);
     }

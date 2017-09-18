@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @RequestMapping(
@@ -19,12 +19,19 @@ import java.util.stream.Collectors;
 @RestController
 public class LiveryController {
     @Autowired
-    private LiveryService liveryService;
+    private APIService apiService;
 
     @RequestMapping
     ResponseEntity<Resources<LiveryResource>> liveries(@PathVariable final int carId) {
-        final List<LiveryModel> liveryModels = liveryService.findAll(carId);
-        final List<LiveryResource> liveryResources = liveryModels.stream()
+        final Car car = apiService.findOne(
+                Application.CARS,
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Collection<Livery> liveries = car.getLiveries();
+        final Collection<LiveryModel> liveryModels = liveries.stream()
+                .map(LiveryModel::new)
+                .collect(Collectors.toList());
+        final Collection<LiveryResource> liveryResources = liveryModels.stream()
                 .map(LiveryModel::toResource)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(LiveryResource.makeResources(liveryResources, carId));
@@ -32,7 +39,15 @@ public class LiveryController {
 
     @RequestMapping("/{liveryId}")
     ResponseEntity<LiveryResource> liveries(@PathVariable final int carId, @PathVariable final int liveryId) {
-        final LiveryModel liveryModel = liveryService.findOne(carId, liveryId);
+        final Car car = apiService.findOne(
+                Application.CARS,
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Livery livery = apiService.findOne(
+                car.getLiveries(),
+                findLivery -> findLivery.getId() == liveryId,
+                () -> new LiveryNotFoundException(liveryId));
+        final LiveryModel liveryModel = new LiveryModel(livery);
         final LiveryResource liveryResource = liveryModel.toResource(carId);
         return ResponseEntity.ok(liveryResource);
     }

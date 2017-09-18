@@ -4,7 +4,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 
-import java.util.List;
+import java.util.Collection;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -31,14 +31,14 @@ class LiveryResource extends Resource<LiveryModel> {
         this.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withRel("liveries"));
     }
 
-    static Resources<LiveryResource> makeResources(final List<LiveryResource> resources, final int carId) {
+    static Resources<LiveryResource> makeResources(final Collection<LiveryResource> resources, final int carId) {
         final Resources<LiveryResource> liveryResources = new Resources<>(resources);
         liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return liveryResources;
     }
 
-    static Resources<LiveryResource> makeResources(final List<LiveryResource> resources, final int eventId, final int carId) {
+    static Resources<LiveryResource> makeResources(final Collection<LiveryResource> resources, final int eventId, final int carId) {
         final Resources<LiveryResource> liveryResources = new Resources<>(resources);
         liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withSelfRel());
