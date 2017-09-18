@@ -1,6 +1,8 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.hateoas.Identifiable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "track", collectionRelation = "track")
@@ -13,9 +15,15 @@ class EmbeddedTrackModel implements Identifiable<Integer> {
         this.name = track.getName();
     }
 
-    EmbeddedTrackResource toResource() {
-        final EmbeddedTrackResourceAssembler assembler = new EmbeddedTrackResourceAssembler(() -> new EmbeddedTrackResource(this));
+    Resource<EmbeddedTrackModel> toResource() {
+        final APIEmbeddedResourceAssembler<EmbeddedTrackModel, EmbeddedTrackResource> assembler = new APIEmbeddedResourceAssembler<>(TrackController.class, EmbeddedTrackResource.class, () -> new EmbeddedTrackResource(this));
         return assembler.toResource(this);
+    }
+
+    private class EmbeddedTrackResource extends Resource<EmbeddedTrackModel> {
+        private EmbeddedTrackResource(final EmbeddedTrackModel content, final Link... links) {
+            super(content, links);
+        }
     }
 
     @Override

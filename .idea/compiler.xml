@@ -6,14 +6,10 @@
       <module name="literate-invention_test" target="1.8" />
       <module name="packetcapture_main" target="1.8" />
       <module name="packetcapture_test" target="1.8" />
-      <module name="race-data_main" target="1.8" />
-      <module name="race-data_test" target="1.8" />
-      <module name="race-report_main" target="1.8" />
-      <module name="race-report_test" target="1.8" />
       <module name="racedata_main" target="1.8" />
       <module name="racedata_test" target="1.8" />
-      <module name="static-data-api_main" target="1.8" />
-      <module name="static-data-api_test" target="1.8" />
+      <module name="racereport_main" target="1.8" />
+      <module name="racereport_test" target="1.8" />
       <module name="staticdata_main" target="1.8" />
       <module name="staticdata_test" target="1.8" />
     </bytecodeTargetLevel>

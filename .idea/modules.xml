@@ -8,6 +8,12 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture.iml" group="packetcapture" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_main.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_main.iml" group="packetcapture" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_test.iml" filepath="$PROJECT_DIR$/.idea/modules/packetcapture/packetcapture_test.iml" group="packetcapture" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata.iml" group="racedata" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata/racedata_main.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata/racedata_main.iml" group="racedata" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racedata/racedata_test.iml" filepath="$PROJECT_DIR$/.idea/modules/racedata/racedata_test.iml" group="racedata" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racereport.iml" filepath="$PROJECT_DIR$/.idea/modules/racereport.iml" group="racereport" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racereport/racereport_main.iml" filepath="$PROJECT_DIR$/.idea/modules/racereport/racereport_main.iml" group="racereport" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/racereport/racereport_test.iml" filepath="$PROJECT_DIR$/.idea/modules/racereport/racereport_test.iml" group="racereport" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/staticdata.iml" filepath="$PROJECT_DIR$/.idea/modules/staticdata.iml" group="staticdata" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/staticdata/staticdata_main.iml" filepath="$PROJECT_DIR$/.idea/modules/staticdata/staticdata_main.iml" group="staticdata" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/staticdata/staticdata_test.iml" filepath="$PROJECT_DIR$/.idea/modules/staticdata/staticdata_test.iml" group="staticdata" />

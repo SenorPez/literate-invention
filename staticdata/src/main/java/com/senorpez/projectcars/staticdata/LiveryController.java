@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 @RequestMapping(
         value = "/cars/{carId}/liveries",
         method = RequestMethod.GET,
@@ -26,21 +23,17 @@ public class LiveryController {
 
     @RequestMapping
     ResponseEntity<Resources<LiveryResource>> liveries(@PathVariable final int carId) {
-        final List<LiveryModel> liveryModels = liveryService.findAll(Application.CARS, carId);
-        final Resources<LiveryResource> liveryResources = new Resources<>(liveryModels.stream()
-                .map(liveryModel -> liveryModel.toResource(carId))
-                .collect(Collectors.toList()));
-        liveryResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
-        return ResponseEntity.ok(liveryResources);
+        final List<LiveryModel> liveryModels = liveryService.findAll(carId);
+        final List<LiveryResource> liveryResources = liveryModels.stream()
+                .map(LiveryModel::toResource)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(LiveryResource.makeResources(liveryResources, carId));
     }
 
     @RequestMapping("/{liveryId}")
     ResponseEntity<LiveryResource> liveries(@PathVariable final int carId, @PathVariable final int liveryId) {
         final LiveryModel liveryModel = liveryService.findOne(carId, liveryId);
         final LiveryResource liveryResource = liveryModel.toResource(carId);
-        liveryResource.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withRel("liveries"));
-        liveryResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(liveryResource);
     }
 }

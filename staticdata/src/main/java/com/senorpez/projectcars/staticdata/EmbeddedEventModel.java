@@ -1,6 +1,8 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.hateoas.Identifiable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "event", collectionRelation = "event")
@@ -13,9 +15,15 @@ class EmbeddedEventModel implements Identifiable<Integer> {
         this.name = event.getName();
     }
 
-    EmbeddedEventResource toResource() {
-        final EmbeddedEventResourceAssembler assembler = new EmbeddedEventResourceAssembler(() -> new EmbeddedEventResource(this));
+    Resource<EmbeddedEventModel> toResource() {
+        final APIEmbeddedResourceAssembler<EmbeddedEventModel, EmbeddedEventResource> assembler = new APIEmbeddedResourceAssembler<>(EventController.class, EmbeddedEventResource.class, () -> new EmbeddedEventResource(this));
         return assembler.toResource(this);
+    }
+
+    private class EmbeddedEventResource extends Resource<EmbeddedEventModel> {
+        private EmbeddedEventResource(final EmbeddedEventModel content, final Link... links) {
+            super(content, links);
+        }
     }
 
     @Override

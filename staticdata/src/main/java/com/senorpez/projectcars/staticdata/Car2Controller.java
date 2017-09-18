@@ -1,7 +1,7 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +23,12 @@ public class Car2Controller {
     private Car2Service car2Service;
 
     @RequestMapping
-    ResponseEntity<Resources<EmbeddedCar2Resource>> cars() {
+    ResponseEntity<EmbeddedCar2Resources> cars() {
         final List<EmbeddedCar2Model> car2Models = car2Service.findAll();
-        final Resources<EmbeddedCar2Resource> car2Resources = new Resources<>(car2Models.stream()
+        final List<Resource<EmbeddedCar2Model>> car2Resources = car2Models.stream()
                 .map(EmbeddedCar2Model::toResource)
-                .collect(Collectors.toList()));
-        return ResponseEntity.ok(car2Resources);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new EmbeddedCar2Resources(car2Resources));
     }
 
     @RequestMapping("/{id}")

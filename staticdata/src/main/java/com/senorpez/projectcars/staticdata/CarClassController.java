@@ -1,6 +1,7 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,9 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/classes",
@@ -25,22 +23,18 @@ public class CarClassController {
     private CarClassService carClassService;
 
     @RequestMapping
-    ResponseEntity<Resources<CarClassResource>> carClasses() {
+    ResponseEntity<Resources<Resource<CarClassModel>>> carClasses() {
         final List<CarClassModel> carClassModels = carClassService.findAll();
-        final Resources<CarClassResource> carClassResources = new Resources<>(carClassModels.stream()
+        final List<Resource<CarClassModel>> carClassResources = carClassModels.stream()
                 .map(CarClassModel::toResource)
-                .collect(Collectors.toList()));
-        carClassResources.add(linkTo(methodOn(CarClassController.class).carClasses()).withSelfRel());
-        carClassResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        return ResponseEntity.ok(carClassResources);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new Resources<>(carClassResources));
     }
 
-    @RequestMapping("/{id}")
-    ResponseEntity<CarClassResource> carClasses(@PathVariable final int id) {
-        final CarClassModel carClassModel = carClassService.findOne(id);
+    @RequestMapping("/{carClassId}")
+    ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
+        final CarClassModel carClassModel = carClassService.findOne(carClassId);
         final CarClassResource carClassResource = carClassModel.toResource();
-        carClassResource.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
-        carClassResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(carClassResource);
     }
 }
