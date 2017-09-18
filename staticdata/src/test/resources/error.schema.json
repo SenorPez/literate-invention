@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-6/schema",
+  "title": "Project CARS Static Data API Error",
+  "description": "JSON Representation of Project CARS Static Data API error page.",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "integer"
+      },
+    "message": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "code",
+    "message"
+  ]
+}
