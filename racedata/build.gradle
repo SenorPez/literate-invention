@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'idea'
+    id 'maven'
+    id 'signing'
+}
+
+group 'com.senorpez.projectcars'
+version '0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = false
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.artifactId = 'racedata'
+
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+                proxy(host: "3.20.109.242", port: 9400, type:"http")
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+                proxy(host: "3.20.109.242", port: 9400, type:"http")
+            }
+
+            pom.project {
+                name 'Project CARS Race Data'
+                packaging 'jar'
+                description 'Project CARS race data java interface'
+                url 'https://github.com/SenorPez/literate-invention'
+
+                scm {
+                    connection 'scm:git:git://github.com/SenorPez/literate-invention.git'
+                    developerConnection 'scm:git:ssh://github.com/SenorPez/literate-invention.git'
+                    url 'https://github.com/SenorPez/literate-invention/tree/master'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'SenorPez'
+                        name 'M. Francois'
+                        email 'senorpez@senorpez.com'
+                    }
+                }
+            }
+        }
+    }
+}
