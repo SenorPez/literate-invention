@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -15,9 +16,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 )
 @RestController
 public class RootController {
-    @RequestMapping(
-            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
-    )
+    @RequestMapping(produces = {PROJECT_CARS_VALUE, FALLBACK_VALUE})
     ResponseEntity<ResourceSupport> root() {
         final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
@@ -28,9 +27,7 @@ public class RootController {
         return ResponseEntity.ok(root);
     }
 
-    @RequestMapping(
-            produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
-    )
+    @RequestMapping(produces = PROJECT_CARS_2_VALUE)
     ResponseEntity<ResourceSupport> root2() {
         final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root2()).withSelfRel());

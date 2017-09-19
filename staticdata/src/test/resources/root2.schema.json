@@ -55,30 +55,6 @@
             }
           }
         },
-        "pcars:classes": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
-        },
-        "pcars:events": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
-        },
-        "pcars:tracks": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
-        },
         "curies": {
           "$ref": "#/definitions/curies"
         }
@@ -87,9 +63,6 @@
       "required": [
         "self",
         "pcars:cars",
-        "pcars:classes",
-        "pcars:events",
-        "pcars:tracks",
         "curies"
       ]
     }
