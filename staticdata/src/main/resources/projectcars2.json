@@ -1,190 +1,63 @@
 {
-  "cars": [
-    {
-      "manufacturer": "Ferrari",
-      "model": "LaFerrari",
-      "year": 2015,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "McLaren",
-      "model": "720S",
-      "year": 2017,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "McLaren",
-      "model": "P1",
-      "year": 2014,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "Pagani",
-      "model": "Huayra BC",
-      "year": 2016,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "Porsche",
-      "model": "918 Spyder Weissach",
-      "year": 2015,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "Radical",
-      "model": "RXC Turbo",
-      "year": 2015,
-      "class": "RDA"
-    },
-    {
-      "manufacturer": "BAC",
-      "model": "Mono",
-      "year": 2017,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Ferrari",
-      "model": "Enzo",
-      "year": 2003,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Ford",
-      "model": "GT",
-      "year": 2016,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Jaguar",
-      "model": "XJ220 S",
-      "year": 1994,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Lamborghini",
-      "model": "Aventador LP700-4",
-      "year": 2016,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Lamborghini",
-      "model": "Veneno LP750-4",
-      "year": 2013,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Pagani",
-      "model": "Zonda Cinque Roadster",
-      "year": 2011,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Porsche",
-      "model": "911 GT3 RS",
-      "year": 2016,
-      "class": "RDB"
-    },
-    {
-      "manufacturer": "Acura",
-      "model": "NSX",
-      "year": 2017,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Aston Martin",
-      "model": "Vantage GT12",
-      "year": 2015,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Audi",
-      "model": "R8 V10 plus 5.2 FSI quattro",
-      "year": 2015,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Chevrolet",
-      "model": "Corvette Z06",
-      "year": 2017,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Lamborghini",
-      "model": "Hurac\u00e1n LP610-4",
-      "year": 2016,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "McLaren",
-      "model": "570S",
-      "year": 2016,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "McLaren",
-      "model": "F1",
-      "year": 1992,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Mercedes-AMG",
-      "model": "GT R",
-      "year": 2017,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Nissan",
-      "model": "GT-R Nismo (R35)",
-      "year": 2017,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Toyota",
-      "model": "GT-86 Rocket Bunny Street",
-      "year": 2015,
-      "class": "RDC"
-    },
-    {
-      "manufacturer": "Aston Martin",
-      "model": "DB11",
-      "year": 2017,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "BMW",
-      "model": "1 Series M Coup\u00e9 StanceWorks Edition",
-      "year": 2011,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "Caterham",
-      "model": "Seven 620 R",
-      "year": 2015,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "Chevrolet",
-      "model": "Camaro ZL-1",
-      "year": 2017,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "Jaguar",
-      "model": "F-Type SVR Coup\u00e9",
-      "year": 2016,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "KTM",
-      "model": "X-Bow R",
-      "year": 2015,
-      "class": "RDD"
-    },
-    {
-      "manufacturer": "Someone",
-      "model": "Something",
-      "year": 2017,
-      "class": "None"
-    }
-  ]
+	"cars": [{
+		"id": 0,
+		"manufacturer": null,
+		"model": null,
+		"class": null,
+		"year": 0,
+		"country": null,
+		"drivetrain": null,
+		"enginePosition": null,
+		"engineType": null,
+		"topSpeed": 0,
+		"horsepower": 0,
+		"acceleration": 0,
+		"braking": 0,
+		"weight": 0,
+		"torque": 0,
+		"weightBalance": 0,
+		"wheelbase": 0,
+		"shiftPattern": null,
+		"shifter": null,
+		"gears": 0,
+		"dlc": null,
+		"liveries": [{
+			"id": 0,
+			"name": null
+		}]
+	}],
+	"classes": [{
+		"id": 0,
+		"name": null
+	}],
+	"events": [{
+		"name": null,
+		"tier": null,
+		"carFilter": [{
+			"field": "model",
+			"operation": "equals",
+			"value": "125cc Shifter Kart"
+		}],
+		"rounds": [{
+			"location": null,
+			"variation": null,
+			"races": [{
+				"laps": null,
+				"time": null,
+				"type": null
+			}]
+		}]
+	}],
+	"tracks": [{
+		"id": 0,
+		"name": null,
+		"location": null,
+		"variation": null,
+		"length": 0,
+		"gridSize": 0,
+		"pitEntryX": 0,
+		"pitEntryZ": 0,
+		"pitExitX": 0,
+		"pitExitZ": 0
+	}]
 }
