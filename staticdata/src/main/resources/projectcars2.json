@@ -179,6 +179,12 @@
       "model": "X-Bow R",
       "year": 2015,
       "class": "RDD"
+    },
+    {
+      "manufacturer": "Someone",
+      "model": "Something",
+      "year": 2017,
+      "class": "None"
     }
   ]
 }
