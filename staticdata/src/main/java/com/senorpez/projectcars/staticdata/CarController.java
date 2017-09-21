@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 class CarController {
     @Autowired
-    APIService apiService;
+    private APIService apiService;
 
     CarController(final APIService apiService) {
         this.apiService = apiService;

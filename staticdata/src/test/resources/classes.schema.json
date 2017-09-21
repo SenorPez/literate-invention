@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Car Class",
-  "description": "JSON Representation of Project CARS Static Data API car class.",
+  "title": "Project CARS Static Data API Car Classes",
+  "description": "JSON Representation of Project CARS Static Data API car classes list.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,54 +41,66 @@
   },
   "type": "object",
   "properties": {
-    "id": {
-      "type": "integer"
-    },
-    "name": {
-      "type": "string"
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "pcars:class": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "$ref": "#/definitions/standardLink"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "_links"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pcars:class"
+      ]
     },
     "_links": {
       "type": "object",
       "properties": {
         "self": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/standardLink"
-              }
-            },
-            {
-              "$ref": "#/definitions/standardLink"
-            }
-          ]
+          "$ref": "#/definitions/standardLink"
         },
         "index": {
           "$ref": "#/definitions/standardLink"
         },
         "curies": {
           "$ref": "#/definitions/curies"
-        },
-        "pcars:car": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:classes": {
-          "$ref": "#/definitions/standardLink"
         }
       },
       "additionalProperties": false,
       "required": [
         "self",
         "index",
-        "curies",
-        "pcars:classes"
+        "curies"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
-    "id",
-    "name",
+    "_embedded",
     "_links"
   ]
 }

@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -200,7 +201,11 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
+                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
+                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -212,7 +217,10 @@ public class CarControllerTest {
         mockMvc.perform(put("/cars").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
+                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
 
         verifyZeroInteractions(apiService);
     }
@@ -324,7 +332,11 @@ public class CarControllerTest {
         mockMvc.perform(get(String.format("/cars/%d", FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
+                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
+                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -336,7 +348,10 @@ public class CarControllerTest {
         mockMvc.perform(put(String.format("/cars/%d", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
+                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
 
         verifyZeroInteractions(apiService);
     }
@@ -348,7 +363,10 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -361,7 +379,10 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309").accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -374,7 +395,11 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
+                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
+                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -386,7 +411,11 @@ public class CarControllerTest {
         mockMvc.perform(put("/cars/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
+                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
+
 
         verifyZeroInteractions(apiService);
     }
@@ -456,7 +485,11 @@ public class CarControllerTest {
         mockMvc.perform(get(String.format("/cars/%d/class", FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
+                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
+                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -468,7 +501,11 @@ public class CarControllerTest {
         mockMvc.perform(put(String.format("/cars/%d/class", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
+                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
+
 
         verifyZeroInteractions(apiService);
     }
@@ -480,7 +517,10 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309/class").accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -493,7 +533,10 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309/class").accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -506,7 +549,11 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/8675309/class").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
+                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
+                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -518,7 +565,10 @@ public class CarControllerTest {
         mockMvc.perform(put("/cars/8675309/class").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)));
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
+                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
 
         verifyZeroInteractions(apiService);
     }
