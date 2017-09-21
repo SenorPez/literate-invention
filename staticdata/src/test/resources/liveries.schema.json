@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Car",
-  "description": "JSON Representation of Project CARS Static Data API car.",
+  "title": "Project CARS Static Data API Car Liveries",
+  "description": "JSON Representation of Project CARS Static Data API car liveries list.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,70 +41,50 @@
   },
   "type": "object",
   "properties": {
-    "id": {
-      "type": "integer"
-    },
-    "manufacturer": {
-      "type": "string"
-    },
-    "model": {
-      "type": "string"
-    },
-    "class": {
-      "type": "string"
-    },
-    "year": {
-      "type": "integer"
-    },
-    "country": {
-      "type": "string"
-    },
-    "drivetrain": {
-      "type": "string"
-    },
-    "enginePosition": {
-      "type": "string"
-    },
-    "engineType": {
-      "type": "string"
-    },
-    "topSpeed": {
-      "type": "integer"
-    },
-    "horsepower": {
-      "type": "integer"
-    },
-    "acceleration": {
-      "type": "number"
-    },
-    "braking": {
-      "type": "number"
-    },
-    "weight": {
-      "type": "integer"
-    },
-    "torque": {
-      "type": "integer"
-    },
-    "weightBalance": {
-      "type": "integer"
-    },
-    "wheelbase": {
-      "type": "number"
-    },
-    "shiftPattern": {
-      "type": "string"
-    },
-    "shifter": {
-      "type": "string"
-    },
-    "gears": {
-      "type": "integer"
-    },
-    "dlc": {
-      "type": [
-        "string",
-        "null"
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "pcars:livery": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/definitions/standardLink"
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/standardLink"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "_links"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pcars:livery"
       ]
     },
     "_links": {
@@ -129,16 +109,7 @@
         "curies": {
           "$ref": "#/definitions/curies"
         },
-        "pcars:cars": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:class": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/standardLink"
-          }
-        },
-        "pcars:liveries": {
+        "pcars:car": {
           "oneOf": [
             {
               "type": "array",
@@ -157,35 +128,13 @@
         "self",
         "index",
         "curies",
-        "pcars:cars",
-        "pcars:class",
-        "pcars:liveries"
+        "pcars:car"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
-    "id",
-    "manufacturer",
-    "model",
-    "country",
-    "class",
-    "year",
-    "drivetrain",
-    "enginePosition",
-    "engineType",
-    "topSpeed",
-    "horsepower",
-    "acceleration",
-    "braking",
-    "weight",
-    "torque",
-    "weightBalance",
-    "wheelbase",
-    "shiftPattern",
-    "shifter",
-    "gears",
-    "dlc",
+    "_embedded",
     "_links"
   ]
 }

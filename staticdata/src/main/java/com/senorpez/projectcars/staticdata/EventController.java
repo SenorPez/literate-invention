@@ -22,9 +22,13 @@ public class EventController {
     @Autowired
     private APIService apiService;
 
+    public EventController(final APIService apiService) {
+        this.apiService = apiService;
+    }
+
     @RequestMapping
     ResponseEntity<EmbeddedEventResources> events() {
-        final Collection<Event> events = Application.EVENTS;
+        final Collection<Event> events = apiService.findAll(Application.EVENTS);
         final Collection<EmbeddedEventModel> eventModels = events.stream()
                 .map(EmbeddedEventModel::new)
                 .collect(Collectors.toList());
@@ -126,7 +130,7 @@ public class EventController {
                 findLivery -> findLivery.getId() == liveryId,
                 () -> new LiveryNotFoundException(liveryId));
         final LiveryModel liveryModel = new LiveryModel(livery);
-        final LiveryResource liveryResource = liveryModel.toResource(carId);
+        final LiveryResource liveryResource = liveryModel.toResource(eventId, carId);
         return ResponseEntity.ok(liveryResource);
     }
 }

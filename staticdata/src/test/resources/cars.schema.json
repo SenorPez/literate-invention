@@ -58,7 +58,17 @@
                 "type": "object",
                 "properties": {
                   "self": {
-                    "$ref": "#/definitions/standardLink"
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/definitions/standardLink"
+                        }
+                      },
+                      {
+                        "$ref": "#/definitions/standardLink"
+                      }
+                    ]
                   }
                 }
               }
@@ -88,6 +98,9 @@
         },
         "curies": {
           "$ref": "#/definitions/curies"
+        },
+        "pcars:event": {
+          "$ref": "#/definitions/standardLink"
         }
       },
       "additionalProperties": false,

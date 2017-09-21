@@ -258,6 +258,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.detail", is(String.format("Class with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verifyNoMoreInteractions(apiService);
     }
     
     @Test
@@ -273,6 +274,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.detail", is(String.format("Class with ID of %d not found", 8675309))));
 
         verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verifyNoMoreInteractions(apiService);
     }
 
     @Test

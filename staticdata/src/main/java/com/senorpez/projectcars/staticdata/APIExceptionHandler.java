@@ -13,7 +13,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 @RestControllerAdvice
 class APIExceptionHandler {
-    @ExceptionHandler({CarNotFoundException.class, CarClassNotFoundException.class})
+    @ExceptionHandler({
+            CarNotFoundException.class,
+            CarClassNotFoundException.class,
+            EventNotFoundException.class,
+            LiveryNotFoundException.class})
     ResponseEntity<ErrorResponse> handleAPIObjectNotFound(final Exception e) {
         return ResponseEntity
                 .status(NOT_FOUND)

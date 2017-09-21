@@ -416,7 +416,6 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
 
-
         verifyZeroInteractions(apiService);
     }
 

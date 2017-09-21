@@ -2,6 +2,7 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 
 import java.util.Collection;
@@ -21,12 +22,7 @@ class LiveryResource extends Resource<LiveryModel> {
 
     LiveryResource(final LiveryModel content, final int eventId, final int carId, final Link... links) {
         super(content, links);
-        this.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withSelfRel());
-    }
-
-    LiveryResource(final LiveryModel content, final int eventId, final int carId, final int liveryId, final Link... links) {
-        super(content, links);
-        this.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId, liveryId)).withSelfRel());
+        this.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId, content.getId())).withSelfRel());
         this.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withRel("liveries"));
         this.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withRel("liveries"));
     }
@@ -39,6 +35,9 @@ class LiveryResource extends Resource<LiveryModel> {
     }
 
     static Resources<LiveryResource> makeResources(final Collection<LiveryResource> resources, final int eventId, final int carId) {
+        resources.forEach(ResourceSupport::removeLinks);
+        resources.forEach(liveryResource -> liveryResource.add(linkTo(methodOn(LiveryController.class).liveries(carId, liveryResource.getContent().getId())).withSelfRel()));
+        resources.forEach(liveryResource -> liveryResource.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId, liveryResource.getContent().getId())).withSelfRel()));
         final Resources<LiveryResource> liveryResources = new Resources<>(resources);
         liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(EventController.class).eventCarLiveries(eventId, carId)).withSelfRel());

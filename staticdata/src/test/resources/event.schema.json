@@ -47,21 +47,20 @@
     "name": {
       "type": "string"
     },
+    "tier": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "verified": {
+      "type": "boolean"
+    },
     "_links": {
       "type": "object",
       "properties": {
         "self": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/standardLink"
-              }
-            },
-            {
-              "$ref": "#/definitions/standardLink"
-            }
-          ]
+          "$ref": "#/definitions/standardLink"
         },
         "index": {
           "$ref": "#/definitions/standardLink"
@@ -69,20 +68,13 @@
         "curies": {
           "$ref": "#/definitions/curies"
         },
-        "pcars:car": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/standardLink"
-              }
-            },
-            {
-              "$ref": "#/definitions/standardLink"
-            }
-          ]
+        "pcars:events": {
+          "$ref": "#/definitions/standardLink"
         },
-        "pcars:classes": {
+        "pcars:cars": {
+          "$ref": "#/definitions/standardLink"
+        },
+        "pcars:rounds": {
           "$ref": "#/definitions/standardLink"
         }
       },
@@ -91,7 +83,9 @@
         "self",
         "index",
         "curies",
-        "pcars:classes"
+        "pcars:events",
+        "pcars:cars",
+        "pcars:rounds"
       ]
     }
   },
@@ -99,6 +93,8 @@
   "required": [
     "id",
     "name",
+    "tier",
+    "verified",
     "_links"
   ]
 }

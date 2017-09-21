@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Car",
-  "description": "JSON Representation of Project CARS Static Data API car.",
+  "title": "Project CARS Static Data API Car Livery",
+  "description": "JSON Representation of Project CARS Static Data API car livery.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -44,68 +44,8 @@
     "id": {
       "type": "integer"
     },
-    "manufacturer": {
+    "name": {
       "type": "string"
-    },
-    "model": {
-      "type": "string"
-    },
-    "class": {
-      "type": "string"
-    },
-    "year": {
-      "type": "integer"
-    },
-    "country": {
-      "type": "string"
-    },
-    "drivetrain": {
-      "type": "string"
-    },
-    "enginePosition": {
-      "type": "string"
-    },
-    "engineType": {
-      "type": "string"
-    },
-    "topSpeed": {
-      "type": "integer"
-    },
-    "horsepower": {
-      "type": "integer"
-    },
-    "acceleration": {
-      "type": "number"
-    },
-    "braking": {
-      "type": "number"
-    },
-    "weight": {
-      "type": "integer"
-    },
-    "torque": {
-      "type": "integer"
-    },
-    "weightBalance": {
-      "type": "integer"
-    },
-    "wheelbase": {
-      "type": "number"
-    },
-    "shiftPattern": {
-      "type": "string"
-    },
-    "shifter": {
-      "type": "string"
-    },
-    "gears": {
-      "type": "integer"
-    },
-    "dlc": {
-      "type": [
-        "string",
-        "null"
-      ]
     },
     "_links": {
       "type": "object",
@@ -129,15 +69,6 @@
         "curies": {
           "$ref": "#/definitions/curies"
         },
-        "pcars:cars": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:class": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/standardLink"
-          }
-        },
         "pcars:liveries": {
           "oneOf": [
             {
@@ -157,8 +88,6 @@
         "self",
         "index",
         "curies",
-        "pcars:cars",
-        "pcars:class",
         "pcars:liveries"
       ]
     }
@@ -166,26 +95,7 @@
   "additionalProperties": false,
   "required": [
     "id",
-    "manufacturer",
-    "model",
-    "country",
-    "class",
-    "year",
-    "drivetrain",
-    "enginePosition",
-    "engineType",
-    "topSpeed",
-    "horsepower",
-    "acceleration",
-    "braking",
-    "weight",
-    "torque",
-    "weightBalance",
-    "wheelbase",
-    "shiftPattern",
-    "shifter",
-    "gears",
-    "dlc",
+    "name",
     "_links"
   ]
 }

@@ -11,6 +11,6 @@ class EventResource extends Resource<EventModel> {
         super(content, links);
         this.add(linkTo(methodOn(EventController.class).events()).withRel("events"));
         this.add(linkTo(methodOn(EventController.class).eventCars(content.getId())).withRel("cars"));
-        this.add(linkTo(methodOn(RoundController.class).rounds(content.getId())).withRel("cars"));
+        this.add(linkTo(methodOn(RoundController.class).rounds(content.getId())).withRel("rounds"));
     }
 }
