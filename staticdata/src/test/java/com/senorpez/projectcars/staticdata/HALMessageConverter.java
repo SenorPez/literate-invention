@@ -1,8 +1,10 @@
 package com.senorpez.projectcars.staticdata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.core.DefaultRelProvider;
+import org.springframework.hateoas.core.Relation;
 import org.springframework.hateoas.hal.DefaultCurieProvider;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.MediaType;
@@ -17,7 +19,7 @@ class HALMessageConverter {
         objectMapper.registerModule(new Jackson2HalModule());
 
         final DefaultCurieProvider curieProvider = new DefaultCurieProvider("pcars", new UriTemplate("/docs/{rel}"));
-        final DefaultRelProvider relProvider = new DefaultRelProvider();
+        final ResourcesRelProvider relProvider = new ResourcesRelProvider();
 
         objectMapper.setHandlerInstantiator(new Jackson2HalModule.HalHandlerInstantiator(relProvider, curieProvider, null));
 
@@ -26,5 +28,26 @@ class HALMessageConverter {
         halConverter.setSupportedMediaTypes(mediaType);
 
         return halConverter;
+    }
+
+    private static class ResourcesRelProvider implements RelProvider {
+        private static final DefaultRelProvider defaultRelProvider = new DefaultRelProvider();
+
+        @Override
+        public String getItemResourceRelFor(final Class<?> type) {
+            final Relation[] relations = type.getAnnotationsByType(Relation.class);
+            return relations.length > 0 ? relations[0].value() : defaultRelProvider.getItemResourceRelFor(type);
+        }
+
+        @Override
+        public String getCollectionResourceRelFor(final Class<?> type) {
+            final Relation[] relations = type.getAnnotationsByType(Relation.class);
+            return relations.length > 0 ? relations[0].collectionRelation() : defaultRelProvider.getCollectionResourceRelFor(type);
+        }
+
+        @Override
+        public boolean supports(final Class<?> delimiter) {
+            return defaultRelProvider.supports(delimiter);
+        }
     }
 }

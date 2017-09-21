@@ -2,7 +2,6 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +19,15 @@ import java.util.stream.Collectors;
 @RestController
 class CarController {
     @Autowired
-    private APIService apiService;
+    APIService apiService;
+
+    CarController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
-    ResponseEntity<Resources<Resource<EmbeddedCarModel>>> cars() {
-        final Collection<Car> cars = Application.CARS;
+    ResponseEntity<EmbeddedCarResources> cars() {
+        final Collection<Car> cars = apiService.findAll(Application.CARS);
         final Collection<EmbeddedCarModel> carModels = cars.stream()
                 .map(EmbeddedCarModel::new)
                 .collect(Collectors.toList());

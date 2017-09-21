@@ -17,5 +17,4 @@ class EmbeddedCarResources extends APIResources<EmbeddedCarModel> {
         this.add(linkTo(methodOn(EventController.class).eventCars(eventId)).withSelfRel());
         this.add(linkTo(methodOn(EventController.class).events(eventId)).withRel("events"));
     }
-
 }

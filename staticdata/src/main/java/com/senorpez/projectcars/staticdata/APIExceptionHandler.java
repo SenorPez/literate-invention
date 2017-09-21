@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static org.springframework.http.HttpStatus.*;
@@ -14,10 +13,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 @RestControllerAdvice
 class APIExceptionHandler {
-    @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(CarNotFoundException.class)
-    ErrorResponse handleCarNotFound(final Exception e) {
-        return new ErrorResponse(e.getMessage());
+    ResponseEntity<ErrorResponse> handleCarNotFound(final Exception e) {
+        return ResponseEntity
+                .status(NOT_FOUND)
+                .contentType(APPLICATION_JSON_UTF8)
+                .body(
+                        new ErrorResponse(NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -26,7 +28,7 @@ class APIExceptionHandler {
                 .status(METHOD_NOT_ALLOWED)
                 .contentType(APPLICATION_JSON_UTF8)
                 .body(
-                        new ErrorResponse(METHOD_NOT_ALLOWED, METHOD_NOT_ALLOWED.getReasonPhrase()));
+                        new ErrorResponse(METHOD_NOT_ALLOWED, "Only GET methods allowed."));
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
@@ -47,12 +49,6 @@ class APIExceptionHandler {
         private final String message;
         @JsonProperty("detail")
         private final String detail;
-
-        private ErrorResponse(final String detail) {
-            this.code = HttpStatus.NOT_FOUND.value();
-            this.message = HttpStatus.NOT_FOUND.getReasonPhrase();
-            this.detail = detail;
-        }
 
         private ErrorResponse(final HttpStatus httpStatus, final String detail) {
             this.code = httpStatus.value();
