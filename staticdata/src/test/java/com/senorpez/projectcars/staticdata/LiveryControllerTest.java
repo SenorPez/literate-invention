@@ -1,6 +1,5 @@
 package com.senorpez.projectcars.staticdata;
 
-import org.hamcrest.core.AllOf;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -24,8 +23,6 @@ import static com.senorpez.projectcars.staticdata.Car.Shifter.PADDLES;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.FALLBACK;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -132,7 +129,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
-                        AllOf.allOf(
+                        allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
@@ -282,7 +279,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
-                        AllOf.allOf(
+                        allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
@@ -305,7 +302,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
-                        AllOf.allOf(
+                        allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))

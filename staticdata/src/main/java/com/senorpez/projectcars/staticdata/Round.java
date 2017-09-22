@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -13,6 +14,7 @@ class Round {
 
     private final static AtomicInteger roundId = new AtomicInteger(0);
 
+    @JsonCreator
     Round(
             @JsonProperty("location") final String location,
             @JsonProperty("variation") final String variation,
@@ -27,6 +29,12 @@ class Round {
 
         Race.resetId();
         this.races = Application.getData(Race.class, races);
+    }
+
+    Round(final int id, final Track track, final Set<Race> races) {
+        this.id = id;
+        this.track = track;
+        this.races = races;
     }
 
     int getId() {

@@ -17,6 +17,8 @@ class APIExceptionHandler {
             CarNotFoundException.class,
             CarClassNotFoundException.class,
             EventNotFoundException.class,
+            RoundNotFoundException.class,
+            RaceNotFoundException.class,
             LiveryNotFoundException.class})
     ResponseEntity<ErrorResponse> handleAPIObjectNotFound(final Exception e) {
         return ResponseEntity
