@@ -12,32 +12,27 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 class RoundResource extends Resource<RoundModel> {
     RoundResource(final RoundModel content, final int eventId, final Link... links) {
         super(content, links);
-        this.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withRel("event"));
-    }
-
-    RoundResource(final RoundModel content, final int eventId, final int roundId, final Link... links) {
-        super(content, links);
 
         final Track track = Application.EVENTS.stream()
                 .filter(event -> event.getId() == eventId)
                 .findFirst()
                 .orElseThrow(() -> new EventNotFoundException(eventId))
                 .getRounds().stream()
-                .filter(round -> round.getId() == roundId)
+                .filter(round -> round.getId() == content.getId())
                 .findFirst()
-                .orElseThrow(() -> new RoundNotFoundException(roundId))
+                .orElseThrow(() -> new RoundNotFoundException(content.getId()))
                 .getTrack();
         this.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withRel("rounds"));
-        this.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
+        this.add(linkTo(methodOn(RaceController.class).races(eventId, content.getId())).withRel("races"));
         this.add(linkTo(methodOn(TrackController.class).tracks(track.getId())).withRel("track"));
-        this.add(linkTo(methodOn(RoundController.class).roundTrack(eventId, roundId)).withRel("track"));
+        this.add(linkTo(methodOn(RoundController.class).roundTrack(eventId, content.getId())).withRel("track"));
     }
 
     static Resources<RoundResource> makeResources(final Collection<RoundResource> resources, final int eventId) {
         final Resources<RoundResource> roundResources = new Resources<>(resources);
         roundResources.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withSelfRel());
         roundResources.add(linkTo(methodOn(EventController.class).events(eventId)).withRel("event"));
-        roundResources.add(linkTo(methodOn(RootController.class)).withRel("index"));
+        roundResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return roundResources;
     }
 }

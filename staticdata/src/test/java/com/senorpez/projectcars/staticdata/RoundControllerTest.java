@@ -31,12 +31,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-public class RaceControllerTest {
+public class RoundControllerTest {
     private MockMvc mockMvc;
     private static final MediaType INVALID_MEDIA_TYPE = new MediaType("application", "invalid+json", UTF_8);
-    private static final ClassLoader CLASS_LOADER = RaceControllerTest.class.getClassLoader();
-    private static InputStream RACE_SCHEMA;
-    private static InputStream RACE_COLLECTION_SCHEMA;
+    private static final ClassLoader CLASS_LOADER = RoundControllerTest.class.getClassLoader();
+    private static InputStream ROUND_SCHEMA;
+    private static InputStream ROUND_COLLECTION_SCHEMA;
     private static InputStream ERROR_SCHEMA;
 
     private static final Race FIRST_RACE = new RaceBuilder()
@@ -68,114 +68,121 @@ public class RaceControllerTest {
             .setRaces(new HashSet<>(Arrays.asList(FIRST_RACE, SECOND_RACE)))
             .build();
 
+    private static final Round SECOND_ROUND = new RoundBuilder()
+            .setId(2)
+            .setTrack(new TrackBuilder()
+                    .setId(-1408779593)
+                    .setName("Glencairn West")
+                    .setLocation("Glencairn")
+                    .setVariation("West")
+                    .setLength(451.7371f)
+                    .setPitEntry(Arrays.asList(null, null))
+                    .setPitExit(Arrays.asList(null, null))
+                    .setGridSize(16)
+                    .build())
+            .setRaces(new HashSet<>(Arrays.asList(FIRST_RACE, SECOND_RACE)))
+            .build();
+
     private static final Event FIRST_EVENT = new EventBuilder()
             .setId(1)
             .setName("Kart One UK Nationals")
             .setTier(8)
             .setVerified(true)
-            .setRounds(new HashSet<>(Collections.singletonList(FIRST_ROUND)))
+            .setRounds(new HashSet<>(Arrays.asList(FIRST_ROUND, SECOND_ROUND)))
             .build();
-    
+
     @InjectMocks
-    RaceController raceController;
-    
+    RoundController roundController;
+
     @Mock
     private APIService apiService;
 
     @Before
     public void setUp() throws Exception {
-        RACE_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("races.schema.json");
-        RACE_SCHEMA = CLASS_LOADER.getResourceAsStream("race.schema.json");
+        ROUND_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("rounds.schema.json");
+        ROUND_SCHEMA = CLASS_LOADER.getResourceAsStream("round.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new RaceController(apiService))
+                .standaloneSetup(new RoundController(apiService))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();
     }
 
     @Test
-    public void GetAllRaces_ValidEventId_ValidRoundId_ValidAcceptHeader() throws Exception {
+    public void GetAllRounds_ValidEventId_ValidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(PROJECT_CARS))
-                .andExpect(content().string(matchesJsonSchema(RACE_COLLECTION_SCHEMA)))
-                .andExpect(jsonPath("$._embedded.pcars:race", hasItem(
+                .andExpect(content().string(matchesJsonSchema(ROUND_COLLECTION_SCHEMA)))
+                .andExpect(jsonPath("$._embedded.pcars:round", hasItem(
                         allOf(
-                                hasEntry("id", (Object) FIRST_RACE.getId()),
-                                hasEntry("laps", (Object) FIRST_RACE.getLaps()),
-                                hasEntry("time", (Object) FIRST_RACE.getTime()),
-                                hasEntry("type", (Object) FIRST_RACE.getType()),
+                                hasEntry("id", (Object) FIRST_ROUND.getId()),
+                                hasEntry("track", (Object) FIRST_ROUND.getTrack().getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId()))))))))
-                .andExpect(jsonPath("$._embedded.pcars:race", hasItem(
+                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))))))
+                .andExpect(jsonPath("$._embedded.pcars:round", hasItem(
                         allOf(
-                                hasEntry("id", (Object) SECOND_RACE.getId()),
-                                hasEntry("laps", (Object) SECOND_RACE.getLaps()),
-                                hasEntry("time", (Object) SECOND_RACE.getTime()),
-                                hasEntry("type", (Object) SECOND_RACE.getType()),
+                                hasEntry("id", (Object) SECOND_ROUND.getId()),
+                                hasEntry("track", (Object) SECOND_ROUND.getTrack().getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), SECOND_RACE.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), SECOND_ROUND.getId()))))))))
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
-    public void GetAllRaces_ValidEventId_ValidRoundId_FallbackAcceptHeader() throws Exception {
+    public void GetAllRounds_ValidEventId_FallbackAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
+        mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(FALLBACK))
-                .andExpect(content().string(matchesJsonSchema(RACE_COLLECTION_SCHEMA)))
-                .andExpect(jsonPath("$._embedded.pcars:race", hasItem(
+                .andExpect(content().string(matchesJsonSchema(ROUND_COLLECTION_SCHEMA)))
+                .andExpect(jsonPath("$._embedded.pcars:round", hasItem(
                         allOf(
-                                hasEntry("id", (Object) FIRST_RACE.getId()),
-                                hasEntry("laps", (Object) FIRST_RACE.getLaps()),
-                                hasEntry("time", (Object) FIRST_RACE.getTime()),
-                                hasEntry("type", (Object) FIRST_RACE.getType()),
+                                hasEntry("id", (Object) FIRST_ROUND.getId()),
+                                hasEntry("track", (Object) FIRST_ROUND.getTrack().getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId()))))))))
-                .andExpect(jsonPath("$._embedded.pcars:race", hasItem(
+                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))))))
+                .andExpect(jsonPath("$._embedded.pcars:round", hasItem(
                         allOf(
-                                hasEntry("id", (Object) SECOND_RACE.getId()),
-                                hasEntry("laps", (Object) SECOND_RACE.getLaps()),
-                                hasEntry("time", (Object) SECOND_RACE.getTime()),
-                                hasEntry("type", (Object) SECOND_RACE.getType()),
+                                hasEntry("id", (Object) SECOND_ROUND.getId()),
+                                hasEntry("track", (Object) SECOND_ROUND.getTrack().getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), SECOND_RACE.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), SECOND_ROUND.getId()))))))))
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
-    public void GetAllRaces_ValidEventId_ValidRoundId_InvalidAcceptHeader() throws Exception {
+    public void GetAllRounds_ValidEventId_InvalidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
+        mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -188,10 +195,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetAllRaces_ValidEventId_ValidRoundId_InvalidMethod() throws Exception {
+    public void GetAllRounds_ValidEventId_InvalidMethod() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(put(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(put(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -201,75 +208,28 @@ public class RaceControllerTest {
 
         verifyZeroInteractions(apiService);
     }
-
+    
     @Test
-    public void GetAllRaces_ValidEventId_InvalidRoundId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races", FIRST_EVENT.getId())).accept(PROJECT_CARS))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
-                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is(String.format("Round with ID of %d not found", 8675309))));
-
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
-        verifyNoMoreInteractions(apiService);
-    }
-
-    @Test
-    public void GetAllRaces_ValidEventId_InvalidRoundId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races", FIRST_EVENT.getId())).accept(FALLBACK))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
-                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is(String.format("Round with ID of %d not found", 8675309))));
-
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
-        verifyNoMoreInteractions(apiService);
-    }
-
-    @Test
-    public void GetAllRaces_ValidEventId_InvalidRoundId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
-                .andExpect(status().isNotAcceptable())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
-                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
-
-        verifyZeroInteractions(apiService);
-    }
-
-    @Test
-    public void GetAllRaces_ValidEventId_InvalidRoundId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
-
-        mockMvc.perform(put(String.format("/events/%d/rounds/8675309/races", FIRST_EVENT.getId())).accept(PROJECT_CARS))
-                .andExpect(status().isMethodNotAllowed())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
-                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
-
-        verifyZeroInteractions(apiService);
-    }
-
-    @Test
-    public void GetAllRaces_InvalidEventId_XXXRoundId_ValidAcceptHeader() throws Exception {
+    public void GetAllRounds_InvalidEventId_ValidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races", FIRST_ROUND.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(get("/events/8675309/rounds/").accept(PROJECT_CARS))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
+                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
+                .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
+
+        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verifyNoMoreInteractions(apiService);
+    }
+    
+    @Test
+    public void GetAllRounds_InvalidEventId_FallbackAcceptHeader() throws Exception {
+        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+
+        mockMvc.perform(get("/events/8675309/rounds/").accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -282,26 +242,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetAllRaces_InvalidEventId_XXXRoundId_FallbackAcceptHeader() throws Exception {
+    public void GetAllRounds_InvalidEventId_InvalidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races", FIRST_ROUND.getId())).accept(FALLBACK))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
-                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
-
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
-        verifyNoMoreInteractions(apiService);
-    }
-
-    @Test
-    public void GetAllRaces_InvalidEventId_XXXRoundId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races", FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
+        mockMvc.perform(get("/events/8675309/rounds/").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -314,10 +258,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetAllRaces_InvalidEventId_XXXRoundId_InvalidMethod() throws Exception {
+    public void GetAllRounds_InvalidEventId_InvalidMethod() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(put(String.format("/events/8675309/rounds/%d/races", FIRST_ROUND.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(put("/events/8675309/rounds/").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -329,60 +273,66 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_ValidAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_ValidRoundId_FallbackAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(PROJECT_CARS))
-                .andExpect(content().string(matchesJsonSchema(RACE_SCHEMA)))
-                .andExpect(jsonPath("$.id", is(FIRST_RACE.getId())))
-                .andExpect(jsonPath("$.laps", is(FIRST_RACE.getLaps())))
-                .andExpect(jsonPath("$.time", is(FIRST_RACE.getTime())))
-                .andExpect(jsonPath("$.type", is(FIRST_RACE.getType())))
+                .andExpect(content().string(matchesJsonSchema(ROUND_SCHEMA)))
+                .andExpect(jsonPath("$.id", is(FIRST_ROUND.getId())))
+                .andExpect(jsonPath("$.track", is(FIRST_ROUND.getTrack().getName())))
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId()))))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:races", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))));
-
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+                .andExpect(jsonPath("$._links.pcars:races", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
+                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:track",
+                        hasItems(
+                                hasEntry("href", String.format("http://localhost/tracks/%d", FIRST_ROUND.getTrack().getId())),
+                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/track", FIRST_EVENT.getId(), FIRST_ROUND.getId())))));
+                
+        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
-
+    
     @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_FallbackAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_ValidRoundId_ValidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(FALLBACK))
+        mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(FALLBACK))
-                .andExpect(content().string(matchesJsonSchema(RACE_SCHEMA)))
-                .andExpect(jsonPath("$.id", is(FIRST_RACE.getId())))
-                .andExpect(jsonPath("$.laps", is(FIRST_RACE.getLaps())))
-                .andExpect(jsonPath("$.time", is(FIRST_RACE.getTime())))
-                .andExpect(jsonPath("$.type", is(FIRST_RACE.getType())))
+                .andExpect(content().string(matchesJsonSchema(ROUND_SCHEMA)))
+                .andExpect(jsonPath("$.id", is(FIRST_ROUND.getId())))
+                .andExpect(jsonPath("$.track", is(FIRST_ROUND.getTrack().getName())))
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId()))))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
                                 hasEntry("href", (Object) "http://localhost/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:races", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))));
-
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+                .andExpect(jsonPath("$._links.pcars:races", hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId()))))
+                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:track",
+                        hasItems(
+                                hasEntry("href", String.format("http://localhost/tracks/%d", FIRST_ROUND.getTrack().getId())),
+                                hasEntry("href", String.format("http://localhost/events/%d/rounds/%d/track", FIRST_EVENT.getId(), FIRST_ROUND.getId())))));
+                
+        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_InvalidAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_ValidRoundId_InvalidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(INVALID_MEDIA_TYPE))
+        mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -395,10 +345,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_InvalidMethod() throws Exception {
+    public void GetSingleRound_ValidEventId_ValidRoundId_InvalidMethod() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
-        mockMvc.perform(put(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(put(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -410,73 +360,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
-        
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
-                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is(String.format("Race with ID of %d not found", 8675309))));
-
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
-        verifyNoMoreInteractions(apiService);
-    }
-
-    @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_FOUND.value())))
-                .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is(String.format("Race with ID of %d not found", 8675309))));
-
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
-        verifyNoMoreInteractions(apiService);
-    }
-
-    @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
-
-        mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
-                .andExpect(status().isNotAcceptable())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
-                .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
-
-        verifyZeroInteractions(apiService);
-    }
-
-    @Test
-    public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
-
-        mockMvc.perform(put(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
-                .andExpect(status().isMethodNotAllowed())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
-                .andExpect(jsonPath("$.code", is(METHOD_NOT_ALLOWED.value())))
-                .andExpect(jsonPath("$.message", is(METHOD_NOT_ALLOWED.getReasonPhrase())))
-                .andExpect(jsonPath("$.detail", is("Only GET methods allowed.")));
-
-        verifyZeroInteractions(apiService);
-    }
-
-    @Test
-    public void GetSingleRace_ValidEventId_InvalidRoundId_XXXRaceId_ValidAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_InvalidRoundId_ValidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
-        
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races/%d", FIRST_EVENT.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+
+        mockMvc.perform(get(String.format("/events/%d/rounds/8675309", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -489,10 +376,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_InvalidRoundId_XXXRaceId_FallbackAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_InvalidRoundId_FallbackAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races/%d", FIRST_EVENT.getId(), FIRST_RACE.getId())).accept(FALLBACK))
+        mockMvc.perform(get(String.format("/events/%d/rounds/8675309", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -505,10 +392,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_InvalidRoundId_XXXRaceId_InvalidAcceptHeader() throws Exception {
+    public void GetSingleRound_ValidEventId_InvalidRoundId_InvalidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/%d/rounds/8675309/races/%d", FIRST_EVENT.getId(), FIRST_RACE.getId())).accept(INVALID_MEDIA_TYPE))
+        mockMvc.perform(get(String.format("/events/%d/rounds/8675309", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -521,10 +408,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_ValidEventId_InvalidRoundId_XXXRaceId_InvalidMethod() throws Exception {
+    public void GetSingleRound_ValidEventId_InvalidRoundId_InvalidMethod() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new RoundNotFoundException(8675309));
 
-        mockMvc.perform(put(String.format("/events/%d/rounds/8675309/races/%d", FIRST_EVENT.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(put(String.format("/events/%d/rounds/8675309", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -536,10 +423,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_InvalidEventId_XXXRoundId_XXXRaceId_ValidAcceptHeader() throws Exception {
+    public void GetSingleRound_InvalidEventId_XXXRoundId_ValidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
-        
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races/%d", FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+
+        mockMvc.perform(get(String.format("/events/8675309/rounds/%d", FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -552,10 +439,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_InvalidEventId_XXXRoundId_XXXRaceId_FallbackAcceptHeader() throws Exception {
+    public void GetSingleRound_InvalidEventId_XXXRoundId_FallbackAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races/%d", FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(FALLBACK))
+        mockMvc.perform(get(String.format("/events/8675309/rounds/%d", FIRST_ROUND.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -568,10 +455,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_InvalidEventId_XXXRoundId_XXXRaceId_InvalidAcceptHeader() throws Exception {
+    public void GetSingleRound_InvalidEventId_XXXRoundId_InvalidAcceptHeader() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(get(String.format("/events/8675309/rounds/%d/races/%d", FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(INVALID_MEDIA_TYPE))
+        mockMvc.perform(get(String.format("/events/8675309/rounds/%d", FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))
@@ -584,10 +471,10 @@ public class RaceControllerTest {
     }
 
     @Test
-    public void GetSingleRace_InvalidEventId_XXXRoundId_XXXRaceId_InvalidMethod() throws Exception {
+    public void GetSingleRound_InvalidEventId_XXXRoundId_InvalidMethod() throws Exception {
         when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
-        mockMvc.perform(put(String.format("/events/8675309/rounds/%d/races/%d", FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
+        mockMvc.perform(put(String.format("/events/8675309/rounds/%d", FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(content().string(matchesJsonSchema(ERROR_SCHEMA)))

@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TrackBuilder {
@@ -8,8 +9,8 @@ public class TrackBuilder {
     private String location = null;
     private String variation = null;
     private float length = 0;
-    private List<Float> pitEntry = null;
-    private List<Float> pitExit = null;
+    private List<Float> pitEntry = Arrays.asList(null, null);
+    private List<Float> pitExit = Arrays.asList(null, null);
     private int gridSize = 0;
 
     TrackBuilder() {
@@ -29,8 +30,8 @@ public class TrackBuilder {
         return this;
     }
 
-    TrackBuilder setLocation() {
-        this.location = "Glencairn";
+    TrackBuilder setLocation(final String location) {
+        this.location = location;
         return this;
     }
 

@@ -19,7 +19,11 @@ import java.util.stream.Collectors;
 @RestController
 public class RoundController {
     @Autowired
-    private APIService apiService;
+    private final APIService apiService;
+
+    RoundController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
     ResponseEntity<Resources<RoundResource>> rounds(@PathVariable final int eventId) {
