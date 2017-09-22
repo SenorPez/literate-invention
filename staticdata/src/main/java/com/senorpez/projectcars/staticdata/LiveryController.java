@@ -21,6 +21,10 @@ public class LiveryController {
     @Autowired
     private APIService apiService;
 
+    LiveryController(final APIService apiService) {
+        this.apiService = apiService;
+    }
+
     @RequestMapping
     ResponseEntity<Resources<LiveryResource>> liveries(@PathVariable final int carId) {
         final Car car = apiService.findOne(
@@ -32,7 +36,7 @@ public class LiveryController {
                 .map(LiveryModel::new)
                 .collect(Collectors.toList());
         final Collection<LiveryResource> liveryResources = liveryModels.stream()
-                .map(LiveryModel::toResource)
+                .map(liveryModel -> liveryModel.toResource(carId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(LiveryResource.makeResources(liveryResources, carId));
     }

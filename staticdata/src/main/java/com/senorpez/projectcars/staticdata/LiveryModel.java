@@ -13,11 +13,6 @@ class LiveryModel implements Identifiable<Integer> {
         this.name = livery.getName();
     }
 
-    LiveryResource toResource() {
-        final APIResourceAssembler<LiveryModel, LiveryResource> assembler = new APIResourceAssembler<>(LiveryController.class, LiveryResource.class, () -> new LiveryResource(this));
-        return assembler.toResource(this);
-    }
-
     LiveryResource toResource(final int carId) {
         final APIResourceAssembler<LiveryModel, LiveryResource> assembler = new APIResourceAssembler<>(LiveryController.class, LiveryResource.class, () -> new LiveryResource(this, carId));
         return assembler.toResource(this, carId);

@@ -28,9 +28,12 @@ class LiveryResource extends Resource<LiveryModel> {
     }
 
     static Resources<LiveryResource> makeResources(final Collection<LiveryResource> resources, final int carId) {
+        resources.forEach(ResourceSupport::removeLinks);
+        resources.forEach(liveryResource -> liveryResource.add(linkTo(methodOn(LiveryController.class).liveries(carId, liveryResource.getContent().getId())).withSelfRel()));
         final Resources<LiveryResource> liveryResources = new Resources<>(resources);
         liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
         liveryResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
+        liveryResources.add(linkTo(methodOn(CarController.class).cars(carId)).withRel("car"));
         return liveryResources;
     }
 
