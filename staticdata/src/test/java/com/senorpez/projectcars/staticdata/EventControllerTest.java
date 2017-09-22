@@ -27,7 +27,6 @@ import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CA
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
@@ -164,7 +163,7 @@ public class EventControllerTest {
 
     @Test
     public void getAllEvents_ValidAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
 
         mockMvc.perform(get("/events").accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -192,13 +191,13 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findAll(anyCollection());
+        verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getAllEvents_FallbackAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
 
         mockMvc.perform(get("/events").accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -226,13 +225,13 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findAll(anyCollection());
+        verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getAllEvents_InvalidAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
 
         mockMvc.perform(get("/events").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -248,7 +247,7 @@ public class EventControllerTest {
 
     @Test
     public void getAllEvents_InvalidMethod() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_EVENT, SECOND_EVENT));
 
         mockMvc.perform(put("/events").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -263,7 +262,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEvent_ValidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -284,13 +283,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEvent_ValidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -311,13 +310,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEvent_ValidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -333,7 +332,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEvent_ValidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(put(String.format("/events/%d", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -348,7 +347,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEvent_InvalidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get("/events/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -358,13 +357,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEvent_InvalidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get("/events/8675309").accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -374,13 +373,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEvent_InvalidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get("/events/8675309").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -396,7 +395,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEvent_InvalidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put("/events/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -411,7 +410,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCars_ValidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -434,13 +433,13 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCars_ValidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -463,13 +462,13 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCars_ValidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -485,7 +484,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCars_ValidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(put(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -500,7 +499,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCars_InvalidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -510,13 +509,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCars_InvalidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -526,13 +525,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCars_InvalidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -548,7 +547,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCars_InvalidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -564,7 +563,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_ValidCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(PROJECT_CARS))
@@ -615,13 +614,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_ValidCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(FALLBACK))
@@ -672,13 +671,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_ValidCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -693,7 +692,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_ValidCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(put(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -707,7 +706,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_InvalidCarId_ValidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -717,13 +716,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_InvalidCarId_FallbackAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -733,13 +732,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_InvalidCarId_InvalidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -755,7 +754,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_InvalidCarId_InvalidMethod() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars/8675309", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -770,7 +769,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_InvalidEventId_XXXCarId_ValidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -780,13 +779,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_InvalidEventId_XXXCarId_FallbackAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d", FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -796,13 +795,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_InvalidEventId_XXXCarId_InvalidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d", FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -818,7 +817,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_InvalidEventId_XXXCarId_InvalidMethod() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/8675309/cars/%d", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -833,7 +832,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_ForeignCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -843,13 +842,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_ForeignCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -859,13 +858,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCar_ValidEventId_ForeignCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -881,7 +880,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCar_ValidEventId_ForeignCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(put(String.format("/events/%d/cars/%d", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -896,7 +895,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ValidCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(PROJECT_CARS))
@@ -920,13 +919,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ValidCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(FALLBACK))
@@ -950,13 +949,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ValidCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -971,7 +970,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ValidCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(put(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -985,7 +984,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_InvalidCarId_ValidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/class", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -995,13 +994,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_InvalidCarId_FallbackAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/class", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1011,13 +1010,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_InvalidCarId_InvalidAcceptHeader() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/class", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1033,7 +1032,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_InvalidCarId_InvalidMethod() throws Exception {
-        when((Event) apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when((Event) apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars/8675309/class", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1048,7 +1047,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_InvalidEventId_XXXCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/class", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1058,13 +1057,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_InvalidEventId_XXXCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/class", FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1074,13 +1073,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_InvalidEventId_XXXCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/class", FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1096,7 +1095,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_InvalidEventId_XXXCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/8675309/cars/%d/class", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1111,7 +1110,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ForeignCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1121,13 +1120,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ForeignCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1137,13 +1136,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ForeignCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1159,7 +1158,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarClass_ValidEventId_ForeignCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(put(String.format("/events/%d/cars/%d/class", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1174,7 +1173,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ValidCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(PROJECT_CARS))
@@ -1212,13 +1211,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ValidCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(FALLBACK))
@@ -1256,13 +1255,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ValidCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1277,7 +1276,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ValidCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1291,7 +1290,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_InvalidCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1301,13 +1300,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_InvalidCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1317,13 +1316,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_InvalidCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1339,7 +1338,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_InvalidCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars/8675309/liveries", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1354,7 +1353,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_InvalidEventId_XXXCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1364,13 +1363,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_InvalidEventId_XXXCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries", FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1380,13 +1379,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_InvalidEventId_XXXCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries", FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1402,7 +1401,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_InvalidEventId_XXXCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/8675309/cars/%d/liveries", FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1417,7 +1416,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ForeignCarId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1427,13 +1426,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ForeignCarId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1443,13 +1442,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ForeignCarId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1465,7 +1464,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLiveries_ValidEventId_ForeignCarId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1480,7 +1479,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_ValidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -1503,13 +1502,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_ValidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -1532,13 +1531,13 @@ public class EventControllerTest {
                                 hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
                                 hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_ValidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1554,7 +1553,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_ValidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
 
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1569,7 +1568,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_InvalidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1579,13 +1578,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Livery with ID of %d not found", 8675309))));
 
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_InvalidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1595,13 +1594,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Livery with ID of %d not found", 8675309))));
 
-        verify(apiService, times(3)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_InvalidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1616,7 +1615,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ValidCarId_InvalidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), FIRST_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1631,7 +1630,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_InvalidCarId_XXXLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries/%d", FIRST_EVENT.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1641,13 +1640,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_InvalidCarId_XXXLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries/%d", FIRST_EVENT.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1657,13 +1656,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", 8675309))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_InvalidCarId_XXXLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/cars/8675309/liveries/%d", FIRST_EVENT.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1679,7 +1678,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_InvalidCarId_XXXLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenThrow(new CarNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/cars/8675309/liveries/%d", FIRST_EVENT.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1694,7 +1693,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_InvalidEventId_XXXCarId_XXXLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -1704,13 +1703,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_InvalidEventId_XXXCarId_XXXLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -1720,13 +1719,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Event with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_InvalidEventId_XXXCarId_XXXLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/8675309/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -1742,7 +1741,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_InvalidEventId_XXXCarId_XXXLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new EventNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new EventNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/8675309/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -1757,7 +1756,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_ValidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), SECOND_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1766,13 +1765,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_ValidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), SECOND_CAR.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1781,13 +1780,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_ValidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), SECOND_CAR.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1802,7 +1801,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_ValidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), SECOND_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1816,7 +1815,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_InvalidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1825,13 +1824,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_InvalidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1840,13 +1839,13 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Car with ID of %d not found", SECOND_CAR.getId()))));
 
-        verify(apiService, times(2)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_InvalidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
         mockMvc.perform(get(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -1861,7 +1860,7 @@ public class EventControllerTest {
 
     @Test
     public void getSingleEventCarLivery_ValidEventId_ForeignCarId_InvalidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new LiveryNotFoundException(8675309));
         mockMvc.perform(put(String.format("/events/%d/cars/%d/liveries/8675309", FIRST_EVENT.getId(), SECOND_CAR.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))

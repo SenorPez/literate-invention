@@ -23,6 +23,8 @@ class TrackResource extends Resource<TrackModel> {
                 .orElseThrow(() -> new RoundNotFoundException(roundId))
                 .getTrack()), links);
         this.add(linkTo(methodOn(RoundController.class).roundTrack(eventId, roundId)).withSelfRel());
-        this.add(linkTo(methodOn(TrackController.class).tracks()).withRel("tracks"));
+        this.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
+        this.add(linkTo(methodOn(RoundController.class).rounds(eventId, roundId)).withRel("round"));
+        this.add(linkTo(methodOn(TrackController.class).tracks(this.getContent().getId())).withSelfRel());
     }
 }

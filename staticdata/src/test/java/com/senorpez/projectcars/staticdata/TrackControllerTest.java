@@ -19,7 +19,6 @@ import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CA
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
@@ -200,7 +199,7 @@ public class TrackControllerTest {
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:tracks", hasEntry("href", "http://localhost/tracks")));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
@@ -228,7 +227,7 @@ public class TrackControllerTest {
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:tracks", hasEntry("href", "http://localhost/tracks")));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
     
@@ -275,7 +274,7 @@ public class TrackControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Track with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
@@ -291,7 +290,7 @@ public class TrackControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Track with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
     

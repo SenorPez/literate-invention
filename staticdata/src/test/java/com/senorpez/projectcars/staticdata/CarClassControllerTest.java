@@ -20,7 +20,6 @@ import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CA
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
@@ -69,7 +68,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getAllClasses_ValidAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
 
         mockMvc.perform(get("/classes").accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -97,13 +96,13 @@ public class CarClassControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findAll(anyCollection());
+        verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getAllClasses_FallbackAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
 
         mockMvc.perform(get("/classes").accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -131,13 +130,13 @@ public class CarClassControllerTest {
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
-        verify(apiService, times(1)).findAll(anyCollection());
+        verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getAllClasses_InvalidAcceptHeader() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
 
         mockMvc.perform(get("/classes").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -153,7 +152,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getAllClasses_InvalidMethod() throws Exception {
-        when(apiService.findAll(anyCollection())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
+        when(apiService.findAll(any())).thenReturn(Arrays.asList(FIRST_CLASS, SECOND_CLASS));
 
         mockMvc.perform(put("/classes").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -168,7 +167,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getSingleClass_ValidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_CLASS);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CLASS);
 
         mockMvc.perform(get(String.format("/classes/%d", FIRST_CLASS.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -185,13 +184,13 @@ public class CarClassControllerTest {
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleClass_ValidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_CLASS);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CLASS);
 
         mockMvc.perform(get(String.format("/classes/%d", FIRST_CLASS.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -208,13 +207,13 @@ public class CarClassControllerTest {
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleClass_ValidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_CLASS);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CLASS);
 
         mockMvc.perform(get(String.format("/classes/%d", FIRST_CLASS.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -230,7 +229,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getSingleClass_ValidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenReturn(FIRST_CLASS);
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CLASS);
 
         mockMvc.perform(put(String.format("/classes/%d", FIRST_CLASS.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -245,7 +244,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getSingleClass_InvalidId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
 
         mockMvc.perform(get("/classes/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -255,13 +254,13 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Class with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
     
     @Test
     public void getSingleClass_InvalidId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
 
         mockMvc.perform(get("/classes/8675309").accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -271,13 +270,13 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.message", is(NOT_FOUND.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is(String.format("Class with ID of %d not found", 8675309))));
 
-        verify(apiService, times(1)).findOne(anyCollection(), any(), any());
+        verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
     }
 
     @Test
     public void getSingleClass_InvalidId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
 
         mockMvc.perform(get("/classes/8675309").accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -293,7 +292,7 @@ public class CarClassControllerTest {
 
     @Test
     public void getSingleClass_InvalidId_InvalidMethod() throws Exception {
-        when(apiService.findOne(anyCollection(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenThrow(new CarClassNotFoundException(8675309));
 
         mockMvc.perform(put("/classes/8675309").accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
