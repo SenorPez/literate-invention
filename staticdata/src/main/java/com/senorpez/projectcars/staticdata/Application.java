@@ -17,13 +17,19 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.*;
+import static org.springframework.http.MediaType.ALL;
 
 @SpringBootApplication
 public class Application {
     private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
+
+    private static final List<MediaType> SUPPORTED_MEDIA_TYPES = Arrays.asList(
+            PROJECT_CARS,
+            PROJECT_CARS_2,
+            FALLBACK);
 
     static final Set<Track> TRACKS = Collections.unmodifiableSet(getProjectCarsData(Track.class, "tracks"));
     static final Set<CarClass> CAR_CLASSES = Collections.unmodifiableSet(getProjectCarsData(CarClass.class, "classes"));
@@ -79,19 +85,7 @@ public class Application {
 
     private class HalMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
         private HalMappingJackson2HttpMessageConverter() {
-            setSupportedMediaTypes(Collections.singletonList(
-                    new MediaType("application", "doesntmatter") {
-                        @Override
-                        public boolean isCompatibleWith(final MediaType other) {
-                            if (other == null) {
-                                return false;
-                            } else if (other.getSubtype().startsWith("vnd.senorpez") && other.getSubtype().endsWith("+json")) {
-                                return true;
-                            }
-                            return super.isCompatibleWith(other);
-                        }
-                    }
-            ));
+            setSupportedMediaTypes(Collections.singletonList(ALL));
 
             final ObjectMapper halObjectMapper = beanFactory.getBean(HAL_OBJECT_MAPPER_BEAN_NAME, ObjectMapper.class);
             setObjectMapper(halObjectMapper);

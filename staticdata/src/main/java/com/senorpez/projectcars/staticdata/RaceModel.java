@@ -17,13 +17,8 @@ class RaceModel implements Identifiable<Integer> {
         this.type = race.getType();
     }
 
-    RaceResource toResource() {
-        final RaceResourceAssembler assembler = new RaceResourceAssembler(() -> new RaceResource(this));
-        return assembler.toResource(this);
-    }
-
     RaceResource toResource(final int eventId, final int roundId) {
-        final RaceResourceAssembler assembler = new RaceResourceAssembler(() -> new RaceResource(this));
+        final APIResourceAssembler<RaceModel, RaceResource> assembler = new APIResourceAssembler<>(RaceController.class, RaceResource.class, () -> new RaceResource(this, eventId, roundId));
         return assembler.toResource(this, eventId, roundId);
     }
 

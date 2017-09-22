@@ -8,11 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/events/{eventId}/rounds/{roundId}/races",
@@ -22,26 +19,48 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class RaceController {
     @Autowired
-    private RaceService raceService;
+    private final APIService apiService;
+
+    RaceController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
     ResponseEntity<Resources<RaceResource>> races(@PathVariable final int eventId, @PathVariable final int roundId) {
-        final List<RaceModel> raceModels = raceService.findAll(eventId, roundId);
-        final Resources<RaceResource> raceResources = new Resources<>(raceModels.stream()
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final Collection<Race> races = round.getRaces();
+        final Collection<RaceModel> raceModels = races.stream()
+                .map(RaceModel::new)
+                .collect(Collectors.toList());
+        final Collection<RaceResource> raceResources = raceModels.stream()
                 .map(raceModel -> raceModel.toResource(eventId, roundId))
-                .collect(Collectors.toList()));
-        raceResources.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withSelfRel());
-        raceResources.add(linkTo(methodOn(RoundController.class).rounds(eventId, roundId)).withRel("round"));
-        raceResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        return ResponseEntity.ok(raceResources);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(RaceResource.makeResources(raceResources, eventId, roundId));
     }
 
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
-        final RaceModel raceModel = raceService.findOne(eventId, roundId, raceId);
+        final Event event = apiService.findOne(
+                Application.EVENTS,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final Race race = apiService.findOne(
+                round.getRaces(),
+                findRace -> findRace.getId() == raceId,
+                () -> new RaceNotFoundException(raceId));
+        final RaceModel raceModel = new RaceModel(race);
         final RaceResource raceResource = raceModel.toResource(eventId, roundId);
-        raceResource.add(linkTo(methodOn(RaceController.class).races(eventId, roundId)).withRel("races"));
-        raceResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(raceResource);
     }
 }

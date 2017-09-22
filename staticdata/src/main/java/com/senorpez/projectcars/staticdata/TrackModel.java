@@ -28,7 +28,7 @@ class TrackModel implements Identifiable<Integer> {
     }
 
     TrackResource toResource() {
-        final TrackResourceAssembler assembler = new TrackResourceAssembler(() -> new TrackResource(this));
+        final APIResourceAssembler<TrackModel, TrackResource> assembler = new APIResourceAssembler<>(TrackController.class, TrackResource.class, () -> new TrackResource(this));
         return assembler.toResource(this);
     }
 

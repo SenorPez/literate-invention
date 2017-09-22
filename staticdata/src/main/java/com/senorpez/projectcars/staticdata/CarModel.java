@@ -1,15 +1,15 @@
 package com.senorpez.projectcars.staticdata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.Identifiable;
-import org.springframework.hateoas.core.Relation;
 
-@Relation(value = "car", collectionRelation = "car")
 class CarModel implements Identifiable<Integer> {
     private final int id;
     private final String manufacturer;
     private final String model;
     private final String country;
+    @JsonProperty("class")
     private final String carClass;
     private final int year;
     private final String drivetrain;
@@ -57,7 +57,12 @@ class CarModel implements Identifiable<Integer> {
     }
 
     CarResource toResource() {
-        final CarResourceAssembler assembler = new CarResourceAssembler(() -> new CarResource(this));
+        final APIResourceAssembler<CarModel, CarResource> assembler = new APIResourceAssembler<>(CarController.class, CarResource.class, () -> new CarResource(this));
+        return assembler.toResource(this);
+    }
+
+    CarResource toResource(final int eventId) {
+        final APIResourceAssembler<CarModel, CarResource> assembler = new APIResourceAssembler<>(CarController.class, CarResource.class, () -> new CarResource(this, eventId));
         return assembler.toResource(this);
     }
 

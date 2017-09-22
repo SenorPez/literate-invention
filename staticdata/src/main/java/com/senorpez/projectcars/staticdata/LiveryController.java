@@ -8,11 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/cars/{carId}/liveries",
@@ -22,25 +19,40 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class LiveryController {
     @Autowired
-    private LiveryService liveryService;
+    private APIService apiService;
+
+    LiveryController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
     ResponseEntity<Resources<LiveryResource>> liveries(@PathVariable final int carId) {
-        final List<LiveryModel> liveryModels = liveryService.findAll(Application.CARS, carId);
-        final Resources<LiveryResource> liveryResources = new Resources<>(liveryModels.stream()
+        final Car car = apiService.findOne(
+                Application.CARS,
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Collection<Livery> liveries = car.getLiveries();
+        final Collection<LiveryModel> liveryModels = liveries.stream()
+                .map(LiveryModel::new)
+                .collect(Collectors.toList());
+        final Collection<LiveryResource> liveryResources = liveryModels.stream()
                 .map(liveryModel -> liveryModel.toResource(carId))
-                .collect(Collectors.toList()));
-        liveryResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        liveryResources.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withSelfRel());
-        return ResponseEntity.ok(liveryResources);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(LiveryResource.makeResources(liveryResources, carId));
     }
 
     @RequestMapping("/{liveryId}")
     ResponseEntity<LiveryResource> liveries(@PathVariable final int carId, @PathVariable final int liveryId) {
-        final LiveryModel liveryModel = liveryService.findOne(carId, liveryId);
+        final Car car = apiService.findOne(
+                Application.CARS,
+                findCar -> findCar.getId() == carId,
+                () -> new CarNotFoundException(carId));
+        final Livery livery = apiService.findOne(
+                car.getLiveries(),
+                findLivery -> findLivery.getId() == liveryId,
+                () -> new LiveryNotFoundException(liveryId));
+        final LiveryModel liveryModel = new LiveryModel(livery);
         final LiveryResource liveryResource = liveryModel.toResource(carId);
-        liveryResource.add(linkTo(methodOn(LiveryController.class).liveries(carId)).withRel("liveries"));
-        liveryResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(liveryResource);
     }
 }

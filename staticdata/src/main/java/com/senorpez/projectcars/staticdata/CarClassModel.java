@@ -14,7 +14,17 @@ class CarClassModel implements Identifiable<Integer> {
     }
 
     CarClassResource toResource() {
-        final CarClassResourceAssembler assembler = new CarClassResourceAssembler(() -> new CarClassResource(this));
+        final APIResourceAssembler<CarClassModel, CarClassResource> assembler = new APIResourceAssembler<>(CarClassController.class, CarClassResource.class, () -> new CarClassResource(this));
+        return assembler.toResource(this);
+    }
+
+    CarClassResource toResource(final int carId) {
+        final APIResourceAssembler<CarClassModel, CarClassResource> assembler = new APIResourceAssembler<>(CarClassController.class, CarClassResource.class, () -> new CarClassResource(this, carId));
+        return assembler.toResource(this);
+    }
+
+    CarClassResource toResource(final int eventId, final int carId) {
+        final APIResourceAssembler<CarClassModel, CarClassResource> assembler = new APIResourceAssembler<>(CarClassController.class, CarClassResource.class, () -> new CarClassResource(this, eventId, carId));
         return assembler.toResource(this);
     }
 

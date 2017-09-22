@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -17,6 +18,7 @@ class Event {
 
     private final static AtomicInteger eventId = new AtomicInteger(0);
 
+    @JsonCreator
     Event(
             @JsonProperty("name") final String name,
             @JsonProperty("tier") final Integer tier,
@@ -40,6 +42,15 @@ class Event {
 
         Round.resetId();
         this.rounds = Application.getData(Round.class, rounds);
+    }
+
+    public Event(final int id, final String name, final Integer tier, final Set<Car> cars, final Set<Round> rounds, final Boolean verified) {
+        this.id = id;
+        this.name = name;
+        this.tier = tier;
+        this.cars = cars;
+        this.rounds = rounds;
+        this.verified = verified;
     }
 
     int getId() {

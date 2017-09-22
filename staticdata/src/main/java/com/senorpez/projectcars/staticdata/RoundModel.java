@@ -13,13 +13,8 @@ class RoundModel implements Identifiable<Integer> {
         this.track = round.getTrack().getName();
     }
 
-    RoundResource toResource() {
-        final RoundResourceAssembler assembler = new RoundResourceAssembler(() -> new RoundResource(this));
-        return assembler.toResource(this);
-    }
-
     RoundResource toResource(final int eventId) {
-        final RoundResourceAssembler assembler = new RoundResourceAssembler(() -> new RoundResource(this));
+        final APIResourceAssembler<RoundModel, RoundResource> assembler = new APIResourceAssembler<>(RoundController.class, RoundResource.class, () -> new RoundResource(this, eventId));
         return assembler.toResource(this, eventId);
     }
 

@@ -1,18 +1,15 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/tracks",
@@ -22,25 +19,32 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class TrackController {
     @Autowired
-    private TrackService trackService;
+    private final APIService apiService;
 
-    @RequestMapping
-    ResponseEntity<Resources<EmbeddedTrackResource>> tracks() {
-        final List<EmbeddedTrackModel> trackModels = trackService.findAll();
-        final Resources<EmbeddedTrackResource> trackResources = new Resources<>(trackModels.stream()
-                .map(EmbeddedTrackModel::toResource)
-                .collect(Collectors.toList()));
-        trackResources.add(linkTo(methodOn(TrackController.class).tracks()).withSelfRel());
-        trackResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        return ResponseEntity.ok(trackResources);
+    TrackController(final APIService apiService) {
+        this.apiService = apiService;
     }
 
-    @RequestMapping("/{id}")
-    ResponseEntity<TrackResource> tracks(@PathVariable final int id) {
-        final TrackModel trackModel = trackService.findOne(id);
+    @RequestMapping
+    ResponseEntity<EmbeddedTrackResources> tracks() {
+        final Collection<Track> tracks = apiService.findAll(Application.TRACKS);
+        final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
+                .map(EmbeddedTrackModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedTrackModel>> trackResources = trackModels.stream()
+                .map(EmbeddedTrackModel::toResource)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new EmbeddedTrackResources(trackResources));
+    }
+
+    @RequestMapping("/{trackId}")
+    ResponseEntity<TrackResource> tracks(@PathVariable final int trackId) {
+        final Track track = apiService.findOne(
+                Application.TRACKS,
+                findTrack -> findTrack.getId() == trackId,
+                () -> new TrackNotFoundException(trackId));
+        final TrackModel trackModel = new TrackModel(track);
         final TrackResource trackResource = trackModel.toResource();
-        trackResource.add(linkTo(methodOn(TrackController.class).tracks()).withRel("tracks"));
-        trackResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(trackResource);
     }
 }

@@ -8,11 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RequestMapping(
         value = "/classes",
@@ -22,25 +19,32 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 public class CarClassController {
     @Autowired
-    private CarClassService carClassService;
+    private APIService apiService;
+
+    CarClassController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
     ResponseEntity<Resources<CarClassResource>> carClasses() {
-        final List<CarClassModel> carClassModels = carClassService.findAll();
-        final Resources<CarClassResource> carClassResources = new Resources<>(carClassModels.stream()
+        final Collection<CarClass> carClasses = apiService.findAll(Application.CAR_CLASSES);
+        final Collection<CarClassModel> carClassModels = carClasses.stream()
+                .map(CarClassModel::new)
+                .collect(Collectors.toList());
+        final Collection<CarClassResource> carClassResources = carClassModels.stream()
                 .map(CarClassModel::toResource)
-                .collect(Collectors.toList()));
-        carClassResources.add(linkTo(methodOn(CarClassController.class).carClasses()).withSelfRel());
-        carClassResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
-        return ResponseEntity.ok(carClassResources);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(CarClassResource.makeResources(carClassResources));
     }
 
-    @RequestMapping("/{id}")
-    ResponseEntity<CarClassResource> carClasses(@PathVariable final int id) {
-        final CarClassModel carClassModel = carClassService.findOne(id);
+    @RequestMapping("/{carClassId}")
+    ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
+        final CarClass carClass = apiService.findOne(
+                Application.CAR_CLASSES,
+                findCarClass -> findCarClass.getId() == carClassId,
+                () -> new CarClassNotFoundException(carClassId));
+        final CarClassModel carClassModel = new CarClassModel(carClass);
         final CarClassResource carClassResource = carClassModel.toResource();
-        carClassResource.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
-        carClassResource.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         return ResponseEntity.ok(carClassResource);
     }
 }

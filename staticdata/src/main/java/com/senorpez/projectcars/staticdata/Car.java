@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -85,6 +86,7 @@ class Car {
         }
     }
 
+    @JsonCreator
     public Car(
             @JsonProperty("id") final int id,
             @JsonProperty("manufacturer") final String manufacturer,
@@ -130,6 +132,53 @@ class Car {
         this.gears = gears;
         this.dlc = dlc;
         this.liveries = Application.getData(Livery.class, liveries);
+    }
+
+    public Car(
+            @JsonProperty("id") final int id,
+            @JsonProperty("manufacturer") final String manufacturer,
+            @JsonProperty("model") final String model,
+            @JsonProperty("country") final String country,
+            @JsonProperty("class") final CarClass carClass,
+            @JsonProperty("year") final int year,
+            @JsonProperty("drivetrain") final Drivetrain drivetrain,
+            @JsonProperty("enginePosition") final EnginePosition enginePosition,
+            @JsonProperty("engineType") final String engineType,
+            @JsonProperty("topSpeed") final int topSpeed,
+            @JsonProperty("horsepower") final int horsepower,
+            @JsonProperty("acceleration") final float acceleration,
+            @JsonProperty("braking") final float braking,
+            @JsonProperty("weight") final int weight,
+            @JsonProperty("torque") final int torque,
+            @JsonProperty("weightBalance") final int weightBalance,
+            @JsonProperty("wheelbase") final float wheelbase,
+            @JsonProperty("shiftPattern") final ShiftPattern shiftPattern,
+            @JsonProperty("shifter") final Shifter shifter,
+            @JsonProperty("gears") final int gears,
+            @JsonProperty("dlc") final String dlc,
+            @JsonProperty("liveries") final Set<Livery> liveries) {
+        this.id = id;
+        this.manufacturer = manufacturer;
+        this.model = model;
+        this.country = country;
+        this.carClass = carClass;
+        this.year = year;
+        this.drivetrain = drivetrain;
+        this.enginePosition = enginePosition;
+        this.engineType = engineType;
+        this.topSpeed = topSpeed;
+        this.horsepower = horsepower;
+        this.acceleration = acceleration;
+        this.braking = braking;
+        this.weight = weight;
+        this.torque = torque;
+        this.weightBalance = weightBalance;
+        this.wheelbase = wheelbase;
+        this.shiftPattern = shiftPattern;
+        this.shifter = shifter;
+        this.gears = gears;
+        this.dlc = dlc;
+        this.liveries = liveries;
     }
 
     int getId() {

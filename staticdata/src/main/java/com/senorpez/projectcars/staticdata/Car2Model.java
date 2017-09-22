@@ -20,7 +20,7 @@ class Car2Model implements Identifiable<Integer> {
     }
 
     Car2Resource toResource() {
-        final Car2ResourceAssembler assembler = new Car2ResourceAssembler(() -> new Car2Resource(this));
+        final APIResourceAssembler<Car2Model, Car2Resource> assembler = new APIResourceAssembler<>(Car2Controller.class, Car2Resource.class, () -> new Car2Resource(this));
         return assembler.toResource(this);
     }
 

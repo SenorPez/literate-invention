@@ -18,7 +18,7 @@ class EventModel implements Identifiable<Integer> {
     }
 
     EventResource toResource() {
-        final EventResourceAssembler assembler = new EventResourceAssembler(() -> new EventResource(this));
+        final APIResourceAssembler<EventModel, EventResource> assembler = new APIResourceAssembler<>(EventController.class, EventResource.class, () -> new EventResource(this));
         return assembler.toResource(this);
     }
 
