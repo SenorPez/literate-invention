@@ -19,7 +19,8 @@ class APIExceptionHandler {
             EventNotFoundException.class,
             RoundNotFoundException.class,
             RaceNotFoundException.class,
-            LiveryNotFoundException.class})
+            LiveryNotFoundException.class,
+            TrackNotFoundException.class})
     ResponseEntity<ErrorResponse> handleAPIObjectNotFound(final Exception e) {
         return ResponseEntity
                 .status(NOT_FOUND)

@@ -19,11 +19,15 @@ import java.util.stream.Collectors;
 @RestController
 public class TrackController {
     @Autowired
-    private APIService apiService;
+    private final APIService apiService;
+
+    TrackController(final APIService apiService) {
+        this.apiService = apiService;
+    }
 
     @RequestMapping
     ResponseEntity<EmbeddedTrackResources> tracks() {
-        final Collection<Track> tracks = Application.TRACKS;
+        final Collection<Track> tracks = apiService.findAll(Application.TRACKS);
         final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
                 .map(EmbeddedTrackModel::new)
                 .collect(Collectors.toList());
