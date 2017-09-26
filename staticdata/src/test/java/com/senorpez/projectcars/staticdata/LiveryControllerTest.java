@@ -97,7 +97,7 @@ public class LiveryControllerTest {
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new LiveryController(apiService))
+                .standaloneSetup(new LiveryController(apiService, Collections.singletonList(FIRST_CAR)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();
@@ -267,7 +267,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -290,7 +290,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -313,7 +313,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -329,7 +329,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(put(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())

@@ -88,7 +88,7 @@ public class RaceControllerTest {
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new RaceController(apiService))
+                .standaloneSetup(new RaceController(apiService, Collections.singletonList(FIRST_EVENT)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();
@@ -96,7 +96,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetAllRaces_ValidEventId_ValidRoundId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -134,7 +134,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetAllRaces_ValidEventId_ValidRoundId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -172,7 +172,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetAllRaces_ValidEventId_ValidRoundId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -188,7 +188,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetAllRaces_ValidEventId_ValidRoundId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(put(String.format("/events/%d/rounds/%d/races", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -329,7 +329,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND, FIRST_RACE);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -354,7 +354,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND, FIRST_RACE);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -379,7 +379,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND, FIRST_RACE);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -395,7 +395,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_ValidRaceId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND, FIRST_RACE);
 
         mockMvc.perform(put(String.format("/events/%d/rounds/%d/races/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId(), FIRST_RACE.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -410,7 +410,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND).thenThrow(new RaceNotFoundException(8675309));
         
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isNotFound())
@@ -426,7 +426,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND).thenThrow(new RaceNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
                 .andExpect(status().isNotFound())
@@ -442,7 +442,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND).thenThrow(new RaceNotFoundException(8675309));
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -458,7 +458,7 @@ public class RaceControllerTest {
 
     @Test
     public void GetSingleRace_ValidEventId_ValidRoundId_InvalidRaceId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod().thenThrow(new RaceNotFoundException(8675309));
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND).thenThrow(new RaceNotFoundException(8675309));
 
         mockMvc.perform(put(String.format("/events/%d/rounds/%d/races/8675309", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())

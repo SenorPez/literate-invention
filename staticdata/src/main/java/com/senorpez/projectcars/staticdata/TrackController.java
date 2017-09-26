@@ -18,16 +18,23 @@ import java.util.stream.Collectors;
 )
 @RestController
 public class TrackController {
-    @Autowired
     private final APIService apiService;
+    private final Collection<Track> tracks;
 
+    @Autowired
     TrackController(final APIService apiService) {
+        this.tracks = Application.TRACKS;
         this.apiService = apiService;
+    }
+
+    TrackController(final APIService apiService, final Collection<Track> tracks) {
+        this.apiService = apiService;
+        this.tracks = tracks;
     }
 
     @RequestMapping
     ResponseEntity<EmbeddedTrackResources> tracks() {
-        final Collection<Track> tracks = apiService.findAll(Application.TRACKS);
+        final Collection<Track> tracks = apiService.findAll(this.tracks);
         final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
                 .map(EmbeddedTrackModel::new)
                 .collect(Collectors.toList());
@@ -40,7 +47,7 @@ public class TrackController {
     @RequestMapping("/{trackId}")
     ResponseEntity<TrackResource> tracks(@PathVariable final int trackId) {
         final Track track = apiService.findOne(
-                Application.TRACKS,
+                this.tracks,
                 findTrack -> findTrack.getId() == trackId,
                 () -> new TrackNotFoundException(trackId));
         final TrackModel trackModel = new TrackModel(track);

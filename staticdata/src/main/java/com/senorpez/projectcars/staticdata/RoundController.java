@@ -18,17 +18,24 @@ import java.util.stream.Collectors;
 )
 @RestController
 public class RoundController {
-    @Autowired
     private final APIService apiService;
+    private Collection<Event> events;
 
+    @Autowired
     RoundController(final APIService apiService) {
         this.apiService = apiService;
+        this.events = Application.EVENTS;
+    }
+
+    RoundController(final APIService apiService, final Collection<Event> events) {
+        this.apiService = apiService;
+        this.events = events;
     }
 
     @RequestMapping
     ResponseEntity<Resources<RoundResource>> rounds(@PathVariable final int eventId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Collection<Round> rounds = event.getRounds();
@@ -44,7 +51,7 @@ public class RoundController {
     @RequestMapping("/{roundId}")
     ResponseEntity<RoundResource> rounds(@PathVariable final int eventId, @PathVariable final int roundId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Round round = apiService.findOne(
@@ -58,7 +65,7 @@ public class RoundController {
 
     @RequestMapping("/{roundId}/track")
     ResponseEntity<TrackResource> roundTrack(@PathVariable final int eventId, @PathVariable final int roundId) {
-        final TrackResource trackResource = new TrackResource(eventId, roundId);
+        final TrackResource trackResource = new TrackResource(eventId, roundId, this.events);
         return ResponseEntity.ok(trackResource);
     }
 }

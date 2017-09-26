@@ -13,19 +13,9 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 class RoundResource extends Resource<RoundModel> {
     RoundResource(final RoundModel content, final int eventId, final Link... links) {
         super(content, links);
-
-        final Track track = Application.EVENTS.stream()
-                .filter(event -> event.getId() == eventId)
-                .findFirst()
-                .orElseThrow(() -> new EventNotFoundException(eventId))
-                .getRounds().stream()
-                .filter(round -> round.getId() == content.getId())
-                .findFirst()
-                .orElseThrow(() -> new RoundNotFoundException(content.getId()))
-                .getTrack();
         this.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withRel("rounds"));
         this.add(linkTo(methodOn(RaceController.class).races(eventId, content.getId())).withRel("races"));
-        this.add(linkTo(methodOn(TrackController.class).tracks(track.getId())).withRel("track"));
+        this.add(linkTo(methodOn(TrackController.class).tracks(this.getContent().getTrackId())).withRel("track"));
         this.add(linkTo(methodOn(RoundController.class).roundTrack(eventId, content.getId())).withRel("track"));
     }
 

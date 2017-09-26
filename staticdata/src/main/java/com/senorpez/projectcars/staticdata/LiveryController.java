@@ -18,17 +18,24 @@ import java.util.stream.Collectors;
 )
 @RestController
 public class LiveryController {
-    @Autowired
-    private APIService apiService;
+    private final APIService apiService;
+    private final Collection<Car> cars;
 
+    @Autowired
     LiveryController(final APIService apiService) {
         this.apiService = apiService;
+        this.cars = Application.CARS;
+    }
+
+    LiveryController(final APIService apiService, final Collection<Car> cars) {
+        this.apiService = apiService;
+        this.cars = cars;
     }
 
     @RequestMapping
     ResponseEntity<Resources<LiveryResource>> liveries(@PathVariable final int carId) {
         final Car car = apiService.findOne(
-                Application.CARS,
+                this.cars,
                 findCar -> findCar.getId() == carId,
                 () -> new CarNotFoundException(carId));
         final Collection<Livery> liveries = car.getLiveries();
@@ -44,7 +51,7 @@ public class LiveryController {
     @RequestMapping("/{liveryId}")
     ResponseEntity<LiveryResource> liveries(@PathVariable final int carId, @PathVariable final int liveryId) {
         final Car car = apiService.findOne(
-                Application.CARS,
+                this.cars,
                 findCar -> findCar.getId() == carId,
                 () -> new CarNotFoundException(carId));
         final Livery livery = apiService.findOne(

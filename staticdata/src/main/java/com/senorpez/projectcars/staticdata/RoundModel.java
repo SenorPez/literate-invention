@@ -1,5 +1,6 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
@@ -7,10 +8,12 @@ import org.springframework.hateoas.core.Relation;
 class RoundModel implements Identifiable<Integer> {
     private final int id;
     private final String track;
+    private final int trackId;
 
     RoundModel(final Round round) {
         this.id = round.getId();
         this.track = round.getTrack().getName();
+        this.trackId = round.getTrack().getId();
     }
 
     RoundResource toResource(final int eventId) {
@@ -25,5 +28,10 @@ class RoundModel implements Identifiable<Integer> {
 
     public String getTrack() {
         return track;
+    }
+
+    @JsonIgnore
+    int getTrackId() {
+        return trackId;
     }
 }

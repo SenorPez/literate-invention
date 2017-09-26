@@ -70,7 +70,7 @@ public class TrackControllerTest {
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new TrackController(apiService))
+                .standaloneSetup(new TrackController(apiService, Arrays.asList(FIRST_TRACK, SECOND_TRACK)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();

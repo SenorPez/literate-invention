@@ -18,16 +18,23 @@ import java.util.stream.Collectors;
 )
 @RestController
 public class CarClassController {
-    @Autowired
-    private APIService apiService;
+    private final APIService apiService;
+    private final Collection<CarClass> carClasses;
 
+    @Autowired
     CarClassController(final APIService apiService) {
         this.apiService = apiService;
+        this.carClasses = Application.CAR_CLASSES;
+    }
+
+    CarClassController(final APIService apiService, final Collection<CarClass> carClasses) {
+        this.apiService = apiService;
+        this.carClasses = carClasses;
     }
 
     @RequestMapping
     ResponseEntity<Resources<CarClassResource>> carClasses() {
-        final Collection<CarClass> carClasses = apiService.findAll(Application.CAR_CLASSES);
+        final Collection<CarClass> carClasses = apiService.findAll(this.carClasses);
         final Collection<CarClassModel> carClassModels = carClasses.stream()
                 .map(CarClassModel::new)
                 .collect(Collectors.toList());
@@ -40,7 +47,7 @@ public class CarClassController {
     @RequestMapping("/{carClassId}")
     ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
         final CarClass carClass = apiService.findOne(
-                Application.CAR_CLASSES,
+                this.carClasses,
                 findCarClass -> findCarClass.getId() == carClassId,
                 () -> new CarClassNotFoundException(carClassId));
         final CarClassModel carClassModel = new CarClassModel(carClass);

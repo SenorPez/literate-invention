@@ -12,24 +12,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.hal.CurieProvider;
 import org.springframework.hateoas.hal.DefaultCurieProvider;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.*;
 import static org.springframework.http.MediaType.ALL;
 
 @SpringBootApplication
 public class Application {
     private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
-
-    private static final List<MediaType> SUPPORTED_MEDIA_TYPES = Arrays.asList(
-            PROJECT_CARS,
-            PROJECT_CARS_2,
-            FALLBACK);
 
     static final Set<Track> TRACKS = Collections.unmodifiableSet(getProjectCarsData(Track.class, "tracks"));
     static final Set<CarClass> CAR_CLASSES = Collections.unmodifiableSet(getProjectCarsData(CarClass.class, "classes"));

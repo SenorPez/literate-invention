@@ -109,7 +109,7 @@ public class RoundControllerTest {
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new RoundController(apiService))
+                .standaloneSetup(new RoundController(apiService, Collections.singletonList(FIRST_EVENT)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();
@@ -117,7 +117,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetAllRounds_ValidEventId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -151,7 +151,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetAllRounds_ValidEventId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -185,7 +185,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetAllRounds_ValidEventId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -201,7 +201,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetAllRounds_ValidEventId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT);
 
         mockMvc.perform(put(String.format("/events/%d/rounds/", FIRST_EVENT.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -279,7 +279,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetSingleRound_ValidEventId_ValidRoundId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -307,7 +307,7 @@ public class RoundControllerTest {
     
     @Test
     public void GetSingleRound_ValidEventId_ValidRoundId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -335,7 +335,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetSingleRound_ValidEventId_ValidRoundId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(get(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -351,7 +351,7 @@ public class RoundControllerTest {
 
     @Test
     public void GetSingleRound_ValidEventId_ValidRoundId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_EVENT, FIRST_ROUND);
 
         mockMvc.perform(put(String.format("/events/%d/rounds/%d", FIRST_EVENT.getId(), FIRST_ROUND.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())

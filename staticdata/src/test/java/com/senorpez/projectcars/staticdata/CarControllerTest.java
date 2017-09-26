@@ -119,7 +119,7 @@ public class CarControllerTest {
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new CarController(apiService))
+                .standaloneSetup(new CarController(apiService, Arrays.asList(FIRST_CAR, SECOND_CAR)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .build();

@@ -18,17 +18,24 @@ import java.util.stream.Collectors;
 )
 @RestController
 public class RaceController {
-    @Autowired
     private final APIService apiService;
+    private final Collection<Event> events;
 
+    @Autowired
     RaceController(final APIService apiService) {
         this.apiService = apiService;
+        this.events = Application.EVENTS;
+    }
+
+    RaceController(final APIService apiService, final Collection<Event> events) {
+        this.apiService = apiService;
+        this.events = events;
     }
 
     @RequestMapping
     ResponseEntity<Resources<RaceResource>> races(@PathVariable final int eventId, @PathVariable final int roundId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Round round = apiService.findOne(
@@ -48,7 +55,7 @@ public class RaceController {
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Round round = apiService.findOne(
