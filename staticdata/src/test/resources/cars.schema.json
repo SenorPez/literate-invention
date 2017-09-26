@@ -70,7 +70,11 @@
                       }
                     ]
                   }
-                }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "self"
+                ]
               }
             },
             "additionalProperties": false,

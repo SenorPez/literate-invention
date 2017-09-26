@@ -2,6 +2,7 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 
 import java.util.Collection;
@@ -29,6 +30,8 @@ class RoundResource extends Resource<RoundModel> {
     }
 
     static Resources<RoundResource> makeResources(final Collection<RoundResource> resources, final int eventId) {
+        resources.forEach(ResourceSupport::removeLinks);
+        resources.forEach(roundResource -> roundResource.add(linkTo(methodOn(RoundController.class).rounds(eventId, roundResource.getContent().getId())).withSelfRel()));
         final Resources<RoundResource> roundResources = new Resources<>(resources);
         roundResources.add(linkTo(methodOn(RoundController.class).rounds(eventId)).withSelfRel());
         roundResources.add(linkTo(methodOn(EventController.class).events(eventId)).withRel("event"));

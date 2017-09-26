@@ -72,7 +72,11 @@
                   "self": {
                     "$ref": "#/definitions/standardLink"
                   }
-                }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "self"
+                ]
               }
             },
             "additionalProperties": false,

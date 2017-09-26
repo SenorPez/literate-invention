@@ -2,6 +2,7 @@ package com.senorpez.projectcars.staticdata;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 
 import java.util.Collection;
@@ -32,6 +33,8 @@ class CarClassResource extends Resource<CarClassModel> {
     }
 
     static Resources<CarClassResource> makeResources(final Collection<CarClassResource> resources) {
+        resources.forEach(ResourceSupport::removeLinks);
+        resources.forEach(carClassResource -> carClassResource.add(linkTo(methodOn(CarClassController.class).carClasses(carClassResource.getContent().getId())).withSelfRel()));
         final Resources<CarClassResource> carClassResources = new Resources<>(resources);
         carClassResources.add(linkTo(methodOn(CarClassController.class).carClasses()).withSelfRel());
         carClassResources.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
