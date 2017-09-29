@@ -1,12 +1,14 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -22,6 +24,7 @@ import static com.senorpez.projectcars.staticdata.Car.ShiftPattern.H;
 import static com.senorpez.projectcars.staticdata.Car.ShiftPattern.SEQUENTIAL;
 import static com.senorpez.projectcars.staticdata.Car.Shifter.PADDLES;
 import static com.senorpez.projectcars.staticdata.Car.Shifter.SHIFTER;
+import static com.senorpez.projectcars.staticdata.DocumentationCommon.commonLinks;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.FALLBACK;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -31,6 +34,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -143,6 +154,9 @@ public class EventControllerTest {
     @Mock
     private APIService apiService;
 
+    @Rule
+    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
     @Before
     public void setUp() throws Exception {
         EVENT_SCHEMA = CLASS_LOADER.getResourceAsStream("event.schema.json");
@@ -154,10 +168,12 @@ public class EventControllerTest {
         LIVERY_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("liveries.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
+
         this.mockMvc = MockMvcBuilders
                 .standaloneSetup(new EventController(apiService, Arrays.asList(FIRST_EVENT, SECOND_EVENT)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
+                .apply(documentationConfiguration(this.restDocumentation))
                 .build();
     }
 
@@ -175,21 +191,35 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) FIRST_EVENT.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d", FIRST_EVENT.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost:8080/events/%d", FIRST_EVENT.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:event", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_EVENT.getId()),
                                 hasEntry("name", (Object) SECOND_EVENT.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d", SECOND_EVENT.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost/events")))
+                                                hasEntry("href", String.format("http://localhost:8080/events/%d", SECOND_EVENT.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost:8080/events")))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
-                                hasEntry("templated", (Object) true)))));
+                                hasEntry("templated", (Object) true)))))
+                .andDo(document("events",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("_embedded.pcars:event").description("Event resources"),
+                                fieldWithPath("_embedded.pcars:event[].id").description("ID number"),
+                                fieldWithPath("_embedded.pcars:event[].name").description("Name"),
+                                subsectionWithPath("_links").ignored(),
+                                subsectionWithPath("_embedded.pcars:event[]._links").ignored()),
+                        commonLinks));
 
         verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
@@ -209,19 +239,19 @@ public class EventControllerTest {
                                 hasEntry("name", (Object) FIRST_EVENT.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d", FIRST_EVENT.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost:8080/events/%d", FIRST_EVENT.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:event", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_EVENT.getId()),
                                 hasEntry("name", (Object) SECOND_EVENT.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/events/%d", SECOND_EVENT.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost/events")))
+                                                hasEntry("href", String.format("http://localhost:8080/events/%d", SECOND_EVENT.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost:8080/events")))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
@@ -272,16 +302,33 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.name", is(FIRST_EVENT.getName())))
                 .andExpect(jsonPath("$.tier", is(FIRST_EVENT.getTier())))
                 .andExpect(jsonPath("$.verified", is(FIRST_EVENT.getVerified())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/events/%d", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:events", hasEntry("href", "http://localhost/events")))
-                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
-                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))));
+                .andExpect(jsonPath("$._links.pcars:events", hasEntry("href", "http://localhost:8080/events")))
+                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost:8080/events/%d/rounds", FIRST_EVENT.getId()))))
+                .andDo(document("event",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("id").description("ID number"),
+                                fieldWithPath("name").description("Name"),
+                                fieldWithPath("tier").description("Career Mode Tier"),
+                                fieldWithPath("verified").ignored(),
+                                subsectionWithPath("_links").ignored()),
+                        commonLinks.and(
+                                linkWithRel("pcars:events").description("List of event resources."),
+                                linkWithRel("pcars:cars").description("List of car resources eligible for event"),
+                                linkWithRel("pcars:rounds").description("List of round resources for event"))));
 
         verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -299,16 +346,16 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.name", is(FIRST_EVENT.getName())))
                 .andExpect(jsonPath("$.tier", is(FIRST_EVENT.getTier())))
                 .andExpect(jsonPath("$.verified", is(FIRST_EVENT.getVerified())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/events/%d", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:events", hasEntry("href", "http://localhost/events")))
-                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
-                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost/events/%d/rounds", FIRST_EVENT.getId()))));
+                .andExpect(jsonPath("$._links.pcars:events", hasEntry("href", "http://localhost:8080/events")))
+                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:rounds", hasEntry("href", String.format("http://localhost:8080/events/%d/rounds", FIRST_EVENT.getId()))));
 
         verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -423,13 +470,13 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
@@ -452,13 +499,13 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
@@ -591,29 +638,29 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.gears", is(FIRST_CAR.getGears())))
                 .andExpect(jsonPath("$.dlc", is(FIRST_CAR.getDlc())))
 
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())))))
 
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
 
-                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.pcars:class",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CAR.getCarClass().getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d/class", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId()))
+                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CAR.getCarClass().getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/class", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId()))
                         )))
                 .andExpect(jsonPath("$._links.pcars:liveries",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -649,29 +696,29 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.gears", is(FIRST_CAR.getGears())))
                 .andExpect(jsonPath("$.dlc", is(FIRST_CAR.getDlc())))
 
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())))))
 
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
 
-                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost/events/%d/cars", FIRST_EVENT.getId()))))
+                .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", String.format("http://localhost:8080/events/%d/cars", FIRST_EVENT.getId()))))
                 .andExpect(jsonPath("$._links.pcars:class",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CAR.getCarClass().getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d/class", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId()))
+                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CAR.getCarClass().getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/class", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId()))
                         )))
                 .andExpect(jsonPath("$._links.pcars:liveries",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -910,22 +957,22 @@ public class EventControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CLASS.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CLASS.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d/class", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/class", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")))
+                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost:8080/classes")))
                 .andExpect(jsonPath("$._links.pcars:car",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -940,22 +987,22 @@ public class EventControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CLASS.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CLASS.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId())),
-                                hasEntry("href", String.format("http://localhost/cars/%d/class", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/class", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/class", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")))
+                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost:8080/classes")))
                 .andExpect(jsonPath("$._links.pcars:car",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -1193,8 +1240,8 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())))))))))
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())))))))))
                 .andExpect(jsonPath("$._embedded.pcars:livery", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_LIVERY.getId()),
@@ -1202,22 +1249,22 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), SECOND_LIVERY.getId())),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId())))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), SECOND_LIVERY.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId())))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:car",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -1237,8 +1284,8 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())))))))))
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())))))))))
                 .andExpect(jsonPath("$._embedded.pcars:livery", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_LIVERY.getId()),
@@ -1246,22 +1293,22 @@ public class EventControllerTest {
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
                                                 hasItems(
-                                                        hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), SECOND_LIVERY.getId())),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId())))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                                                        hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), SECOND_LIVERY.getId())),
+                                                        hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId())))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:car",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -1495,20 +1542,20 @@ public class EventControllerTest {
                 .andExpect(content().string(matchesJsonSchema(LIVERY_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_LIVERY.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_LIVERY.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:liveries",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -1524,20 +1571,20 @@ public class EventControllerTest {
                 .andExpect(content().string(matchesJsonSchema(LIVERY_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_LIVERY.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_LIVERY.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())))))
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries/%d", FIRST_EVENT.getId(), FIRST_CAR.getId(), FIRST_LIVERY.getId())))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
                 .andExpect(jsonPath("$._links.pcars:liveries",
                         hasItems(
-                                hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId())),
-                                hasEntry("href", String.format("http://localhost/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
+                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId())),
+                                hasEntry("href", String.format("http://localhost:8080/events/%d/cars/%d/liveries", FIRST_EVENT.getId(), FIRST_CAR.getId())))));
 
         verify(apiService, times(3)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);

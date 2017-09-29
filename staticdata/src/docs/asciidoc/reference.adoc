@@ -1,0 +1,339 @@
+:apiname: Project CARS Static Data API
+
+= {apiname} Reference
+SenorPez;
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+== Overview
+
+[[overview-versions]]
+=== Versions
+
+The following versions of the {apiname} are available by setting the `Accept` header on the request. Fallback web access
+defaults to Project CARS, v1 of the {apiname}.
+
+.{apiname} Versions
+|===
+| Product | API Version | Accept Header
+
+| Project CARS
+| v1
+| `application/vnd.senorpez.pcars.v1+json; charset=UTF-8`
+
+| Project CARS 2
+| v1
+| `application/vnd.senorpez.pcars2.v1+json; charset=UTF-8`
+|===
+
+[[overview-http-methods]]
+=== HTTP Methods
+
+The following HTTP methods are compatible with the {apiname}.
+
+.Supported HTTP Methods
+|===
+| Method | Usage
+
+| `GET`
+| Used to retrieve a resource.
+|===
+
+[[overview-http-status-codes]]
+=== HTTP Status Codes
+
+The following HTTP status codes are returned by requests to the {apiname}. Any other status codes
+returned may indicate general connection or server failure and are not returned by the API itself.
+
+.HTTP Status Codes
+
+|===
+| Status Code | Usage
+
+| `200 OK`
+| The request succeeded. The requested resource is sent in the response.
+
+| `402 Payment Required`
+| This code is reserved for when I need extra money.
+
+| `404 Not Found`
+| The requested resource could not be found. An error message is sent in the response.
+
+| `405 Method Not Allowed`
+| The requested method is not allowed. See <<overview-http-status-codes, HTTP Status Codes>> for a list of supported
+methods. An error message is sent in the response.
+
+| `406 Not Acceptable`
+| The Accept header of the request is not supported. Individual endpoints describe supported formats. An error message
+is sent in the response
+|===
+
+[[overview-errors]]
+=== Errors
+
+If the {apiname} returns an error, the response contains a JSON object describing the error. The object has the
+following structure.
+
+.Error Fields
+
+include::{snippets}/error-example/response-fields.adoc[]
+
+Regardless of the `Accept` header of the request, error responses always have a `Content-Type` header of
+`application/json;charset=UTF-8`.
+
+==== Example
+
+A request that attempts to retrieve a car that does not exist produces a `404 Not Found` error with the following error
+message.
+
+include::{snippets}/error-example/response-body.adoc[]
+
+[[overview-hypermedia]]
+=== Hypermedia
+
+The {apiname} conforms to the http://stateless.co/hal_specification.html[Hypertext Application Language (HAL)] standard.
+
+* Resources are represented by key-value pairs.
+* Collections of resources are contained in an `_embedded` field. Fields of embedded resources may be transformed or
+omitted.
+* Links to other resources are contained in a `_links` field.
+** Users should not create URIs but use the `_links` field entries to navigate the API.
+** Some resources may be represented by multiple `_links` values depending on the position in the API hierarchy. With
+the exception of the `_links` field, these resources are identical regardless of the link used to reach them.
+
+The following fields are present in the `_links` value of every resource.
+
+.Common Links
+
+include::{snippets}/links/links.adoc[]
+
+[[resources-pcars]]
+== Project CARS Resources
+
+[[resources-pcars-index]]
+=== Index
+
+Provides the entry point to the {apiname}.
+
+.Request Header
+
+include::{snippets}/index/request-headers.adoc[]
+
+.Links
+
+include::{snippets}/index/links.adoc[]
+
+[[resources-pcars-cars]]
+=== Cars
+
+Provides a list of car resources.
+
+.Request Header
+
+include::{snippets}/cars/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/cars/response-fields.adoc[]
+
+[[resources-pcars-car]]
+=== Car
+
+Provides a car resource.
+
+.Request Header
+
+include::{snippets}/car/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/car/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/car/links.adoc[]
+
+[[resources-pcars-classes]]
+=== Classes
+
+Provides a list of class resources.
+
+.Request Header
+
+include::{snippets}/classes/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/classes/response-fields.adoc[]
+
+[[resources-pcars-class]]
+=== Class
+
+Provides a class resource.
+
+.Request Header
+
+include::{snippets}/class/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/class/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/class/links.adoc[]
+
+[[resources-pcars-events]]
+=== Events
+
+Provides a list of event resources.
+
+.Request Header
+
+include::{snippets}/events/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/events/response-fields.adoc[]
+
+[[resources-pcars-event]]
+=== Event
+
+Provides a event resource.
+
+.Request Header
+
+include::{snippets}/event/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/event/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/event/links.adoc[]
+
+[[resources-pcars-liveries]]
+=== Liveries
+
+Provides a list of livery resources.
+
+.Request Header
+
+include::{snippets}/liveries/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/liveries/response-fields.adoc[]
+
+[[resources-pcars-livery]]
+=== Livery
+
+Provides a livery resource.
+
+.Request Header
+
+include::{snippets}/livery/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/livery/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/livery/links.adoc[]
+
+[[resources-pcars-races]]
+=== Races
+
+Provides a list of race resources.
+
+.Request Header
+
+include::{snippets}/races/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/races/response-fields.adoc[]
+
+[[resources-pcars-race]]
+=== Race
+
+Provides a race resource.
+
+.Request Header
+
+include::{snippets}/race/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/race/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/race/links.adoc[]
+
+[[resources-pcars-rounds]]
+=== Rounds
+
+Provides a list of round resources.
+
+.Request Header
+
+include::{snippets}/rounds/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/rounds/response-fields.adoc[]
+
+[[resources-pcars-round]]
+=== Round
+
+Provides a round resource.
+
+.Request Header
+
+include::{snippets}/round/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/round/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/round/links.adoc[]
+
+[[resources-pcars-tracks]]
+=== Tracks
+
+Provides a list of track resources.
+
+.Request Header
+
+include::{snippets}/tracks/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/tracks/response-fields.adoc[]
+
+[[resources-pcars-track]]
+=== Track
+
+Provides a track resource.
+
+.Request Header
+
+include::{snippets}/track/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/track/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/track/links.adoc[]

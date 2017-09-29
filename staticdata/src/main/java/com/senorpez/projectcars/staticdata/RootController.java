@@ -20,6 +20,7 @@ public class RootController {
     ResponseEntity<ResourceSupport> root() {
         final ResourceSupport root = new ResourceSupport();
         root.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
+        root.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         root.add(linkTo(methodOn(CarController.class).cars()).withRel("cars"));
         root.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
         root.add(linkTo(methodOn(EventController.class).events()).withRel("events"));
