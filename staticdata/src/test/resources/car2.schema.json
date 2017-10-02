@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Root",
-  "description": "JSON Representation of Project CARS Static Data API root page.",
+  "title": "Project CARS Static Data API Car",
+  "description": "JSON Representation of Project CARS Static Data API car.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,45 +41,76 @@
   },
   "type": "object",
   "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "class": {
+      "type": "string"
+    },
     "_links": {
       "type": "object",
       "properties": {
         "self": {
-          "$ref": "#/definitions/standardLink"
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/standardLink"
+              }
+            },
+            {
+              "$ref": "#/definitions/standardLink"
+            }
+          ]
         },
         "index": {
           "$ref": "#/definitions/standardLink"
         },
+        "curies": {
+          "$ref": "#/definitions/curies"
+        },
         "pcars:cars": {
           "$ref": "#/definitions/standardLink"
         },
-        "pcars:classes": {
-          "$ref": "#/definitions/standardLink"
+        "pcars:class": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/standardLink"
+          }
         },
-        "pcars:events": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:tracks": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "curies": {
-          "$ref": "#/definitions/curies"
+        "pcars:liveries": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/standardLink"
+              }
+            },
+            {
+              "$ref": "#/definitions/standardLink"
+            }
+          ]
         }
       },
       "additionalProperties": false,
       "required": [
         "self",
         "index",
+        "curies",
         "pcars:cars",
-        "pcars:classes",
-        "pcars:events",
-        "pcars:tracks",
-        "curies"
+        "pcars:class",
+        "pcars:liveries"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
+    "id",
+    "name",
+    "class",
     "_links"
   ]
 }

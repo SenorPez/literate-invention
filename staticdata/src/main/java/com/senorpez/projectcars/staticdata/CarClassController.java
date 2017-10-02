@@ -13,18 +13,16 @@ import java.util.stream.Collectors;
 
 @RequestMapping(
         value = "/classes",
-        method = RequestMethod.GET,
-        produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+        method = RequestMethod.GET
 )
 @RestController
 public class CarClassController {
     private final APIService apiService;
-    private final Collection<CarClass> carClasses;
+    private Collection<CarClass> carClasses = null;
 
     @Autowired
     CarClassController(final APIService apiService) {
         this.apiService = apiService;
-        this.carClasses = Application.CAR_CLASSES;
     }
 
     CarClassController(final APIService apiService, final Collection<CarClass> carClasses) {
@@ -32,8 +30,23 @@ public class CarClassController {
         this.carClasses = carClasses;
     }
 
-    @RequestMapping
-    ResponseEntity<Resources<CarClassResource>> carClasses() {
+    @RequestMapping(
+            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+    )
+    ResponseEntity<Resources<CarClassResource>> carClasses1() {
+        carClasses = Application.CAR_CLASSES;
+        return carClasses();
+    }
+
+    @RequestMapping(
+            produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+    )
+    ResponseEntity<Resources<CarClassResource>> carClasses2() {
+        carClasses = Application.CAR_CLASSES2;
+        return carClasses();
+    }
+
+    private ResponseEntity<Resources<CarClassResource>> carClasses() {
         final Collection<CarClass> carClasses = apiService.findAll(this.carClasses);
         final Collection<CarClassModel> carClassModels = carClasses.stream()
                 .map(CarClassModel::new)
@@ -44,10 +57,27 @@ public class CarClassController {
         return ResponseEntity.ok(CarClassResource.makeResources(carClassResources));
     }
 
-    @RequestMapping("/{carClassId}")
-    ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
+    @RequestMapping(
+            value = "/{carClassId}",
+            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+    )
+    ResponseEntity<CarClassResource> carClasses1(@PathVariable final int carClassId) {
+        carClasses = Application.CAR_CLASSES;
+        return carClasses(carClassId);
+    }
+
+    @RequestMapping(
+            value = "/{carClassId}",
+            produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+    )
+    ResponseEntity<CarClassResource> carClasses2(@PathVariable final int carClassId) {
+        carClasses = Application.CAR_CLASSES2;
+        return carClasses(carClassId);
+    }
+
+    private ResponseEntity<CarClassResource> carClasses(@PathVariable final int carClassId) {
         final CarClass carClass = apiService.findOne(
-                this.carClasses,
+                carClasses,
                 findCarClass -> findCarClass.getId() == carClassId,
                 () -> new CarClassNotFoundException(carClassId));
         final CarClassModel carClassModel = new CarClassModel(carClass);

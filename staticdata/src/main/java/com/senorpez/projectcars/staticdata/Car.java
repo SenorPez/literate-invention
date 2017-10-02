@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Set;
 
-class Car {
+class Car implements CommonCar {
     private final int id;
     private final String manufacturer;
     private final String model;
@@ -181,7 +181,7 @@ class Car {
         this.liveries = liveries;
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
@@ -265,7 +265,7 @@ class Car {
         return dlc;
     }
 
-    Set<Livery> getLiveries() {
+    public Set<Livery> getLiveries() {
         return liveries;
     }
 }

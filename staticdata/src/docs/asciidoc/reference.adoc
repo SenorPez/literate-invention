@@ -337,3 +337,139 @@ include::{snippets}/track/response-fields.adoc[]
 .Links
 
 include::{snippets}/track/links.adoc[]
+
+[[resources-pcars2]]
+== Project CARS 2 Resources
+
+[[resources-pcars2-index]]
+=== Index
+
+Provides the entry point to the {apiname}.
+
+.Request Header
+
+include::{snippets}/index2/request-headers.adoc[]
+
+.Links
+
+include::{snippets}/index2/links.adoc[]
+
+[[resources-pcars2-cars]]
+=== Cars
+
+Provides a list of car resources.
+
+.Request Header
+
+include::{snippets}/cars2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/cars2/response-fields.adoc[]
+
+[[resources-pcars2-car]]
+=== Car
+
+Provides a car resource.
+
+.Request Header
+
+include::{snippets}/car2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/car2/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/car2/links.adoc[]
+
+[[resources-pcars2-classes]]
+=== Classes
+
+Provides a list of class resources.
+
+.Request Header
+
+include::{snippets}/classes2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/classes2/response-fields.adoc[]
+
+[[resources-pcars2-class]]
+=== Class
+
+Provides a class resource.
+
+.Request Header
+
+include::{snippets}/class2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/class2/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/class/links.adoc[]
+
+[[resources-pcars2-liveries]]
+=== Liveries
+
+Provides a list of livery resources.
+
+.Request Header
+
+include::{snippets}/liveries2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/liveries2/response-fields.adoc[]
+
+[[resources-pcars2-livery]]
+=== Livery
+
+Provides a livery resource.
+
+.Request Header
+
+include::{snippets}/livery2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/livery2/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/livery2/links.adoc[]
+
+[[resources-pcars2-tracks]]
+=== Tracks
+
+Provides a list of track resources.
+
+.Request Header
+
+include::{snippets}/tracks2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/tracks2/response-fields.adoc[]
+
+[[resources-pcars2-track]]
+=== Track
+
+Provides a track resource.
+
+.Request Header
+
+include::{snippets}/track2/request-headers.adoc[]
+
+.Fields
+
+include::{snippets}/track2/response-fields.adoc[]
+
+.Links
+
+include::{snippets}/track2/links.adoc[]

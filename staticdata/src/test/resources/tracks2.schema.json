@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Root",
-  "description": "JSON Representation of Project CARS Static Data API root page.",
+  "title": "Project CARS 2 Static Data API Car Tracks",
+  "description": "JSON Representation of Project CARS 2 Static Data API tracks list.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,6 +41,50 @@
   },
   "type": "object",
   "properties": {
+    "_embedded": {
+      "type": "object",
+      "properties": {
+        "pcars:track": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "gridSize": {
+                "type": "integer"
+              },
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "$ref": "#/definitions/standardLink"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "self"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "gridSize",
+              "_links"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pcars:track"
+      ]
+    },
     "_links": {
       "type": "object",
       "properties": {
@@ -48,18 +92,6 @@
           "$ref": "#/definitions/standardLink"
         },
         "index": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:cars": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:classes": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:events": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:tracks": {
           "$ref": "#/definitions/standardLink"
         },
         "curies": {
@@ -70,16 +102,13 @@
       "required": [
         "self",
         "index",
-        "pcars:cars",
-        "pcars:classes",
-        "pcars:events",
-        "pcars:tracks",
         "curies"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
+    "_embedded",
     "_links"
   ]
 }

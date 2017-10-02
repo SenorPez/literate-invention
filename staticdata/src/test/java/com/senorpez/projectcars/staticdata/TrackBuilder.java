@@ -20,6 +20,10 @@ public class TrackBuilder {
         return new Track(id, name, location, variation, length, pitEntry.get(0), pitEntry.get(1), pitExit.get(0), pitExit.get(1), gridSize);
     }
 
+    Track2 build2() {
+        return new Track2(id, name, gridSize);
+    }
+
     public TrackBuilder setId(final int id) {
         this.id = id;
         return this;

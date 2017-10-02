@@ -94,7 +94,6 @@ public class RootControllerTest {
                                 linkWithRel("pcars:classes").description("Classes"),
                                 linkWithRel("pcars:events").description("Single-player events"),
                                 linkWithRel("pcars:tracks").description("Tracks"))));
-
     }
 
     @Test
@@ -139,11 +138,24 @@ public class RootControllerTest {
                 .andExpect(content().string(matchesJsonSchema(OBJECT2_SCHEMA)))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.pcars:cars", hasEntry("href", "http://localhost:8080/cars")))
+                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost:8080/classes")))
+                .andExpect(jsonPath("$._links.pcars:tracks", hasEntry("href", "http://localhost:8080/tracks")))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
                                 hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
-                                hasEntry("templated", (Object) true)))));
+                                hasEntry("templated", (Object) true)))))
+                .andDo(document("index2",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value("application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"))),
+                        commonLinks.and(
+                                linkWithRel("pcars:cars").description("Cars"),
+                                linkWithRel("pcars:classes").description("Classes"),
+                                linkWithRel("pcars:tracks").description("Tracks"))));
     }
 
     @Test

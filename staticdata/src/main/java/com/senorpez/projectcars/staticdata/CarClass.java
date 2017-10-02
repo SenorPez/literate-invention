@@ -7,9 +7,10 @@ class CarClass {
     private final String name;
 
     CarClass(
-            @JsonProperty("id") final int id,
+            @JsonProperty("id") final Integer id,
+            @JsonProperty("value") final Integer value,
             @JsonProperty("name") final String name) {
-        this.id = id;
+        this.id = id == null ? value : id;
         this.name = name;
     }
 

@@ -47,13 +47,17 @@
         "self": {
           "$ref": "#/definitions/standardLink"
         },
+        "index": {
+          "$ref": "#/definitions/standardLink"
+        },
         "pcars:cars": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+          "$ref": "#/definitions/standardLink"
+        },
+        "pcars:classes": {
+          "$ref": "#/definitions/standardLink"
+        },
+        "pcars:tracks": {
+          "$ref": "#/definitions/standardLink"
         },
         "curies": {
           "$ref": "#/definitions/curies"
@@ -62,7 +66,10 @@
       "additionalProperties": false,
       "required": [
         "self",
+        "index",
         "pcars:cars",
+        "pcars:classes",
+        "pcars:tracks",
         "curies"
       ]
     }

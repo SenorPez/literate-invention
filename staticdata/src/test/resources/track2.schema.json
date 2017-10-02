@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Root",
-  "description": "JSON Representation of Project CARS Static Data API root page.",
+  "title": "Project CARS 2 Static Data API Track",
+  "description": "JSON Representation of Project CARS 2 Static Data API track.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -41,45 +41,58 @@
   },
   "type": "object",
   "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "gridSize": {
+      "type": "integer"
+    },
     "_links": {
       "type": "object",
       "properties": {
         "self": {
-          "$ref": "#/definitions/standardLink"
+          "oneOf": [
+            {
+              "$ref": "#/definitions/standardLink"
+            },
+            {
+              "type": "array",
+              "objects": {
+                "$ref": "#/definitions/standardLink"
+              }
+            }
+          ]
         },
         "index": {
           "$ref": "#/definitions/standardLink"
         },
-        "pcars:cars": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:classes": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:events": {
-          "$ref": "#/definitions/standardLink"
+        "curies": {
+          "$ref": "#/definitions/curies"
         },
         "pcars:tracks": {
           "$ref": "#/definitions/standardLink"
         },
-        "curies": {
-          "$ref": "#/definitions/curies"
+        "pcars:round": {
+          "$ref": "#/definitions/standardLink"
         }
       },
       "additionalProperties": false,
       "required": [
         "self",
         "index",
-        "pcars:cars",
-        "pcars:classes",
-        "pcars:events",
-        "pcars:tracks",
-        "curies"
+        "curies",
+        "pcars:tracks"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
+    "id",
+    "name",
+    "gridSize",
     "_links"
   ]
 }

@@ -31,7 +31,10 @@ public class Application {
     static final Set<Car> CARS = Collections.unmodifiableSet(getProjectCarsData(Car.class, "cars"));
     static final Set<Event> EVENTS = Collections.unmodifiableSet(getProjectCarsData(Event.class, "events"));
 
-    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class));
+    static final Set<Track2> TRACKS2 = Collections.unmodifiableSet(getProjectCars2Data(Track2.class, "tracks"));
+    static final Set<CarClass> CAR_CLASSES2 = Collections.unmodifiableSet(getProjectCars2Data(CarClass.class, "classes"));
+    static final Set<JsonNode> LIVERY_NODES = Collections.unmodifiableSet(getProjectCars2Data(JsonNode.class, "liveries"));
+    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class, "cars"));
 
     @Autowired
     private BeanFactory beanFactory;
@@ -45,9 +48,9 @@ public class Application {
         return getData(resourceFileName, objectClass, field);
     }
 
-    private static <T> Set<T> getProjectCars2Data(final Class objectClass) {
+    private static <T> Set<T> getProjectCars2Data(final Class objectClass, final String field) {
         final String resourceFileName = "projectcars2.json";
-        return getData(resourceFileName, objectClass, "cars");
+        return getData(resourceFileName, objectClass, field);
     }
 
     static <T> Set<T> getData(final Class objectClass, final JsonNode jsonData) {

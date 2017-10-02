@@ -8,7 +8,7 @@ class CarClassBuilder {
     }
 
     CarClass build() {
-        return new CarClass(id, name);
+        return new CarClass(id, null, name);
     }
 
     CarClassBuilder setId(final int id) {
