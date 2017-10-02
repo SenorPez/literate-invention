@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_2_VALUE;
+
 @RequestMapping(
         value = "/tracks",
         method = RequestMethod.GET,
-        produces = "application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"
+        produces = PROJECT_CARS_2_VALUE
 )
 @RestController
 public class Track2Controller {

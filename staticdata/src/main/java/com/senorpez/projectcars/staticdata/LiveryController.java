@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_2_VALUE;
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RequestMapping(
         value = "/cars/{carId}/liveries",
         method = RequestMethod.GET
@@ -35,14 +39,14 @@ public class LiveryController {
     }
 
     @RequestMapping(
-    produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+    produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
     )
     ResponseEntity<Resources<LiveryResource>> liveries1(@PathVariable final int carId) {
         return liveries(cars, carId);
     }
 
     @RequestMapping(
-    produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+    produces = {PROJECT_CARS_2_VALUE}
     )
     ResponseEntity<Resources<LiveryResource>> liveries2(@PathVariable final int carId) {
         return liveries(car2s, carId);
@@ -65,7 +69,7 @@ public class LiveryController {
 
     @RequestMapping(
             value = "/{liveryId}",
-            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+            produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
     )
     ResponseEntity<LiveryResource> liveries1(@PathVariable final int carId, @PathVariable final int liveryId) {
         return liveries(cars, carId, liveryId);
@@ -73,7 +77,7 @@ public class LiveryController {
 
     @RequestMapping(
             value = "/{liveryId}",
-            produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+            produces = {PROJECT_CARS_2_VALUE}
     )
     ResponseEntity<LiveryResource> liveries2(@PathVariable final int carId, @PathVariable final int liveryId) {
         return liveries(car2s, carId, liveryId);

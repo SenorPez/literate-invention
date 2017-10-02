@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class RootControllerTest {
     private MockMvc mockMvc;
-    private final RootController rootController = new RootController();
     private static final MediaType INVALID_MEDIA_TYPE = new MediaType("application", "invalid+json", UTF_8);
     private static final ClassLoader CLASS_LOADER = RootControllerTest.class.getClassLoader();
     private static InputStream OBJECT_SCHEMA;
@@ -88,7 +87,7 @@ public class RootControllerTest {
                         requestHeaders(
                                 headerWithName("Accept")
                                         .description("Accept header")
-                                        .attributes(key("acceptvalue").value("application/vnd.senorpez.pcars.v1+json; charset=UTF-8"))),
+                                        .attributes(key("acceptvalue").value(PROJECT_CARS_VALUE))),
                         commonLinks.and(
                                 linkWithRel("pcars:cars").description("Cars"),
                                 linkWithRel("pcars:classes").description("Classes"),
@@ -151,7 +150,7 @@ public class RootControllerTest {
                         requestHeaders(
                                 headerWithName("Accept")
                                         .description("Accept header")
-                                        .attributes(key("acceptvalue").value("application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"))),
+                                        .attributes(key("acceptvalue").value(PROJECT_CARS_2_VALUE))),
                         commonLinks.and(
                                 linkWithRel("pcars:cars").description("Cars"),
                                 linkWithRel("pcars:classes").description("Classes"),

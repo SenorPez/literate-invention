@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_2_VALUE;
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RequestMapping(
         value = "/classes",
         method = RequestMethod.GET
@@ -31,7 +35,7 @@ public class CarClassController {
     }
 
     @RequestMapping(
-            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+            produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
     )
     ResponseEntity<Resources<CarClassResource>> carClasses1() {
         carClasses = Application.CAR_CLASSES;
@@ -39,7 +43,7 @@ public class CarClassController {
     }
 
     @RequestMapping(
-            produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+            produces = {PROJECT_CARS_2_VALUE}
     )
     ResponseEntity<Resources<CarClassResource>> carClasses2() {
         carClasses = Application.CAR_CLASSES2;
@@ -59,7 +63,7 @@ public class CarClassController {
 
     @RequestMapping(
             value = "/{carClassId}",
-            produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+            produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
     )
     ResponseEntity<CarClassResource> carClasses1(@PathVariable final int carClassId) {
         carClasses = Application.CAR_CLASSES;
@@ -68,7 +72,7 @@ public class CarClassController {
 
     @RequestMapping(
             value = "/{carClassId}",
-            produces = {"application/vnd.senorpez.pcars2.v1+json; charset=UTF-8"}
+            produces = {PROJECT_CARS_2_VALUE}
     )
     ResponseEntity<CarClassResource> carClasses2(@PathVariable final int carClassId) {
         carClasses = Application.CAR_CLASSES2;

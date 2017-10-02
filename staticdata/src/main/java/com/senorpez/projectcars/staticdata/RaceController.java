@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RequestMapping(
         value = "/events/{eventId}/rounds/{roundId}/races",
         method = RequestMethod.GET,
-        produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+        produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
 )
 @RestController
 public class RaceController {
