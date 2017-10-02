@@ -175,7 +175,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -265,7 +265,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -328,7 +328,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }

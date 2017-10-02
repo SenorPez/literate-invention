@@ -27,8 +27,8 @@ defaults to Project CARS, v1 of the {apiname}.
 | `application/vnd.senorpez.pcars.v1+json; charset=UTF-8`
 
 | Project CARS 2
-| v1
-| `application/vnd.senorpez.pcars2.v1+json; charset=UTF-8`
+| v0
+| `application/vnd.senorpez.pcars2.v0+json; charset=UTF-8`
 |===
 
 [[overview-http-methods]]
