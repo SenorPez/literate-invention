@@ -58,6 +58,10 @@ class CarBuilder {
         );
     }
 
+    Car2 build2() {
+        return new Car2(id, String.join(" ", manufacturer, model), carClass, liveries);
+    }
+
     CarBuilder() {
     }
 

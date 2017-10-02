@@ -1,12 +1,14 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -20,6 +22,7 @@ import static com.senorpez.projectcars.staticdata.Car.Drivetrain.RWD;
 import static com.senorpez.projectcars.staticdata.Car.EnginePosition.MID;
 import static com.senorpez.projectcars.staticdata.Car.ShiftPattern.SEQUENTIAL;
 import static com.senorpez.projectcars.staticdata.Car.Shifter.PADDLES;
+import static com.senorpez.projectcars.staticdata.DocumentationCommon.commonLinks;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.FALLBACK;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -29,6 +32,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -90,16 +101,21 @@ public class LiveryControllerTest {
     @Mock
     private APIService apiService;
 
+    @Rule
+    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
     @Before
     public void setUp() throws Exception {
         LIVERY_SCHEMA = CLASS_LOADER.getResourceAsStream("livery.schema.json");
         LIVERY_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("liveries.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
+
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new LiveryController(apiService))
+                .standaloneSetup(new LiveryController(apiService, Collections.singletonList(FIRST_CAR), null))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
+                .apply(documentationConfiguration(this.restDocumentation))
                 .build();
     }
 
@@ -115,23 +131,38 @@ public class LiveryControllerTest {
                         allOf(
                                 hasEntry("id", (Object) FIRST_LIVERY.getId()),
                                 hasEntry("name", (Object) FIRST_LIVERY.getName()),
-                                        hasEntry(equalTo("_links"),
-                                                hasEntry(equalTo("self"),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))))))
+                                hasEntry(equalTo("_links"),
+                                        hasEntry(equalTo("self"),
+                                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:livery", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_LIVERY.getId()),
                                 hasEntry("name", (Object) SECOND_LIVERY.getName()),
-                                        hasEntry(equalTo("_links"),
-                                                hasEntry(equalTo("self"),
-                                                        hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId()))))
+                                hasEntry(equalTo("_links"),
+                                        hasEntry(equalTo("self"),
+                                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
-                                hasEntry("templated", (Object) true)))));
+                                hasEntry("templated", (Object) true)))))
+                .andDo(document("liveries",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("_embedded.pcars:livery").description("Livery resources"),
+                                fieldWithPath("_embedded.pcars:livery[].id").description("ID number"),
+                                fieldWithPath("_embedded.pcars:livery[].name").description("Name"),
+                                subsectionWithPath("_links").ignored(),
+                                subsectionWithPath("_embedded.pcars:livery[]._links").ignored()),
+                        commonLinks.and(
+                                linkWithRel("pcars:car").description("Car resource"))));
 
         verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -151,19 +182,19 @@ public class LiveryControllerTest {
                                 hasEntry("name", (Object) FIRST_LIVERY.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:livery", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_LIVERY.getId()),
                                 hasEntry("name", (Object) SECOND_LIVERY.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId()))))
+                                                hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), SECOND_LIVERY.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
@@ -182,7 +213,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -245,7 +276,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -267,7 +298,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_ValidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isOk())
@@ -275,14 +306,27 @@ public class LiveryControllerTest {
                 .andExpect(content().string(matchesJsonSchema(LIVERY_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_LIVERY.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_LIVERY.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:liveries", hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId()))));
+                .andExpect(jsonPath("$._links.pcars:liveries", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId()))))
+                .andDo(document("livery",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("id").description("ID number"),
+                                fieldWithPath("name").description("Name"),
+                                subsectionWithPath("_links").ignored()),
+                        commonLinks.and(
+                                linkWithRel("pcars:liveries").description("List of event resources."))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -290,7 +334,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_FallbackAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(FALLBACK))
                 .andExpect(status().isOk())
@@ -298,14 +342,14 @@ public class LiveryControllerTest {
                 .andExpect(content().string(matchesJsonSchema(LIVERY_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_LIVERY.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_LIVERY.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:liveries", hasEntry("href", String.format("http://localhost/cars/%d/liveries", FIRST_CAR.getId()))));
+                .andExpect(jsonPath("$._links.pcars:liveries", hasEntry("href", String.format("http://localhost:8080/cars/%d/liveries", FIRST_CAR.getId()))));
 
         verify(apiService, times(2)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -313,7 +357,7 @@ public class LiveryControllerTest {
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_InvalidAcceptHeader() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(get(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(INVALID_MEDIA_TYPE))
                 .andExpect(status().isNotAcceptable())
@@ -322,14 +366,14 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
 
     @Test
     public void getSingleLivery_ValidCarId_ValidLiveryId_InvalidMethod() throws Exception {
-        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR).thenCallRealMethod();
+        when(apiService.findOne(any(), any(), any())).thenReturn(FIRST_CAR, FIRST_LIVERY);
 
         mockMvc.perform(put(String.format("/cars/%d/liveries/%d", FIRST_CAR.getId(), FIRST_LIVERY.getId())).accept(PROJECT_CARS))
                 .andExpect(status().isMethodNotAllowed())
@@ -385,7 +429,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -448,7 +492,7 @@ public class LiveryControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }

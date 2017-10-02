@@ -12,31 +12,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.hateoas.hal.CurieProvider;
 import org.springframework.hateoas.hal.DefaultCurieProvider;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.*;
 import static org.springframework.http.MediaType.ALL;
 
 @SpringBootApplication
 public class Application {
     private static final String HAL_OBJECT_MAPPER_BEAN_NAME = "_halObjectMapper";
 
-    private static final List<MediaType> SUPPORTED_MEDIA_TYPES = Arrays.asList(
-            PROJECT_CARS,
-            PROJECT_CARS_2,
-            FALLBACK);
-
     static final Set<Track> TRACKS = Collections.unmodifiableSet(getProjectCarsData(Track.class, "tracks"));
     static final Set<CarClass> CAR_CLASSES = Collections.unmodifiableSet(getProjectCarsData(CarClass.class, "classes"));
     static final Set<Car> CARS = Collections.unmodifiableSet(getProjectCarsData(Car.class, "cars"));
     static final Set<Event> EVENTS = Collections.unmodifiableSet(getProjectCarsData(Event.class, "events"));
 
-    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class));
+    static final Set<Track2> TRACKS2 = Collections.unmodifiableSet(getProjectCars2Data(Track2.class, "tracks"));
+    static final Set<CarClass> CAR_CLASSES2 = Collections.unmodifiableSet(getProjectCars2Data(CarClass.class, "classes"));
+    static final Set<JsonNode> LIVERY_NODES = Collections.unmodifiableSet(getProjectCars2Data(JsonNode.class, "liveries"));
+    static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class, "cars"));
 
     @Autowired
     private BeanFactory beanFactory;
@@ -50,9 +48,9 @@ public class Application {
         return getData(resourceFileName, objectClass, field);
     }
 
-    private static <T> Set<T> getProjectCars2Data(final Class objectClass) {
+    private static <T> Set<T> getProjectCars2Data(final Class objectClass, final String field) {
         final String resourceFileName = "projectcars2.json";
-        return getData(resourceFileName, objectClass, "cars");
+        return getData(resourceFileName, objectClass, field);
     }
 
     static <T> Set<T> getData(final Class objectClass, final JsonNode jsonData) {

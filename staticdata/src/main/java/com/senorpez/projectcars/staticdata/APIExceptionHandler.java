@@ -46,7 +46,7 @@ class APIExceptionHandler {
                 .contentType(APPLICATION_JSON_UTF8)
                 .body(
                         new ErrorResponse(NOT_ACCEPTABLE, "Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                                "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2"));
+                                "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2"));
     }
 
     private class ErrorResponse {

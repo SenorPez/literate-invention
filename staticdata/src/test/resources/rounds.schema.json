@@ -8,7 +8,7 @@
       "properties": {
         "href": {
           "type": "string",
-          "pattern": "^http[s]?://[a-z.]+((/[a-z0-9-]+)+|/)$"
+          "pattern": "^http[s]?://[a-z.]+(:[0-9]+)*((/[a-z0-9-]+)+|/)$"
         }
       },
       "additionalProperties": false,
@@ -60,7 +60,11 @@
                   "self": {
                     "$ref": "#/definitions/standardLink"
                   }
-                }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "self"
+                ]
               }
             },
             "additionalProperties": false,

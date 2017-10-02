@@ -1,22 +1,24 @@
 package com.senorpez.projectcars.staticdata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "car", collectionRelation = "car")
 class Car2Model implements Identifiable<Integer> {
     private final int id;
-    private final String manufacturer;
-    private final String model;
-    private final int year;
+    private final String name;
+    @JsonProperty("class")
     private final String carClass;
+    @JsonIgnore
+    private final int carClassId;
 
     Car2Model(final Car2 car) {
         this.id = car.getId();
-        this.manufacturer = car.getManufacturer();
-        this.model = car.getModel();
-        this.year = car.getYear();
-        this.carClass = car.getCarClass();
+        this.name = car.getName();
+        this.carClass = car.getCarClass().getName();
+        this.carClassId = car.getCarClass().getId();
     }
 
     Car2Resource toResource() {
@@ -29,19 +31,15 @@ class Car2Model implements Identifiable<Integer> {
         return id;
     }
 
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public int getYear() {
-        return year;
+    public String getName() {
+        return name;
     }
 
     public String getCarClass() {
         return carClass;
+    }
+
+    int getCarClassId() {
+        return carClassId;
     }
 }

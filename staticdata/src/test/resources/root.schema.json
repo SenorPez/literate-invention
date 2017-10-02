@@ -8,7 +8,7 @@
       "properties": {
         "href": {
           "type": "string",
-          "pattern": "^http[s]?://[a-z.]+((/[a-z0-9-]+)+|/)$"
+          "pattern": "^http[s]?://[a-z.]+(:[0-9]+)*((/[a-z0-9-]+)+|/)$"
         }
       },
       "additionalProperties": false,
@@ -47,37 +47,20 @@
         "self": {
           "$ref": "#/definitions/standardLink"
         },
+        "index": {
+          "$ref": "#/definitions/standardLink"
+        },
         "pcars:cars": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+          "$ref": "#/definitions/standardLink"
         },
         "pcars:classes": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+          "$ref": "#/definitions/standardLink"
         },
         "pcars:events": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+          "$ref": "#/definitions/standardLink"
         },
         "pcars:tracks": {
-          "type": "object",
-          "properties": {
-            "self": {
-              "$ref": "#/definitions/standardLink"
-            }
-          }
+          "$ref": "#/definitions/standardLink"
         },
         "curies": {
           "$ref": "#/definitions/curies"
@@ -86,6 +69,7 @@
       "additionalProperties": false,
       "required": [
         "self",
+        "index",
         "pcars:cars",
         "pcars:classes",
         "pcars:events",

@@ -11,24 +11,34 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RequestMapping(
         value = "/events/{eventId}/rounds/{roundId}/races",
         method = RequestMethod.GET,
-        produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+        produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
 )
 @RestController
 public class RaceController {
-    @Autowired
     private final APIService apiService;
+    private final Collection<Event> events;
 
+    @Autowired
     RaceController(final APIService apiService) {
         this.apiService = apiService;
+        this.events = Application.EVENTS;
+    }
+
+    RaceController(final APIService apiService, final Collection<Event> events) {
+        this.apiService = apiService;
+        this.events = events;
     }
 
     @RequestMapping
     ResponseEntity<Resources<RaceResource>> races(@PathVariable final int eventId, @PathVariable final int roundId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Round round = apiService.findOne(
@@ -48,7 +58,7 @@ public class RaceController {
     @RequestMapping("/{raceId}")
     ResponseEntity<RaceResource> races(@PathVariable final int eventId, @PathVariable final int roundId, @PathVariable final int raceId) {
         final Event event = apiService.findOne(
-                Application.EVENTS,
+                this.events,
                 findEvent -> findEvent.getId() == eventId,
                 () -> new EventNotFoundException(eventId));
         final Round round = apiService.findOne(

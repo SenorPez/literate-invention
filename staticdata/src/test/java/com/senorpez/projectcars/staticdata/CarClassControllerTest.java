@@ -1,12 +1,14 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -15,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
+import static com.senorpez.projectcars.staticdata.DocumentationCommon.commonLinks;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.FALLBACK;
 import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -24,6 +27,14 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.ALL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,16 +64,21 @@ public class CarClassControllerTest {
     @Mock
     private APIService apiService;
 
+    @Rule
+    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
     @Before
     public void setUp() throws Exception {
         CAR_CLASS_SCHEMA = CLASS_LOADER.getResourceAsStream("class.schema.json");
         CAR_CLASS_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("classes.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
+        
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new CarClassController(apiService))
+                .standaloneSetup(new CarClassController(apiService, Arrays.asList(FIRST_CLASS, SECOND_CLASS)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
+                .apply(documentationConfiguration(this.restDocumentation))
                 .build();
     }
 
@@ -80,21 +96,35 @@ public class CarClassControllerTest {
                                 hasEntry("name", (Object) FIRST_CLASS.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:class", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_CLASS.getId()),
                                 hasEntry("name", (Object) SECOND_CLASS.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/classes/%d", SECOND_CLASS.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost/classes")))
+                                                hasEntry("href", String.format("http://localhost:8080/classes/%d", SECOND_CLASS.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost:8080/classes")))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
-                                hasEntry("templated", (Object) true)))));
+                                hasEntry("templated", (Object) true)))))
+                .andDo(document("classes",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("_embedded.pcars:class").description("Class resources"),
+                                fieldWithPath("_embedded.pcars:class[].id").description("ID number"),
+                                fieldWithPath("_embedded.pcars:class[].name").description("Name"),
+                                subsectionWithPath("_links").ignored(),
+                                subsectionWithPath("_embedded.pcars:class[]._links").ignored()),
+                        commonLinks));
 
         verify(apiService, times(1)).findAll(any());
         verifyNoMoreInteractions(apiService);
@@ -114,19 +144,19 @@ public class CarClassControllerTest {
                                 hasEntry("name", (Object) FIRST_CLASS.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId()))))))))
+                                                hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId()))))))))
                 .andExpect(jsonPath("$._embedded.pcars:class", hasItem(
                         allOf(
                                 hasEntry("id", (Object) SECOND_CLASS.getId()),
                                 hasEntry("name", (Object) SECOND_CLASS.getName()),
                                 hasEntry(equalTo("_links"),
                                         hasEntry(equalTo("self"),
-                                                hasEntry("href", String.format("http://localhost/classes/%d", SECOND_CLASS.getId()))))))))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost/classes")))
+                                                hasEntry("href", String.format("http://localhost:8080/classes/%d", SECOND_CLASS.getId()))))))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", "http://localhost:8080/classes")))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))));
 
@@ -145,7 +175,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -175,14 +205,27 @@ public class CarClassControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CLASS.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CLASS.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")));
+                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost:8080/classes")))
+                .andDo(document("class",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Accept")
+                                        .description("Accept header")
+                                        .attributes(key("acceptvalue").value(SupportedMediaTypes.PROJECT_CARS_VALUE))),
+                        responseFields(
+                                fieldWithPath("id").description("ID number"),
+                                fieldWithPath("name").description("Name"),
+                                subsectionWithPath("_links").ignored()),
+                        commonLinks.and(
+                                linkWithRel("pcars:classes").description("Collection of class resources."))));
 
         verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -198,14 +241,14 @@ public class CarClassControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CLASS.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CLASS.getName())))
-                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost/")))
-                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost/classes/%d", FIRST_CLASS.getId()))))
+                .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
+                .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
                         allOf(
-                                hasEntry("href", (Object) "http://localhost/docs/{rel}"),
+                                hasEntry("href", (Object) "http://localhost:8080/docs/{rel}"),
                                 hasEntry("name", (Object) "pcars"),
                                 hasEntry("templated", (Object) true)))))
-                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost/classes")));
+                .andExpect(jsonPath("$._links.pcars:classes", hasEntry("href", "http://localhost:8080/classes")));
 
         verify(apiService, times(1)).findOne(any(), any(), any());
         verifyNoMoreInteractions(apiService);
@@ -222,7 +265,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }
@@ -285,7 +328,7 @@ public class CarClassControllerTest {
                 .andExpect(jsonPath("$.code", is(NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.message", is(NOT_ACCEPTABLE.getReasonPhrase())))
                 .andExpect(jsonPath("$.detail", is("Accept header must be \"vnd.senorpez.pcars.v1+json\" for Project CARS " +
-                        "or \"vnd.senorpez.pcars2.v1+json\" for Project CARS 2")));
+                        "or \"vnd.senorpez.pcars2.v0+json\" for Project CARS 2")));
 
         verifyZeroInteractions(apiService);
     }

@@ -30,7 +30,7 @@ class Event {
         this.tier = tier;
 
         if (carFilter.isNull()) {
-            this.cars = null;
+            this.cars = Application.CARS;
         } else {
             final Set<Car> cars = new HashSet<>(Application.CARS);
             final Set<CarFilter> carFilters = Application.getData(CarFilter.class, carFilter);

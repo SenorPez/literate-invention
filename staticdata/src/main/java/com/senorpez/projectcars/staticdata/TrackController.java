@@ -11,23 +11,33 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RequestMapping(
         value = "/tracks",
         method = RequestMethod.GET,
-        produces = {"application/vnd.senorpez.pcars.v1+json; charset=UTF-8", "application/json; charset=UTF-8"}
+        produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
 )
 @RestController
 public class TrackController {
-    @Autowired
     private final APIService apiService;
+    private final Collection<Track> tracks;
 
+    @Autowired
     TrackController(final APIService apiService) {
+        this.tracks = Application.TRACKS;
         this.apiService = apiService;
+    }
+
+    TrackController(final APIService apiService, final Collection<Track> tracks) {
+        this.apiService = apiService;
+        this.tracks = tracks;
     }
 
     @RequestMapping
     ResponseEntity<EmbeddedTrackResources> tracks() {
-        final Collection<Track> tracks = apiService.findAll(Application.TRACKS);
+        final Collection<Track> tracks = apiService.findAll(this.tracks);
         final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
                 .map(EmbeddedTrackModel::new)
                 .collect(Collectors.toList());
@@ -40,7 +50,7 @@ public class TrackController {
     @RequestMapping("/{trackId}")
     ResponseEntity<TrackResource> tracks(@PathVariable final int trackId) {
         final Track track = apiService.findOne(
-                Application.TRACKS,
+                this.tracks,
                 findTrack -> findTrack.getId() == trackId,
                 () -> new TrackNotFoundException(trackId));
         final TrackModel trackModel = new TrackModel(track);
