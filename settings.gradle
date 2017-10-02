@@ -1,3 +1,6 @@
 rootProject.name = 'literate-invention'
-include 'race-data'
+include 'packetcapture'
+include 'racedata'
+include 'racereport'
+include 'staticdata'
 
