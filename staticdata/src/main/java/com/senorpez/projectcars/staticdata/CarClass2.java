@@ -2,18 +2,18 @@ package com.senorpez.projectcars.staticdata;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-class Track2 {
+class CarClass2 {
     private final int id;
     private final String name;
-    private final int gridSize;
+    private final String abbreviation;
 
-    Track2(
-            @JsonProperty("id") final int id,
+    CarClass2(
+            @JsonProperty("value") final Integer id,
             @JsonProperty("name") final String name,
-            @JsonProperty("gridsize") final int gridSize) {
+            @JsonProperty("abbreviation") final String abbreviation) {
         this.id = id;
         this.name = name;
-        this.gridSize = gridSize;
+        this.abbreviation = abbreviation;
     }
 
     public int getId() {
@@ -24,7 +24,7 @@ class Track2 {
         return name;
     }
 
-    public int getGridSize() {
-        return gridSize;
+    String getAbbreviation() {
+        return abbreviation;
     }
 }

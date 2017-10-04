@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-6/schema",
-  "title": "Project CARS Static Data API Car",
-  "description": "JSON Representation of Project CARS Static Data API car.",
+  "title": "Project CARS 2 Static Data API Car Class",
+  "description": "JSON Representation of Project CARS 2 Static Data API car class.",
   "definitions": {
     "standardLink": {
       "type": "object",
@@ -47,62 +47,8 @@
     "name": {
       "type": "string"
     },
-    "class": {
+    "abbreviation": {
       "type": "string"
-    },
-    "manufacturer": {
-      "type": "string"
-    },
-    "country": {
-      "type": "string"
-    },
-    "year": {
-      "type": "integer"
-    },
-    "drivetrain": {
-      "type": "string"
-    },
-    "topSpeed": {
-      "type": "integer"
-    },
-    "acceleration": {
-      "type": "number"
-    },
-    "power": {
-      "type": "integer"
-    },
-    "weight": {
-      "type": "integer"
-    },
-    "gears": {
-      "type": "integer"
-    },
-    "transmission": {
-      "type": "string"
-    },
-    "engineType": {
-      "type": "string"
-    },
-    "antilockBrakeSystem": {
-      "type": "boolean"
-    },
-    "tractionControl": {
-      "type": "boolean"
-    },
-    "stabilityControl": {
-      "type": "boolean"
-    },
-    "controlDifficulty": {
-      "type": "integer"
-    },
-    "corneringSpeed": {
-      "type": "integer"
-    },
-    "dlc": {
-      "type": [
-        "string",
-        "null"
-        ]
     },
     "_links": {
       "type": "object",
@@ -126,16 +72,7 @@
         "curies": {
           "$ref": "#/definitions/curies"
         },
-        "pcars:cars": {
-          "$ref": "#/definitions/standardLink"
-        },
-        "pcars:class": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/standardLink"
-          }
-        },
-        "pcars:liveries": {
+        "pcars:car": {
           "oneOf": [
             {
               "type": "array",
@@ -147,6 +84,9 @@
               "$ref": "#/definitions/standardLink"
             }
           ]
+        },
+        "pcars:classes": {
+          "$ref": "#/definitions/standardLink"
         }
       },
       "additionalProperties": false,
@@ -154,9 +94,7 @@
         "self",
         "index",
         "curies",
-        "pcars:cars",
-        "pcars:class",
-        "pcars:liveries"
+        "pcars:classes"
       ]
     }
   },
@@ -164,25 +102,7 @@
   "required": [
     "id",
     "name",
-    "class",
-    "manufacturer",
-    "class",
-    "country",
-    "year",
-    "drivetrain",
-    "topSpeed",
-    "acceleration",
-    "power",
-    "weight",
-    "gears",
-    "transmission",
-    "engineType",
-    "antilockBrakeSystem",
-    "tractionControl",
-    "stabilityControl",
-    "controlDifficulty",
-    "corneringSpeed",
-    "dlc",
+    "abbreviation",
     "_links"
   ]
 }

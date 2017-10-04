@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.senorpez.projectcars.staticdata.DocumentationCommon.commonLinks;
@@ -50,29 +49,57 @@ public class Car2ControllerTest {
     private static InputStream ERROR_SCHEMA;
 
     private static final Car2 FIRST_CAR = new CarBuilder()
-            .setId(-2046825312)
-            .setManufacturer("Ruf")
-            .setModel("CTR3 SMS-R")
+            .setId(9503224)
+            .setManufacturer("BMW")
+            .setModel("320 TC (E90)")
             .setCarClass(new CarClassBuilder()
                     .setId(1)
-                    .setName("GT1X")
-                    .build())
-            .setLiveries(new HashSet<>(Arrays.asList(
-                    new LiveryBuilder().setId(51).setName("Ruf CTR3 SMS-R #32").build(),
-                    new LiveryBuilder().setId(52).setName("Ruf CTR3 SMS-R #33").build())))
+                    .setName("Touring Car")
+                    .setAbbreviation("TC")
+                    .build2())
+            .setCountry("Germany")
+            .setYear(2012)
+            .setDrivetrain(Car.Drivetrain.RWD)
+            .setTopSpeed(267)
+            .setAcceleration(4.19f)
+            .setHorsepower(315)
+            .setWeight(1150)
+            .setGears(6)
+            .setShiftPattern(Car.ShiftPattern.SEQUENTIAL)
+            .setEngineType("Straight 4")
+            .setAntilockBrakeSystem(false)
+            .setTractionControl(false)
+            .setStabilityControl(false)
+            .setControlDifficulty(2)
+            .setCorneringSpeed(2)
+            .setDlc(null)
             .build2();
 
     private static final Car2 SECOND_CAR = new CarBuilder()
-            .setId(844159614)
-            .setManufacturer("SMS")
-            .setModel("125cc Shifter Kart")
+            .setId(85063219)
+            .setManufacturer("Nissan")
+            .setModel("GT-R Nismo (R35)")
             .setCarClass(new CarClassBuilder()
                     .setId(2)
-                    .setName("Kart1")
-                    .build())
-            .setLiveries(new HashSet<>(Arrays.asList(
-                    new LiveryBuilder().setId(51).setName("Mudino #4").build(),
-                    new LiveryBuilder().setId(52).setName("Luquitas #11").build())))
+                    .setName("Road C")
+                    .setAbbreviation("RDC")
+                    .build2())
+            .setCountry("Japan")
+            .setYear(2017)
+            .setDrivetrain(Car.Drivetrain.AWD)
+            .setTopSpeed(315)
+            .setAcceleration(2.90f)
+            .setHorsepower(600)
+            .setWeight(1774)
+            .setGears(6)
+            .setShiftPattern(Car.ShiftPattern.SEQUENTIAL)
+            .setEngineType("V6")
+            .setAntilockBrakeSystem(true)
+            .setTractionControl(true)
+            .setStabilityControl(true)
+            .setControlDifficulty(1)
+            .setCorneringSpeed(1)
+            .setDlc(null)
             .build2();
 
     @InjectMocks
@@ -88,7 +115,7 @@ public class Car2ControllerTest {
     public void setUp() throws Exception {
         CAR_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("cars2.schema.json");
         CAR_SCHEMA = CLASS_LOADER.getResourceAsStream("car2.schema.json");
-        CAR_CLASS_SCHEMA = CLASS_LOADER.getResourceAsStream("class.schema.json");
+        CAR_CLASS_SCHEMA = CLASS_LOADER.getResourceAsStream("class2.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
 
@@ -140,7 +167,6 @@ public class Car2ControllerTest {
                                 fieldWithPath("_embedded.pcars:car").description("Car resources"),
                                 fieldWithPath("_embedded.pcars:car[].id").description("ID number"),
                                 fieldWithPath("_embedded.pcars:car[].name").description("Name"),
-                                fieldWithPath("_embedded.pcars:car[].class").description("Class"),
                                 subsectionWithPath("_links").ignored(),
                                 subsectionWithPath("_embedded.pcars:car[]._links").ignored()),
                         commonLinks));
@@ -191,6 +217,23 @@ public class Car2ControllerTest {
                 .andExpect(jsonPath("$.id", is(FIRST_CAR.getId())))
                 .andExpect(jsonPath("$.class", is(FIRST_CAR.getCarClass().getName())))
                 .andExpect(jsonPath("$.name", is(FIRST_CAR.getName())))
+                .andExpect(jsonPath("$.manufacturer", is(FIRST_CAR.getManufacturer())))
+                .andExpect(jsonPath("$.country", is(FIRST_CAR.getCountry())))
+                .andExpect(jsonPath("$.year", is(FIRST_CAR.getYear())))
+                .andExpect(jsonPath("$.drivetrain", is(FIRST_CAR.getDrivetrain())))
+                .andExpect(jsonPath("$.topSpeed", is(FIRST_CAR.getTopSpeed())))
+                .andExpect(jsonPath("$.acceleration", closeTo((double) FIRST_CAR.getAcceleration(), 0.001)))
+                .andExpect(jsonPath("$.power", is(FIRST_CAR.getPower())))
+                .andExpect(jsonPath("$.weight", is(FIRST_CAR.getWeight())))
+                .andExpect(jsonPath("$.gears", is(FIRST_CAR.getGears())))
+                .andExpect(jsonPath("$.transmission", is(FIRST_CAR.getTransmission())))
+                .andExpect(jsonPath("$.engineType", is(FIRST_CAR.getEngineType())))
+                .andExpect(jsonPath("$.antilockBrakeSystem", is(FIRST_CAR.hasAntilockBrakeSystem())))
+                .andExpect(jsonPath("$.tractionControl", is(FIRST_CAR.hasTractionControl())))
+                .andExpect(jsonPath("$.stabilityControl", is(FIRST_CAR.hasStabilityControl())))
+                .andExpect(jsonPath("$.controlDifficulty", is(FIRST_CAR.getControlDifficulty())))
+                .andExpect(jsonPath("$.corneringSpeed", is(FIRST_CAR.getCorneringSpeed())))
+                .andExpect(jsonPath("$.dlc", is(FIRST_CAR.getDlc())))
 
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/cars/%d", FIRST_CAR.getId()))))
@@ -218,6 +261,23 @@ public class Car2ControllerTest {
                                 fieldWithPath("id").description("ID number"),
                                 fieldWithPath("name").description("Name"),
                                 fieldWithPath("class").description("Class name"),
+                                fieldWithPath("manufacturer").description("Manufacturer"),
+                                fieldWithPath("country").description("Country"),
+                                fieldWithPath("year").description("Year"),
+                                fieldWithPath("drivetrain").description("Drivetrain"),
+                                fieldWithPath("topSpeed").description("Top Speed (km/h)"),
+                                fieldWithPath("acceleration").description("Acceleration (0-60)"),
+                                fieldWithPath("power").description("Power (HP)"),
+                                fieldWithPath("weight").description("Weight (kg)"),
+                                fieldWithPath("gears").description("Gears"),
+                                fieldWithPath("transmission").description("Transmission"),
+                                fieldWithPath("engineType").description("Engine Type"),
+                                fieldWithPath("antilockBrakeSystem").description("Has Antilock Brake System?"),
+                                fieldWithPath("tractionControl").description("Has Traction Control?"),
+                                fieldWithPath("stabilityControl").description("Has Stability Control?"),
+                                fieldWithPath("controlDifficulty").description("Control Difficulty (1-3)"),
+                                fieldWithPath("corneringSpeed").description("Cornering Speed (1-3)"),
+                                fieldWithPath("dlc").description("DLC"),
                                 subsectionWithPath("_links").ignored()),
                         commonLinks.and(
                                 linkWithRel("pcars:cars").description("List of cars"),
@@ -316,6 +376,7 @@ public class Car2ControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CAR.getCarClass().getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CAR.getCarClass().getName())))
+                .andExpect(jsonPath("$.abbreviation", is(FIRST_CAR.getCarClass().getAbbreviation())))
 
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self",

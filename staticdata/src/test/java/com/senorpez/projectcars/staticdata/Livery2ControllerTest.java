@@ -50,12 +50,12 @@ public class Livery2ControllerTest {
 
     private static final Livery FIRST_LIVERY = new LiveryBuilder()
             .setId(51)
-            .setName("Ruf CTR3 SMS-R #32")
+            .setName("Cassius Racing #9")
             .build();
 
     private static final Livery SECOND_LIVERY = new LiveryBuilder()
             .setId(52)
-            .setName("Ruf CTR3 SMS-R #33")
+            .setName("Cassius Racing #10")
             .build();
 
     private static final CarClass FIRST_CLASS = new CarClassBuilder()
@@ -64,13 +64,27 @@ public class Livery2ControllerTest {
             .build();
 
     private static final Car2 FIRST_CAR = new CarBuilder()
-            .setId(-2046825312)
-            .setManufacturer("Ruf")
-            .setModel("CTR3 SMS-R")
+            .setId(9503224)
+            .setManufacturer("BMW")
+            .setModel("320 TC (E90)")
             .setCarClass(FIRST_CLASS)
-            .setLiveries(new HashSet<>(Arrays.asList(
-                    FIRST_LIVERY,
-                    SECOND_LIVERY)))
+            .setCountry("Germany")
+            .setYear(2012)
+            .setDrivetrain(Car.Drivetrain.RWD)
+            .setTopSpeed(267)
+            .setAcceleration(4.19f)
+            .setHorsepower(315)
+            .setWeight(1150)
+            .setGears(6)
+            .setShiftPattern(Car.ShiftPattern.SEQUENTIAL)
+            .setEngineType("Straight 4")
+            .setAntilockBrakeSystem(false)
+            .setTractionControl(false)
+            .setStabilityControl(false)
+            .setControlDifficulty(2)
+            .setCorneringSpeed(2)
+            .setDlc(null)
+            .setLiveries(new HashSet<>(Arrays.asList(FIRST_LIVERY, SECOND_LIVERY)))
             .build2();
 
     @InjectMocks

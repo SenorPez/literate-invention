@@ -8,9 +8,8 @@ class CarClass {
 
     CarClass(
             @JsonProperty("id") final Integer id,
-            @JsonProperty("value") final Integer value,
             @JsonProperty("name") final String name) {
-        this.id = id == null ? value : id;
+        this.id = id;
         this.name = name;
     }
 

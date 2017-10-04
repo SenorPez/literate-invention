@@ -15,7 +15,7 @@ class Car2Resource extends Resource<Car2Model> {
         super(content, links);
         this.add(linkTo(methodOn(Car2Controller.class).cars()).withRel("cars"));
         this.add(linkTo(methodOn(Car2Controller.class).carClass(content.getId())).withRel("class"));
-        this.add(linkTo(methodOn(CarClassController.class).carClasses2(content.getCarClassId())).withRel("class"));
+        this.add(linkTo(methodOn(CarClass2Controller.class).carClasses(content.getCarClassId())).withRel("class"));
         this.add(linkTo(methodOn(LiveryController.class).liveries2(content.getId())).withRel("liveries"));
     }
 

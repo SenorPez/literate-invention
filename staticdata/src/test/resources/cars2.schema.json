@@ -54,9 +54,6 @@
               "name": {
                 "type": "string"
               },
-              "class": {
-                "type": "string"
-              },
               "_links": {
                 "type": "object",
                 "properties": {
@@ -70,7 +67,6 @@
             "required": [
               "id",
               "name",
-              "class",
               "_links"
             ]
           }
