@@ -13,6 +13,7 @@ class CarBuilder {
     private String model = null;
     private String country = null;
     private CarClass carClass = null;
+    private CarClass2 carClass2 = null;
     private int year = 0;
     private Drivetrain drivetrain = null;
     private EnginePosition enginePosition = null;
@@ -30,6 +31,12 @@ class CarBuilder {
     private int gears = 0;
     private String dlc = null;
     private Set<Livery> liveries = null;
+
+    private boolean antilockBrakeSystem = false;
+    private boolean tractionControl = false;
+    private boolean stabilityControl = false;
+    private int controlDifficulty = 0;
+    private int corneringSpeed = 0;
 
     Car build() {
         return new Car(
@@ -59,7 +66,28 @@ class CarBuilder {
     }
 
     Car2 build2() {
-        return new Car2(id, String.join(" ", manufacturer, model), carClass, liveries);
+        return new Car2(
+                id,
+                String.join(" ", manufacturer, model),
+                carClass2,
+                manufacturer,
+                country,
+                year,
+                drivetrain.toString(),
+                topSpeed,
+                acceleration,
+                horsepower,
+                weight,
+                gears,
+                shiftPattern.getDisplayString(),
+                engineType,
+                antilockBrakeSystem,
+                tractionControl,
+                stabilityControl,
+                controlDifficulty,
+                corneringSpeed,
+                dlc,
+                liveries);
     }
 
     CarBuilder() {
@@ -87,6 +115,11 @@ class CarBuilder {
 
     CarBuilder setCarClass(final CarClass carClass) {
         this.carClass = carClass;
+        return this;
+    }
+
+    CarBuilder setCarClass(final CarClass2 carClass) {
+        this.carClass2 = carClass;
         return this;
     }
 
@@ -172,6 +205,31 @@ class CarBuilder {
 
     CarBuilder setLiveries(final Set<Livery> liveries) {
         this.liveries = liveries;
+        return this;
+    }
+
+    CarBuilder setAntilockBrakeSystem(final boolean antilockBrakeSystem) {
+        this.antilockBrakeSystem = antilockBrakeSystem;
+        return this;
+    }
+
+    CarBuilder setTractionControl(final boolean tractionControl) {
+        this.tractionControl = tractionControl;
+        return this;
+    }
+
+    CarBuilder setStabilityControl(final boolean stabilityControl) {
+        this.stabilityControl = stabilityControl;
+        return this;
+    }
+
+    CarBuilder setControlDifficulty(final int controlDifficulty) {
+        this.controlDifficulty = controlDifficulty;
+        return this;
+    }
+
+    CarBuilder setCorneringSpeed(final int corneringSpeed) {
+        this.corneringSpeed = corneringSpeed;
         return this;
     }
 }

@@ -22,7 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RestController
 public class RoundController {
     private final APIService apiService;
-    private Collection<Event> events;
+    private final Collection<Event> events;
 
     @Autowired
     RoundController(final APIService apiService) {

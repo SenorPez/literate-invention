@@ -32,7 +32,7 @@ public class Application {
     static final Set<Event> EVENTS = Collections.unmodifiableSet(getProjectCarsData(Event.class, "events"));
 
     static final Set<Track2> TRACKS2 = Collections.unmodifiableSet(getProjectCars2Data(Track2.class, "tracks"));
-    static final Set<CarClass> CAR_CLASSES2 = Collections.unmodifiableSet(getProjectCars2Data(CarClass.class, "classes"));
+    static final Set<CarClass2> CAR_CLASSES2 = Collections.unmodifiableSet(getProjectCars2Data(CarClass2.class, "classes"));
     static final Set<JsonNode> LIVERY_NODES = Collections.unmodifiableSet(getProjectCars2Data(JsonNode.class, "liveries"));
     static final Set<Car2> CARS2 = Collections.unmodifiableSet(getProjectCars2Data(Car2.class, "cars"));
 

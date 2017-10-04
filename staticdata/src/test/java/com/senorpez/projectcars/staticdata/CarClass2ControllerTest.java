@@ -47,15 +47,17 @@ public class CarClass2ControllerTest {
     private static InputStream CAR_CLASS_COLLECTION_SCHEMA;
     private static InputStream ERROR_SCHEMA;
 
-    private static final CarClass FIRST_CLASS = new CarClassBuilder()
+    private static final CarClass2 FIRST_CLASS = new CarClassBuilder()
             .setId(-1289517523)
             .setName("LMP1")
-            .build();
+            .setAbbreviation("LMP1")
+            .build2();
 
-    private static final CarClass SECOND_CLASS = new CarClassBuilder()
+    private static final CarClass2 SECOND_CLASS = new CarClassBuilder()
             .setId(298754909)
             .setName("Road D")
-            .build();
+            .setAbbreviation("RDD")
+            .build2();
 
     @InjectMocks
     CarClassController carClassController;
@@ -68,13 +70,13 @@ public class CarClass2ControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        CAR_CLASS_SCHEMA = CLASS_LOADER.getResourceAsStream("class.schema.json");
+        CAR_CLASS_SCHEMA = CLASS_LOADER.getResourceAsStream("class2.schema.json");
         CAR_CLASS_COLLECTION_SCHEMA = CLASS_LOADER.getResourceAsStream("classes.schema.json");
         ERROR_SCHEMA = CLASS_LOADER.getResourceAsStream("error.schema.json");
         MockitoAnnotations.initMocks(this);
         
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new CarClassController(apiService, Arrays.asList(FIRST_CLASS, SECOND_CLASS)))
+                .standaloneSetup(new CarClass2Controller(apiService, Arrays.asList(FIRST_CLASS, SECOND_CLASS)))
                 .setMessageConverters(HALMessageConverter.getConverter(Collections.singletonList(ALL)))
                 .setControllerAdvice(new APIExceptionHandler())
                 .apply(documentationConfiguration(this.restDocumentation))
@@ -170,6 +172,7 @@ public class CarClass2ControllerTest {
                 .andExpect(content().string(matchesJsonSchema(CAR_CLASS_SCHEMA)))
                 .andExpect(jsonPath("$.id", is(FIRST_CLASS.getId())))
                 .andExpect(jsonPath("$.name", is(FIRST_CLASS.getName())))
+                .andExpect(jsonPath("$.abbreviation", is(FIRST_CLASS.getAbbreviation())))
                 .andExpect(jsonPath("$._links.index", hasEntry("href", "http://localhost:8080/")))
                 .andExpect(jsonPath("$._links.self", hasEntry("href", String.format("http://localhost:8080/classes/%d", FIRST_CLASS.getId()))))
                 .andExpect(jsonPath("$._links.curies", everyItem(
@@ -188,6 +191,7 @@ public class CarClass2ControllerTest {
                         responseFields(
                                 fieldWithPath("id").description("ID number"),
                                 fieldWithPath("name").description("Name"),
+                                fieldWithPath("abbreviation").description("Abbreviation"),
                                 subsectionWithPath("_links").ignored()),
                         commonLinks.and(
                                 linkWithRel("pcars:classes").description("Collection of class resources."))));

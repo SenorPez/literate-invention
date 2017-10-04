@@ -22,7 +22,7 @@ public class RootController {
         root.add(linkTo(methodOn(RootController.class).root()).withSelfRel());
         root.add(linkTo(methodOn(RootController.class).root()).withRel("index"));
         root.add(linkTo(methodOn(CarController.class).cars()).withRel("cars"));
-        root.add(linkTo(methodOn(CarClassController.class).carClasses1()).withRel("classes"));
+        root.add(linkTo(methodOn(CarClassController.class).carClasses()).withRel("classes"));
         root.add(linkTo(methodOn(EventController.class).events()).withRel("events"));
         root.add(linkTo(methodOn(TrackController.class).tracks()).withRel("tracks"));
         return ResponseEntity.ok(root);
@@ -34,7 +34,7 @@ public class RootController {
         root.add(linkTo(methodOn(RootController.class).root2()).withSelfRel());
         root.add(linkTo(methodOn(RootController.class).root2()).withRel("index"));
         root.add(linkTo(methodOn(Car2Controller.class).cars()).withRel("cars"));
-        root.add(linkTo(methodOn(CarClassController.class).carClasses2()).withRel("classes"));
+        root.add(linkTo(methodOn(CarClass2Controller.class).carClasses()).withRel("classes"));
         root.add(linkTo(methodOn(Track2Controller.class).tracks()).withRel("tracks"));
         return ResponseEntity.ok(root);
     }

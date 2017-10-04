@@ -1,7 +1,7 @@
 package com.senorpez.projectcars.staticdata;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,15 +36,15 @@ public class Car2Controller {
     }
 
     @RequestMapping
-    ResponseEntity<Resources<Car2Resource>> cars() {
-        final Collection<Car2> car2s = apiService.findAll(this.cars);
-        final Collection<Car2Model> car2Models = car2s.stream()
-                .map(Car2Model::new)
+    ResponseEntity<EmbeddedCar2Resources> cars() {
+        final Collection<Car2> cars = apiService.findAll(this.cars);
+        final Collection<EmbeddedCar2Model> carModels = cars.stream()
+                .map(EmbeddedCar2Model::new)
                 .collect(Collectors.toList());
-        final Collection<Car2Resource> car2Resources = car2Models.stream()
-                .map(Car2Model::toResource)
+        final Collection<Resource<EmbeddedCar2Model>> carResources = carModels.stream()
+                .map(EmbeddedCar2Model::toResource)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(Car2Resource.makeResources(car2Resources));
+        return ResponseEntity.ok(new EmbeddedCar2Resources(carResources));
     }
 
     @RequestMapping("/{carId}")
@@ -59,13 +59,13 @@ public class Car2Controller {
     }
 
     @RequestMapping("/{carId}/class")
-    ResponseEntity<CarClassResource> carClass(@PathVariable final int carId) {
+    ResponseEntity<CarClass2Resource> carClass(@PathVariable final int carId) {
         final Car2 car = apiService.findOne(
                 this.cars,
                 findCar -> findCar.getId() == carId,
                 () -> new CarNotFoundException(carId));
-        final CarClassModel carClassModel = new CarClassModel(car.getCarClass());
-        final CarClassResource carClassResource = carClassModel.toResource(carId);
+        final CarClass2Model carClassModel = new CarClass2Model(car.getCarClass());
+        final CarClass2Resource carClassResource = carClassModel.toResource(carId);
         return ResponseEntity.ok(carClassResource);
     }
 }

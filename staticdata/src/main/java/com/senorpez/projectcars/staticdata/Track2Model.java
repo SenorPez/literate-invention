@@ -4,7 +4,7 @@ import org.springframework.hateoas.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 @Relation(value = "track", collectionRelation = "track")
-public class Track2Model implements Identifiable<Integer> {
+class Track2Model implements Identifiable<Integer> {
     private final int id;
     private final String name;
     private final int gridSize;
