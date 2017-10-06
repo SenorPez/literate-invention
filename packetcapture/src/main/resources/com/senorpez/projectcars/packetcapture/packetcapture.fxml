@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.senorpez.projectcars.packetcapture.PacketCaptureController">
    <children>
-      <MenuBar>
+      <MenuBar fx:id="menuBar">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>

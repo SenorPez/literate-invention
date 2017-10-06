@@ -15,10 +15,12 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import static java.nio.file.StandardOpenOption.*;
 import static javafx.beans.binding.Bindings.not;
 
 public class PacketCaptureController {
@@ -85,9 +87,14 @@ public class PacketCaptureController {
     @FXML
     private void menuAbout() {
         final Alert about = new Alert(Alert.AlertType.INFORMATION);
+        final String headerText = ApplicationInfo.getImplementationTitle() == null ?
+                "Packet Capture" : ApplicationInfo.getImplementationTitle();
+        final String contentText = ApplicationInfo.getImplementationVersion() == null ?
+                "Development" : ApplicationInfo.getImplementationVersion();
+
         about.setTitle("About");
-        about.setHeaderText(ApplicationInfo.getImplementationTitle());
-        about.setContentText("Version: " + ApplicationInfo.getImplementationVersion());
+        about.setHeaderText(headerText);
+        about.setContentText("Version: " + contentText);
         about.showAndWait();
     }
 
@@ -113,7 +120,10 @@ public class PacketCaptureController {
             captureThread = new Thread(packetReader);
             captureThread.start();
 
-            final Writer writer = new SimplePCAPNGWriter(outputFile.get().map(File::toPath).orElseThrow(IOException::new));
+            final Writer writer = new SimplePCAPNGWriter(
+                    Files.newOutputStream(
+                            outputFile.get().map(File::toPath).orElseThrow(IOException::new),
+                            CREATE, TRUNCATE_EXISTING, WRITE));
             packetWriter = new PacketWriter(queue, writer);
             writerThread = new Thread(packetWriter);
             writerThread.start();
