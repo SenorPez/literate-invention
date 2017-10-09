@@ -29,7 +29,8 @@ public class SimplePCAPNGWriterTest {
     private final static int expectedSnapLen = 0;
 
     private final static byte[] packetData = new byte[]{8, 6, 7, 5, 3, 0, 9};
-    private final static int paddedPacketLength = 8;
+    private final static int paddedPacketLength =
+            packetData.length % 4 == 0 ? packetData.length : packetData.length + 4  - packetData.length % 4;
     private final static byte[] paddedPacketData = Arrays.copyOf(packetData, paddedPacketLength);
 
     private final static int expectedSimplePacketBlockType = 3;
@@ -147,7 +148,52 @@ public class SimplePCAPNGWriterTest {
     }
 
     @Test
-    public void writePacket() throws Exception {
+    public void writePacket_PaddingRequired() throws Exception {
+        final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
+        buf.clear();
+        buf.put(packetData);
+        buf.flip();
+        final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
+
+        writer.writePacket(packet);
+
+        final byte[] outputBytes = outputStream.toByteArray();
+
+        final int sectionHeaderBlockLength = ByteBuffer
+                .wrap(Arrays.copyOfRange(outputBytes, 4, 8))
+                .order(LITTLE_ENDIAN)
+                .getInt();
+        final int interfaceDescriptionBlockLength = ByteBuffer
+                .wrap(Arrays.copyOfRange(outputBytes, sectionHeaderBlockLength + 4, sectionHeaderBlockLength + 8))
+                .order(LITTLE_ENDIAN)
+                .getInt();
+        final int simplePacketBlockLength = ByteBuffer
+                .wrap(Arrays.copyOfRange(outputBytes, sectionHeaderBlockLength + interfaceDescriptionBlockLength + 4, sectionHeaderBlockLength + interfaceDescriptionBlockLength + 8))
+                .order(LITTLE_ENDIAN)
+                .getInt();
+        assertThat(simplePacketBlockLength, is(expectedSimplePacketBlockLength));
+
+        final ByteBuffer simplePacketBlock = ByteBuffer
+                .wrap(Arrays.copyOfRange(outputBytes, sectionHeaderBlockLength + interfaceDescriptionBlockLength, sectionHeaderBlockLength + interfaceDescriptionBlockLength + simplePacketBlockLength))
+                .order(LITTLE_ENDIAN);
+
+        assertThat(simplePacketBlock.getInt(), is(expectedSimplePacketBlockType));
+        assertThat(simplePacketBlock.getInt(), is(expectedSimplePacketBlockLength));
+        assertThat(simplePacketBlock.getInt(), is(expectedPacketLength));
+
+        final byte retrievedData[] = new byte[paddedPacketLength];
+
+        simplePacketBlock.get(retrievedData);
+        assertThat(retrievedData, is(paddedPacketData));
+        assertThat(simplePacketBlock.getInt(), is(expectedSimplePacketBlockLength));
+        assertThat(simplePacketBlock.remaining(), is(0));
+    }
+
+    @Test
+    public void writePacket_NoPaddingRequired() throws Exception {
+        final byte[] packetData = new byte[]{8, 6, 7, 5, 3, 0, 9, 0};
+        final int expectedPacketLength = packetData.length;
+
         final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
         buf.clear();
         buf.put(packetData);

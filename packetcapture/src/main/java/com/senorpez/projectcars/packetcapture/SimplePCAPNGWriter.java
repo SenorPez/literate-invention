@@ -73,6 +73,6 @@ public class SimplePCAPNGWriter implements PCAPNGWriter {
     }
 
     private int getPacketPaddedLength(final int length) {
-        return length + 4 - length % 4;
+        return length % 4 == 0 ? length : length + 4 - length % 4;
     }
 }
