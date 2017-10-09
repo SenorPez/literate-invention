@@ -9,28 +9,22 @@ import java.nio.channels.DatagramChannel;
 import java.util.concurrent.BlockingQueue;
 
 class PacketReader implements Runnable {
-    private static final DatagramChannel CHANNEL;
     private static final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
 
+    private final DatagramChannel channel;
     private final BlockingQueue<DatagramPacket> queue;
+
     private boolean cancelled = false;
 
-    static {
-        DatagramChannel newChannel = null;
-        try {
-            newChannel = DatagramChannel.open();
-            newChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-            newChannel.setOption(StandardSocketOptions.SO_BROADCAST, true);
-            newChannel.bind(new InetSocketAddress(5606));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-
-        CHANNEL = newChannel;
-    }
-
-    PacketReader(final BlockingQueue<DatagramPacket> queue) {
+    PacketReader(final BlockingQueue<DatagramPacket> queue) throws IOException {
         this.queue = queue;
+
+        DatagramChannel newChannel;
+        newChannel = DatagramChannel.open();
+        newChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        newChannel.setOption(StandardSocketOptions.SO_BROADCAST, true);
+        newChannel.bind(new InetSocketAddress(5606));
+        channel = newChannel;
     }
 
     @Override
@@ -38,14 +32,18 @@ class PacketReader implements Runnable {
         while (!cancelled) {
             try {
                 buf.clear();
-                CHANNEL.receive(buf);
+                channel.receive(buf);
                 buf.flip();
                 final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
                 queue.add(packet);
-            } catch (final IOException | IllegalStateException e) {
+            } catch (final IOException e) {
+                cancel();
                 try {
-                    CHANNEL.close();
+                    channel.close();
                 } catch (final IOException ignored) {}
+            } catch (final IllegalStateException ignored) {
+                // TODO: 10/03/17 Actual Logging
+                System.out.println("Error: Queue full. Is a writer running?");
             }
         }
     }
