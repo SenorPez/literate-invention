@@ -10,10 +10,13 @@ import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class PacketReader implements Runnable {
     private static final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
     private static final Logger logger = LoggerFactory.getLogger(PacketReader.class);
+
+    private final AtomicInteger packetsCaptured = new AtomicInteger(0);
 
     private final DatagramChannel channel;
     private final BlockingQueue<DatagramPacket> queue;
@@ -40,6 +43,10 @@ class PacketReader implements Runnable {
                 buf.flip();
                 final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
                 queue.add(packet);
+
+                if (packetsCaptured.incrementAndGet() % 100 == 0) {
+                    logger.info(String.format("%d packets read", packetsCaptured.get()));
+                }
 
                 if (queue.remainingCapacity() < queue.size() / 50)
                     logger.warn("Queue at half capacity. Is a writer running?");

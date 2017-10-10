@@ -13,10 +13,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.testfx.api.FxAssert.verifyThat;
 
-public class PacketCaptureTest extends ApplicationTest {
+public class PacketCaptureGUITest extends ApplicationTest {
     @Override
     public void start(final Stage stage) throws Exception {
-        new PacketCapture().start(stage);
+        new PacketCaptureGUI().start(stage);
     }
 
     @Test
