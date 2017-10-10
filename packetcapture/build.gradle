@@ -21,7 +21,6 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
     testCompile group: 'org.testfx', name: 'testfx-junit', version: '4.0.7-alpha'
-    testCompile group: 'org.testfx', name: 'testfx-core', version: '4.0.7-alpha'
 }
 
 jar {

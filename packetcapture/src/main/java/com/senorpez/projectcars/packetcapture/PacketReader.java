@@ -1,5 +1,8 @@
 package com.senorpez.projectcars.packetcapture;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
@@ -10,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 
 class PacketReader implements Runnable {
     private static final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
+    private static final Logger logger = LoggerFactory.getLogger(PacketReader.class);
 
     private final DatagramChannel channel;
     private final BlockingQueue<DatagramPacket> queue;
@@ -19,12 +23,12 @@ class PacketReader implements Runnable {
     PacketReader(final BlockingQueue<DatagramPacket> queue) throws IOException {
         this.queue = queue;
 
-        DatagramChannel newChannel;
-        newChannel = DatagramChannel.open();
-        newChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
-        newChannel.setOption(StandardSocketOptions.SO_BROADCAST, true);
-        newChannel.bind(new InetSocketAddress(5606));
-        channel = newChannel;
+        final DatagramChannel channel;
+        channel = DatagramChannel.open();
+        channel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        channel.setOption(StandardSocketOptions.SO_BROADCAST, true);
+        channel.bind(new InetSocketAddress(5606));
+        this.channel = channel;
     }
 
     @Override
@@ -36,19 +40,23 @@ class PacketReader implements Runnable {
                 buf.flip();
                 final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
                 queue.add(packet);
+
+                if (queue.remainingCapacity() < queue.size() / 50)
+                    logger.warn("Queue at half capacity. Is a writer running?");
             } catch (final IOException e) {
+                logger.warn("IOException");
                 cancel();
                 try {
                     channel.close();
                 } catch (final IOException ignored) {}
             } catch (final IllegalStateException ignored) {
-                // TODO: 10/03/17 Actual Logging
-                System.out.println("Error: Queue full. Is a writer running?");
+                logger.error("Queue full. Is a writer running?");
             }
         }
     }
 
     void cancel() {
+        if (!cancelled) logger.info("Shutting Down");
         cancelled = true;
     }
 }
