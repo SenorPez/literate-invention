@@ -69,7 +69,7 @@ public class PacketWriterTest {
         when(queue.take())
                 .thenReturn(new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7))
                 .thenThrow(new InterruptedException());
-        when(queue.size()).thenReturn(3, 2, 1, 0);
+        when(queue.size()).thenReturn(3, 3, 2, 2, 1, 1, 0);
         when(queue.remove()).thenReturn(
                 new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7),
                 new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7),
@@ -87,7 +87,7 @@ public class PacketWriterTest {
 
         verify(queue, times(2)).take();
         verify(queue, times(3)).remove();
-        verify(queue, times(4)).size();
+        verify(queue, times(7)).size();
         verifyNoMoreInteractions(queue);
 
         verify(writer, times(4)).writePacket(any(DatagramPacket.class));

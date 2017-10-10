@@ -5,9 +5,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PacketCapture extends Application {
     private PacketCaptureController controller;
+    private final static Logger logger = LoggerFactory.getLogger(PacketCapture.class);
 
     @Override
     public void start(final Stage stage) throws Exception {
@@ -23,10 +26,12 @@ public class PacketCapture extends Application {
 
     @Override
     public void stop() throws Exception {
+        logger.info("Shutting Down");
         controller.menuExit();
     }
 
     public static void main(final String[] args) {
+        logger.info("Launching");
         launch(args);
     }
 }
