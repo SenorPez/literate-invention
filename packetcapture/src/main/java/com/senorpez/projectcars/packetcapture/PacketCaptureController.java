@@ -2,12 +2,10 @@ package com.senorpez.projectcars.packetcapture;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -27,12 +25,12 @@ public class PacketCaptureController {
     private final SimpleObjectProperty<Optional<File>> outputFile = new SimpleObjectProperty<>(Optional.empty());
     private final SimpleBooleanProperty capturing = new SimpleBooleanProperty(false);
 
-    private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(10000);
+    private final int queueCapacity = 1000;
+    private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(queueCapacity);
+    private final SimpleIntegerProperty queueSize = new SimpleIntegerProperty(0);
 
-    private Thread captureThread;
-    private Thread writerThread;
-    private PacketReader packetReader;
-    private PacketWriter packetWriter;
+    private PacketReaderService packetReaderService;
+    private PacketWriterService packetWriterService;
 
     @FXML
     private VBox root;
@@ -50,7 +48,10 @@ public class PacketCaptureController {
     private Button buttonEndCapture;
 
     @FXML
-    private void initialize() {
+    private ProgressBar queueStatus;
+
+    @FXML
+    private void initialize() throws IOException {
         textFieldOutputFile.textProperty().bind(
                 Bindings.createStringBinding(
                         () -> outputFile.get().map(File::getAbsolutePath).orElse(""),
@@ -69,16 +70,22 @@ public class PacketCaptureController {
         );
 
         buttonEndCapture.disableProperty().bind(not(capturing));
+
+        packetReaderService = new PacketReaderService(queue, queueSize);
+
+        packetWriterService = new PacketWriterService(queue, queueSize);
+
+        queueStatus.progressProperty().bind(
+                Bindings.createDoubleBinding(
+                        () -> (double) queueSize.get() / (double) queueCapacity,
+                        queueSize));
     }
 
     @FXML
     void menuExit() {
         capturing.set(false);
-
-        if (captureThread != null) captureThread.interrupt();
-        if (writerThread != null) writerThread.interrupt();
-        if (packetReader != null) packetReader.cancel();
-        if (packetWriter != null) packetWriter.cancel();
+        packetReaderService.cancel();
+        packetWriterService.cancel();
 
         final Stage stage = (Stage) root.getScene().getWindow();
         stage.close();
@@ -112,32 +119,27 @@ public class PacketCaptureController {
     }
 
     @FXML
-    private void buttonBeginCapture() {
+    private void buttonBeginCapture() throws IOException, InterruptedException {
         capturing.set(true);
 
-        try {
-            packetReader = new PacketReader(queue);
-            captureThread = new Thread(packetReader);
-            captureThread.start();
+        packetReaderService.start();
 
-            final Writer writer = new SimplePCAPNGWriter(
-                    Files.newOutputStream(
-                            outputFile.get().map(File::toPath).orElseThrow(IOException::new),
-                            CREATE, TRUNCATE_EXISTING, WRITE));
-            packetWriter = new PacketWriter(queue, writer);
-            writerThread = new Thread(packetWriter);
-            writerThread.start();
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
+        final Writer writer = new SimplePCAPNGWriter(
+                Files.newOutputStream(
+                        outputFile.get().map(File::toPath).orElseThrow(IOException::new),
+                        CREATE, TRUNCATE_EXISTING, WRITE));
+        packetWriterService.start(writer);
     }
 
     @FXML
     private void buttonEndCapture() {
         capturing.set(false);
 
-        packetReader.cancel();
-        packetWriter.cancel();
+        packetWriterService.cancel();
+        packetReaderService.cancel();
+
+        packetWriterService.reset();
+        packetReaderService.reset();
     }
 
     private static Optional<File> validateOutputFile(final File selectedFile) {
