@@ -14,12 +14,12 @@ import java.util.stream.IntStream;
 import static org.mockito.Mockito.*;
 
 public class PacketReaderTest {
-    private BlockingQueue<DatagramPacket> queue;
+    private BlockingQueue<byte[]> queue;
     private Thread readerThread;
 
     @Before
     public void setUp() throws Exception {
-        queue = (BlockingQueue<DatagramPacket>) mock(BlockingQueue.class);
+        queue = (BlockingQueue<byte[]>) mock(BlockingQueue.class);
         final PacketReader reader = new PacketReader(queue);
         readerThread = new Thread(reader);
         readerThread.start();
@@ -28,25 +28,25 @@ public class PacketReaderTest {
 
     @Test
     public void run() throws Exception {
-        when(queue.add(any(DatagramPacket.class))).thenReturn(true);
+        when(queue.add(any())).thenReturn(true);
 
         packetSender(10);
         Thread.sleep(500);
 
         readerThread.interrupt();
         readerThread.join();
-        verify(queue, times(10)).add(any(DatagramPacket.class));
+        verify(queue, times(10)).add(any());
     }
 
     @Test
     public void run_InsufficientCapacity() throws Exception {
-        when(queue.add(any(DatagramPacket.class))).thenThrow(new IllegalStateException());
+        when(queue.add(any())).thenThrow(new IllegalStateException());
         packetSender(10);
         Thread.sleep(500);
 
         readerThread.interrupt();
         readerThread.join();
-        verify(queue, times(10)).add(any(DatagramPacket.class));
+        verify(queue, times(10)).add(any());
     }
 
     private void packetSender(final int count) throws SocketException {

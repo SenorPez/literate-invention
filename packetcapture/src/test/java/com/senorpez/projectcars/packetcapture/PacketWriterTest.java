@@ -4,27 +4,26 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.concurrent.BlockingQueue;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class PacketWriterTest {
-    private BlockingQueue<DatagramPacket> queue;
+    private BlockingQueue<byte[]> queue;
     private Writer writer;
     private Thread writerThread;
 
     @Before
     public void setUp() throws Exception {
-        queue = (BlockingQueue<DatagramPacket>) mock(BlockingQueue.class);
+        queue = (BlockingQueue<byte[]>) mock(BlockingQueue.class);
         writer = mock(SimplePCAPNGWriter.class);
     }
 
     @Test
     public void run() throws Exception {
-        when(queue.take()).thenReturn(new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7));
-        doNothing().when(writer).writePacket(any(DatagramPacket.class));
+        when(queue.take()).thenReturn(new byte[]{8, 6, 7, 5, 3, 0, 9});
+        doNothing().when(writer).writePacket(any());
 
         final PacketWriter packetWriter = new PacketWriter(queue, writer);
         writerThread = new Thread(packetWriter);
@@ -38,7 +37,7 @@ public class PacketWriterTest {
         verify(queue, atLeast(1)).take();
         verifyNoMoreInteractions(queue);
 
-        verify(writer, atLeast(1)).writePacket(any(DatagramPacket.class));
+        verify(writer, atLeast(1)).writePacket(any());
         verifyNoMoreInteractions(writer);
     }
 
@@ -46,7 +45,7 @@ public class PacketWriterTest {
     public void run_InterruptTake() throws Exception {
         when(queue.take()).thenThrow(new InterruptedException());
         when(queue.size()).thenReturn(0);
-        doNothing().when(writer).writePacket(any(DatagramPacket.class));
+        doNothing().when(writer).writePacket(any());
 
         final PacketWriter packetWriter = new PacketWriter(queue, writer);
         writerThread = new Thread(packetWriter);
@@ -67,14 +66,14 @@ public class PacketWriterTest {
     @Test
     public void run_InterruptTakeWithQueueRemaining() throws Exception {
         when(queue.take())
-                .thenReturn(new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7))
+                .thenReturn(new byte[]{8, 6, 7, 5, 3, 0, 9})
                 .thenThrow(new InterruptedException());
         when(queue.size()).thenReturn(3, 3, 2, 2, 1, 1, 0);
         when(queue.remove()).thenReturn(
-                new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7),
-                new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7),
-                new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7));
-        doNothing().when(writer).writePacket(any(DatagramPacket.class));
+                new byte[]{8, 6, 7, 5, 3, 0, 9},
+                new byte[]{8, 6, 7, 5, 3, 0, 9},
+                new byte[]{8, 6, 7, 5, 3, 0, 9});
+        doNothing().when(writer).writePacket(any());
 
         final PacketWriter packetWriter = new PacketWriter(queue, writer);
         writerThread = new Thread(packetWriter);
@@ -90,14 +89,14 @@ public class PacketWriterTest {
         verify(queue, times(7)).size();
         verifyNoMoreInteractions(queue);
 
-        verify(writer, times(4)).writePacket(any(DatagramPacket.class));
+        verify(writer, times(4)).writePacket(any());
         verifyNoMoreInteractions(writer);
     }
 
     @Test
     public void run_WriterIOError() throws Exception {
-        when(queue.take()).thenReturn(new DatagramPacket(new byte[]{8, 6, 7, 5, 3, 0, 9}, 7));
-        doThrow(new IOException()).when(writer).writePacket(any(DatagramPacket.class));
+        when(queue.take()).thenReturn(new byte[]{8, 6, 7, 5, 3, 0, 9});
+        doThrow(new IOException()).when(writer).writePacket(any());
 
         final PacketWriter packetWriter = new PacketWriter(queue, writer);
         writerThread = new Thread(packetWriter);
@@ -111,7 +110,7 @@ public class PacketWriterTest {
         verify(queue, atLeast(1)).take();
         verifyNoMoreInteractions(queue);
 
-        verify(writer, atLeast(1)).writePacket(any(DatagramPacket.class));
+        verify(writer, atLeast(1)).writePacket(any());
         verifyNoMoreInteractions(writer);
     }
 }

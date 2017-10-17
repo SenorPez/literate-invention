@@ -16,6 +16,7 @@ public class PacketServer {
         try {
             socket = new DatagramSocket();
             socket.setReuseAddress(true);
+            socket.setBroadcast(true);
         } catch (final SocketException e) {
             e.printStackTrace();
         }

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
 import static java.nio.file.StandardOpenOption.*;
 
 public class PacketCaptureHeadless {
-    private static final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(10000);
+    private static final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(10000);
     private static final Logger logger = LoggerFactory.getLogger(PacketCaptureHeadless.class);
 
     private static Thread readerThread;
