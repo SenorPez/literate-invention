@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,11 +19,11 @@ class PacketReader implements Runnable {
     private final AtomicInteger packetsCaptured = new AtomicInteger(0);
 
     private final DatagramChannel channel;
-    private final BlockingQueue<DatagramPacket> queue;
+    private final BlockingQueue<byte[]> queue;
 
     private boolean cancelled = false;
 
-    PacketReader(final BlockingQueue<DatagramPacket> queue) throws IOException {
+    PacketReader(final BlockingQueue<byte[]> queue) throws IOException {
         this.queue = queue;
 
         final DatagramChannel channel;
@@ -41,8 +41,7 @@ class PacketReader implements Runnable {
                 buf.clear();
                 channel.receive(buf);
                 buf.flip();
-                final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
-                queue.add(packet);
+                queue.add(Arrays.copyOfRange(buf.array(), 0, buf.limit()));
 
                 if (packetsCaptured.incrementAndGet() % 100 == 0) {
                     logger.info(String.format("%d packets read", packetsCaptured.get()));

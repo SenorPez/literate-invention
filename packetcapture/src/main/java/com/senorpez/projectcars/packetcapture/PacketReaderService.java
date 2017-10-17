@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,12 +20,12 @@ import static java.net.StandardSocketOptions.SO_REUSEADDR;
 public class PacketReaderService extends Service<Void> {
     private static final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
 
-    private final BlockingQueue<DatagramPacket> queue;
+    private final BlockingQueue<byte[]> queue;
     private final SimpleIntegerProperty queueSize;
     private final AtomicInteger packetsCaptured = new AtomicInteger(0);
     private final Logger logger = LoggerFactory.getLogger(PacketReaderService.class);
 
-    PacketReaderService(final BlockingQueue<DatagramPacket> queue, final SimpleIntegerProperty queueSize) {
+    PacketReaderService(final BlockingQueue<byte[]> queue, final SimpleIntegerProperty queueSize) {
         this.queue = queue;
         this.queueSize = queueSize;
     }
@@ -48,9 +48,7 @@ public class PacketReaderService extends Service<Void> {
                         buf.clear();
                         channel.receive(buf);
                         buf.flip();
-
-                        final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
-                        queue.add(packet);
+                        queue.add(Arrays.copyOfRange(buf.array(), 0, buf.limit()));
                         queueSize.setValue(queue.size());
 
                         if (packetsCaptured.incrementAndGet() % 100 == 0) {

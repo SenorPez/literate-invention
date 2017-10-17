@@ -2,8 +2,8 @@ package com.senorpez.projectcars.packetcapture;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -53,22 +53,22 @@ public class SimplePCAPNGWriter implements PCAPNGWriter {
     }
 
     @Override
-    public void writeSimplePacketBlock(final DatagramPacket packet) throws IOException {
+    public void writeSimplePacketBlock(final byte[] packet) throws IOException {
         final ByteBuffer blockType = ByteBuffer.allocate(4).order(LITTLE_ENDIAN).put((byte) 3);
-        final ByteBuffer blockLength = ByteBuffer.allocate(4).order(LITTLE_ENDIAN).putInt(getPacketPaddedLength(packet.getLength()) + 16);
-        final ByteBuffer originalPacketLength = ByteBuffer.allocate(4).order(LITTLE_ENDIAN).putInt(packet.getLength());
+        final ByteBuffer blockLength = ByteBuffer.allocate(4).order(LITTLE_ENDIAN).putInt(getPacketPaddedLength(packet.length) + 16);
+        final ByteBuffer originalPacketLength = ByteBuffer.allocate(4).order(LITTLE_ENDIAN).putInt(packet.length);
 
         outputStream.write(blockType.array());
         outputStream.write(blockLength.array());
         outputStream.write(originalPacketLength.array());
-        outputStream.write(packet.getData(), 0, getPacketPaddedLength(packet.getLength()));
+        outputStream.write(Arrays.copyOf(packet, getPacketPaddedLength(packet.length)));
 
         outputStream.write(blockLength.array());
         blockLength.rewind();
     }
 
     @Override
-    public void writePacket(final DatagramPacket packet) throws IOException {
+    public void writePacket(final byte[] packet) throws IOException {
         writeSimplePacketBlock(packet);
     }
 

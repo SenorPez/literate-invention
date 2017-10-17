@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.net.DatagramPacket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -107,13 +106,7 @@ public class SimplePCAPNGWriterTest {
 
     @Test
     public void writeSimplePacketBlock() throws Exception {
-        final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
-        buf.clear();
-        buf.put(packetData);
-        buf.flip();
-        final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
-
-        writer.writeSimplePacketBlock(packet);
+        writer.writeSimplePacketBlock(packetData);
 
         final byte[] outputBytes = outputStream.toByteArray();
 
@@ -149,13 +142,7 @@ public class SimplePCAPNGWriterTest {
 
     @Test
     public void writePacket_PaddingRequired() throws Exception {
-        final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
-        buf.clear();
-        buf.put(packetData);
-        buf.flip();
-        final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
-
-        writer.writePacket(packet);
+        writer.writePacket(packetData);
 
         final byte[] outputBytes = outputStream.toByteArray();
 
@@ -193,14 +180,7 @@ public class SimplePCAPNGWriterTest {
     public void writePacket_NoPaddingRequired() throws Exception {
         final byte[] packetData = new byte[]{8, 6, 7, 5, 3, 0, 9, 0};
         final int expectedPacketLength = packetData.length;
-
-        final ByteBuffer buf = ByteBuffer.allocate(Short.MAX_VALUE);
-        buf.clear();
-        buf.put(packetData);
-        buf.flip();
-        final DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit());
-
-        writer.writePacket(packet);
+        writer.writePacket(packetData);
 
         final byte[] outputBytes = outputStream.toByteArray();
 

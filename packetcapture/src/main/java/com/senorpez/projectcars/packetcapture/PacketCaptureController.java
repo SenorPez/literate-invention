@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -25,8 +24,8 @@ public class PacketCaptureController {
     private final SimpleObjectProperty<Optional<File>> outputFile = new SimpleObjectProperty<>(Optional.empty());
     private final SimpleBooleanProperty capturing = new SimpleBooleanProperty(false);
 
-    private final int queueCapacity = 1000;
-    private final BlockingQueue<DatagramPacket> queue = new ArrayBlockingQueue<>(queueCapacity);
+    private final int queueCapacity = 10000;
+    private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(queueCapacity);
     private final SimpleIntegerProperty queueSize = new SimpleIntegerProperty(0);
 
     private PacketReaderService packetReaderService;
