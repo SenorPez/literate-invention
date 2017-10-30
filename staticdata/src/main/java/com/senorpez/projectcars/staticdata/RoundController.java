@@ -1,0 +1,74 @@
+package com.senorpez.projectcars.staticdata;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resources;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+@RequestMapping(
+        value = "/events/{eventId}/rounds",
+        method = RequestMethod.GET,
+        produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
+)
+@RestController
+public class RoundController {
+    private final APIService apiService;
+    private final Collection<Event> events;
+
+    @Autowired
+    RoundController(final APIService apiService) {
+        this.apiService = apiService;
+        this.events = Application.EVENTS;
+    }
+
+    RoundController(final APIService apiService, final Collection<Event> events) {
+        this.apiService = apiService;
+        this.events = events;
+    }
+
+    @RequestMapping
+    ResponseEntity<Resources<RoundResource>> rounds(@PathVariable final int eventId) {
+        final Event event = apiService.findOne(
+                this.events,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Collection<Round> rounds = event.getRounds();
+        final Collection<RoundModel> roundModels = rounds.stream()
+                .map(RoundModel::new)
+                .collect(Collectors.toList());
+        final Collection<RoundResource> roundResources = roundModels.stream()
+                .map(roundModel -> roundModel.toResource(eventId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(RoundResource.makeResources(roundResources, eventId));
+    }
+
+    @RequestMapping("/{roundId}")
+    ResponseEntity<RoundResource> rounds(@PathVariable final int eventId, @PathVariable final int roundId) {
+        final Event event = apiService.findOne(
+                this.events,
+                findEvent -> findEvent.getId() == eventId,
+                () -> new EventNotFoundException(eventId));
+        final Round round = apiService.findOne(
+                event.getRounds(),
+                findRound -> findRound.getId() == roundId,
+                () -> new RoundNotFoundException(roundId));
+        final RoundModel roundModel = new RoundModel(round);
+        final RoundResource roundResource = roundModel.toResource(eventId);
+        return ResponseEntity.ok(roundResource);
+    }
+
+    @RequestMapping("/{roundId}/track")
+    ResponseEntity<TrackResource> roundTrack(@PathVariable final int eventId, @PathVariable final int roundId) {
+        final TrackResource trackResource = new TrackResource(eventId, roundId, this.events);
+        return ResponseEntity.ok(trackResource);
+    }
+}

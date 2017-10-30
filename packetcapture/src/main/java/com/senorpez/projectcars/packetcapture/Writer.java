@@ -1,7 +1,7 @@
 package com.senorpez.projectcars.packetcapture;
 
-import java.net.DatagramPacket;
+import java.io.IOException;
 
 interface Writer {
-    void writePacket(DatagramPacket packet);
+    void writePacket(byte[] packet) throws IOException;
 }

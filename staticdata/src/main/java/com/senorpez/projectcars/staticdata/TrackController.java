@@ -1,0 +1,60 @@
+package com.senorpez.projectcars.staticdata;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static com.senorpez.projectcars.staticdata.SupportedMediaTypes.PROJECT_CARS_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+@RequestMapping(
+        value = "/tracks",
+        method = RequestMethod.GET,
+        produces = {PROJECT_CARS_VALUE, APPLICATION_JSON_UTF8_VALUE}
+)
+@RestController
+public class TrackController {
+    private final APIService apiService;
+    private final Collection<Track> tracks;
+
+    @Autowired
+    TrackController(final APIService apiService) {
+        this.tracks = Application.TRACKS;
+        this.apiService = apiService;
+    }
+
+    TrackController(final APIService apiService, final Collection<Track> tracks) {
+        this.apiService = apiService;
+        this.tracks = tracks;
+    }
+
+    @RequestMapping
+    ResponseEntity<EmbeddedTrackResources> tracks() {
+        final Collection<Track> tracks = apiService.findAll(this.tracks);
+        final Collection<EmbeddedTrackModel> trackModels = tracks.stream()
+                .map(EmbeddedTrackModel::new)
+                .collect(Collectors.toList());
+        final Collection<Resource<EmbeddedTrackModel>> trackResources = trackModels.stream()
+                .map(EmbeddedTrackModel::toResource)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new EmbeddedTrackResources(trackResources));
+    }
+
+    @RequestMapping("/{trackId}")
+    ResponseEntity<TrackResource> tracks(@PathVariable final int trackId) {
+        final Track track = apiService.findOne(
+                this.tracks,
+                findTrack -> findTrack.getId() == trackId,
+                () -> new TrackNotFoundException(trackId));
+        final TrackModel trackModel = new TrackModel(track);
+        final TrackResource trackResource = trackModel.toResource();
+        return ResponseEntity.ok(trackResource);
+    }
+}

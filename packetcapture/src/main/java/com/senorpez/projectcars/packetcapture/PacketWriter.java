@@ -1,35 +1,53 @@
 package com.senorpez.projectcars.packetcapture;
 
-import java.net.DatagramPacket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class PacketWriter implements Runnable {
-    private final BlockingQueue<DatagramPacket> queue;
-    private final Writer writer;
-    private boolean cancelled;
+    private static final Logger logger = LoggerFactory.getLogger(PacketWriter.class);
 
-    PacketWriter(final BlockingQueue<DatagramPacket> queue, final Writer writer) {
+    private final AtomicInteger packetsWritten = new AtomicInteger(0);
+    private final BlockingQueue<byte[]> queue;
+    private final Writer writer;
+    private boolean cancelled = false;
+
+    PacketWriter(final BlockingQueue<byte[]> queue, final Writer writer) {
         this.queue = queue;
         this.writer = writer;
     }
 
     @Override
     public void run() {
-        while (!cancelled || queue.size() > 0) {
+        while (!cancelled) {
             try {
-                final DatagramPacket packet = queue.take();
+                final byte[] packet = queue.take();
                 writer.writePacket(packet);
-            } catch (final InterruptedException e) {
-                while (queue.size() > 0) {
-                    final DatagramPacket packet = queue.remove();
-                    writer.writePacket(packet);
-                    cancelled = true;
+
+                if (packetsWritten.incrementAndGet() % 100 == 0) {
+                    logger.info(String.format("%d packets written", packetsWritten.get()));
                 }
+
+            } catch (final InterruptedException e) {
+                cancel();
+                while (queue.size() > 0) {
+                    logger.info(String.format("Writing %d remaining queue items", queue.size()));
+                    final byte[] packet = queue.remove();
+                    try {
+                        writer.writePacket(packet);
+                    } catch (final IOException ignored) {}
+                }
+            } catch (final IOException e) {
+                logger.warn("IOException");
             }
         }
     }
 
     void cancel() {
+        if (!cancelled) logger.info("Shutting Down");
         cancelled = true;
     }
 }
