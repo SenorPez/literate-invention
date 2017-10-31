@@ -175,8 +175,28 @@ class CarPhysicsPacket extends Packet {
         return unfilteredClutch;
     }
 
-    short getCarFlags() {
-        return carFlags;
+    boolean isHeadlight() {
+        return CarFlags.CAR_HEADLIGHT.isSet(carFlags);
+    }
+
+    boolean isEngineActive() {
+        return CarFlags.CAR_ENGINE_ACTIVE.isSet(carFlags);
+    }
+
+    boolean isEngineWarning() {
+        return CarFlags.CAR_ENGINE_WARNING.isSet(carFlags);
+    }
+
+    boolean isSpeedLimiter() {
+        return CarFlags.CAR_SPEED_LIMITER.isSet(carFlags);
+    }
+
+    boolean isAbs() {
+        return CarFlags.CAR_ABS.isSet(carFlags);
+    }
+
+    boolean isHandbrake() {
+        return CarFlags.CAR_HANDBRAKE.isSet(carFlags);
     }
 
     short getOilTemp() {
