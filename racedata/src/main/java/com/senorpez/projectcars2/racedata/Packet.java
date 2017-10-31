@@ -43,13 +43,13 @@ abstract class Packet {
         return packetVersion;
     }
 
-    private static short readUnsignedByte(final ByteBuffer data) {
+    static short readUnsignedByte(final ByteBuffer data) {
         final byte[] bytes = new byte[1];
         data.get(bytes);
         return (short) (bytes[0] & 0xFF);
     }
 
-    private static long readUnsignedInt(final ByteBuffer data) {
+    static long readUnsignedInt(final ByteBuffer data) {
         final byte[] bytes = new byte[4];
         data.get(bytes);
         return (bytes[0] & 0xFFL)

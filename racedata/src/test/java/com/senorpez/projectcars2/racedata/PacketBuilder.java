@@ -82,7 +82,7 @@ class PacketBuilder {
         return data;
     }
 
-    private ByteBuffer build(final ByteBuffer data) {
+    ByteBuffer build(final ByteBuffer data) {
         writeUnsignedInt(expectedPacketNumber, data);
         writeUnsignedInt(expectedCategoryPacketNumber, data);
         writeUnsignedByte(expectedPartialPacketIndex, data);
@@ -92,16 +92,16 @@ class PacketBuilder {
         return data;
     }
 
-    private static long getBoundedLong() {
+    static long getBoundedLong() {
         return (long) (Math.random() * (MAX_UNSIGNED_INTEGER));
     }
 
-    private static void writeUnsignedByte(final short value, final ByteBuffer data) {
+    static void writeUnsignedByte(final short value, final ByteBuffer data) {
         final byte[] valueBytes = ByteBuffer.allocate(Short.BYTES).order(LITTLE_ENDIAN).putShort(value).array();
         data.put(valueBytes, 0, Byte.BYTES);
     }
 
-    private static void writeUnsignedInt(final long value, final ByteBuffer data) {
+    static void writeUnsignedInt(final long value, final ByteBuffer data) {
         final byte[] valueBytes = ByteBuffer.allocate(Long.BYTES).order(LITTLE_ENDIAN).putLong(value).array();
         data.put(valueBytes, 0, Integer.BYTES);
     }
