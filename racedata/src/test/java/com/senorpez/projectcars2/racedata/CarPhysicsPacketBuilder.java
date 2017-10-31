@@ -7,14 +7,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 class CarPhysicsPacketBuilder extends PacketBuilder {
     private final static Random random = new Random();
-    private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    final static int MAX_UNSIGNED_SHORT = Integer.MAX_VALUE >>> 15;
-    final static int MIN_UNSIGNED_SHORT = 0;
+    private final static int TYRE_NAME_LENGTH_MAX = 40;
 
     private byte expectedViewedParticipantIndex = (byte) random.nextInt(Byte.MAX_VALUE);
 
@@ -83,12 +79,10 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
 
     private long expectedJoypad0 = getBoundedLong();
     private short expectedDPad = (short) random.nextInt(MAX_UNSIGNED_BYTE);
-    private List<String> expectedTyreCompound = IntStream.range(0, 4).mapToObj(value -> {
-        int nameLength = random.nextInt(40);
-        StringBuilder nameBuilder = new StringBuilder();
-        IntStream.rangeClosed(0, nameLength).forEach(value1 -> nameBuilder.append(ALPHABET.charAt(random.nextInt(ALPHABET.length()))));
-        return nameBuilder.toString();
-    }).collect(Collectors.toList());
+    private List<String> expectedTyreCompound = IntStream
+            .range(0, 4)
+            .mapToObj(value -> generateString(TYRE_NAME_LENGTH_MAX))
+            .collect(Collectors.toList());
 
     CarPhysicsPacketBuilder() {
         super();
@@ -742,21 +736,9 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
 
         writeUnsignedInt(expectedJoypad0, data);
         writeUnsignedByte(expectedDPad, data);
-        expectedTyreCompound.forEach(v -> writeString(v, data));
+        expectedTyreCompound.forEach(v -> writeString(v, TYRE_NAME_LENGTH_MAX, data));
 
         data.rewind();
         return data;
-    }
-
-    private static void writeUnsignedShort(final int value, final ByteBuffer data) {
-        final byte[] valueBytes = ByteBuffer.allocate(Integer.BYTES).order(LITTLE_ENDIAN).putInt(value).array();
-        data.put(valueBytes, 0, Short.BYTES);
-    }
-
-    private static void writeString(final String value, final ByteBuffer data) {
-        final byte[] nameBuffer = new byte[40];
-        final byte[] nameBytes = value.getBytes(UTF_8);
-        System.arraycopy(nameBytes, 0, nameBuffer, 0, nameBytes.length);
-        data.put(nameBuffer);
     }
 }

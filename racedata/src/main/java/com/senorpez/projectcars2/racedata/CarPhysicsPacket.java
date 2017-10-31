@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.senorpez.projectcars2.racedata.PacketType.PACKET_CAR_PHYSICS;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 class CarPhysicsPacket extends Packet {
+    private final static int TYRE_NAME_LENGTH_MAX = 40;
+
     private final byte viewedParticipantIndex;
 
     private final short unfilteredThrottle;
@@ -83,7 +84,7 @@ class CarPhysicsPacket extends Packet {
         super(data);
 
         if (PacketType.valueOf(this.getPacketType()) != PACKET_CAR_PHYSICS) {
-            throw new InvalidPacketDataException();
+            throw new InvalidPacketTypeException();
         }
 
         this.viewedParticipantIndex = data.get();
@@ -169,7 +170,7 @@ class CarPhysicsPacket extends Packet {
 
         this.joypad0 = readUnsignedInt(data);
         this.dPad = readUnsignedByte(data);
-        this.tyreCompound = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readString(data)).collect(Collectors.toList()));
+        this.tyreCompound = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readString(data, TYRE_NAME_LENGTH_MAX)).collect(Collectors.toList()));
 
         if (data.hasRemaining()) {
             throw new InvalidPacketDataException();
@@ -458,18 +459,5 @@ class CarPhysicsPacket extends Packet {
 
     List<String> getTyreCompound() {
         return tyreCompound;
-    }
-
-    private static int readUnsignedShort(final ByteBuffer data) {
-        final byte[] bytes = new byte[2];
-        data.get(bytes);
-        return (bytes[0] & 0xFF)
-                | ((bytes[1] & 0xFF) << 8);
-    }
-    
-    private static String readString(final ByteBuffer data) {
-        final byte[] bytes = new byte[40];
-        data.get(bytes);
-        return new String(bytes, UTF_8).split("\u0000", 2)[0];
     }
 }

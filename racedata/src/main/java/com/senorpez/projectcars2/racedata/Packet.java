@@ -2,6 +2,8 @@ package com.senorpez.projectcars2.racedata;
 
 import java.nio.ByteBuffer;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 abstract class Packet {
     private final long packetNumber;
     private final long categoryPacketNumber;
@@ -56,6 +58,13 @@ abstract class Packet {
         return (short) (bytes[0] & 0xFF);
     }
 
+    static int readUnsignedShort(final ByteBuffer data) {
+        final byte[] bytes = new byte[2];
+        data.get(bytes);
+        return (bytes[0] & 0xFF)
+                | ((bytes[1] & 0xFF) << 8);
+    }
+
     static long readUnsignedInt(final ByteBuffer data) {
         final byte[] bytes = new byte[4];
         data.get(bytes);
@@ -65,5 +74,9 @@ abstract class Packet {
                 | ((bytes[3] & 0xFFL) << 24);
     }
 
-
+    static String readString(final ByteBuffer data, final int length) {
+        final byte[] bytes = new byte[length];
+        data.get(bytes);
+        return new String(bytes, UTF_8).split("\u0000", 2)[0];
+    }
 }

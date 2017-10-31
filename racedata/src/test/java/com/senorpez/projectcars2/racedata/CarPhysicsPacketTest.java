@@ -202,8 +202,8 @@ public class CarPhysicsPacketTest {
             packet = new CarPhysicsPacket(data);
         }
 
-        @Test(expected = InvalidPacketDataException.class)
-        public void throwInvalidPacketData_WrongPacketType() throws Exception {
+        @Test(expected = InvalidPacketTypeException.class)
+        public void throwInvalidPacketType_WrongPacketType() throws Exception {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
                     .setExpectedPacketType((short) 2);
             packet = new CarPhysicsPacket(builder.build());

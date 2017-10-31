@@ -2,14 +2,19 @@ package com.senorpez.projectcars2.racedata;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 class PacketBuilder {
     private final static Random random = new Random();
+    private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     final static long MAX_UNSIGNED_INTEGER = Long.MAX_VALUE >>> 31;
     final static long MIN_UNSIGNED_INTEGER = 0;
+    final static int MAX_UNSIGNED_SHORT = Integer.MAX_VALUE >>> 15;
+    final static int MIN_UNSIGNED_SHORT = 0;
     final static short MAX_UNSIGNED_BYTE = Short.MAX_VALUE >>> 7;
     final static short MIN_UNSIGNED_BYTE = 0;
 
@@ -102,8 +107,27 @@ class PacketBuilder {
         data.put(valueBytes, 0, Byte.BYTES);
     }
 
+    static void writeUnsignedShort(final int value, final ByteBuffer data) {
+        final byte[] valueBytes = ByteBuffer.allocate(Integer.BYTES).order(LITTLE_ENDIAN).putInt(value).array();
+        data.put(valueBytes, 0, Short.BYTES);
+    }
+
     static void writeUnsignedInt(final long value, final ByteBuffer data) {
         final byte[] valueBytes = ByteBuffer.allocate(Long.BYTES).order(LITTLE_ENDIAN).putLong(value).array();
         data.put(valueBytes, 0, Integer.BYTES);
+    }
+
+    static void writeString(final String value, final int length, final ByteBuffer data) {
+        final byte[] nameBuffer = new byte[length];
+        final byte[] nameBytes = value.getBytes(UTF_8);
+        System.arraycopy(nameBytes, 0, nameBuffer, 0, nameBytes.length);
+        data.put(nameBuffer);
+    }
+
+    static String generateString(final int maxLength) {
+        final int length = random.nextInt(maxLength);
+        final StringBuilder nameBuilder = new StringBuilder();
+        IntStream.rangeClosed(0, length).forEach(value -> nameBuilder.append(ALPHABET.charAt(random.nextInt(ALPHABET.length()))));
+        return nameBuilder.toString();
     }
 }
