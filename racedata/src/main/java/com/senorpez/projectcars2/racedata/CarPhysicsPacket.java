@@ -78,7 +78,7 @@ class CarPhysicsPacket extends Packet {
     private final short dPad;
     private final List<String> tyreCompound;
 
-    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException {
+    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException, InvalidCrashDamageStateException {
         super(data);
 
         this.viewedParticipantIndex = data.get();
@@ -105,7 +105,15 @@ class CarPhysicsPacket extends Packet {
         this.steering = data.get();
         this.gearNumGears = readUnsignedByte(data);
         this.boostAmount = readUnsignedByte(data);
-        this.crashState = readUnsignedByte(data);
+
+        final short crashStateValue = readUnsignedByte(data);
+        if (crashStateValue >= CrashDamageState.CRASH_DAMAGE_MAX.ordinal()
+                || crashStateValue < 0) {
+            throw new InvalidCrashDamageStateException();
+        } else {
+            this.crashState = crashStateValue;
+        }
+
         this.odometer = data.getFloat();
         this.orientation = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
         this.localVelocity = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
@@ -263,8 +271,8 @@ class CarPhysicsPacket extends Packet {
         return boostAmount;
     }
 
-    short getCrashState() {
-        return crashState;
+    CrashDamageState getCrashDamageState() {
+        return CrashDamageState.valueOf(crashState);
     }
 
     float getOdometer() {

@@ -94,6 +94,31 @@ public class CarPhysicsPacketTest {
         }
     }
 
+    @RunWith(Parameterized.class)
+    public static class CrashDamageStateTests {
+        private CarPhysicsPacket packet;
+
+        @Parameter()
+        public CrashDamageState crashDamageState;
+
+        @Parameters(name = "Crash Damage State: {0}")
+        public static Collection<Object[]> data() {
+            final List<Object[]> output = new ArrayList<>();
+            IntStream
+                    .range(0, CrashDamageState.CRASH_DAMAGE_MAX.ordinal())
+                    .forEach(value -> output.add(new Object[]{CrashDamageState.valueOf(value)}));
+            return output;
+        }
+
+        @Test
+        public void getCrashDamageState() throws Exception {
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedCrashState((short) crashDamageState.ordinal());
+            packet = new CarPhysicsPacket(builder.build());
+            assertThat(packet.getCrashDamageState(), is(crashDamageState));
+        }
+    }
+
     public static class SingleTests {
         private CarPhysicsPacket packet;
 
@@ -706,35 +731,18 @@ public class CarPhysicsPacketTest {
             assertThat(packet.getBoostAmount(), is(not(MIN_UNSIGNED_BYTE - 1)));
         }
 
-        @Test
-        public void getCrashState() throws Exception {
-            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder();
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getCrashState(), is(builder.getExpectedCrashState()));
-        }
-
-        @Test
+        @Test(expected = InvalidCrashDamageStateException.class)
         public void getCrashState_MaxValue() throws Exception {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedCrashState(MAX_UNSIGNED_BYTE);
+                    .setExpectedCrashState((short) CrashDamageState.CRASH_DAMAGE_MAX.ordinal());
             packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getCrashState(), is(MAX_UNSIGNED_BYTE));
-
-            builder.setExpectedCrashState((byte) (MAX_UNSIGNED_BYTE + 1));
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getCrashState(), is(not(MAX_UNSIGNED_BYTE + 1)));
         }
 
-        @Test
-        public void getCrashState_Min_Value() throws Exception {
+        @Test(expected = InvalidCrashDamageStateException.class)
+        public void getCrashState_MinValue() throws Exception {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedCrashState(MIN_UNSIGNED_BYTE);
+                    .setExpectedCrashState((short) -1);
             packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getCrashState(), is(MIN_UNSIGNED_BYTE));
-
-            builder.setExpectedCrashState((byte) (MIN_UNSIGNED_BYTE - 1));
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getCrashState(), is(not(MIN_UNSIGNED_BYTE - 1)));
         }
 
         @Test

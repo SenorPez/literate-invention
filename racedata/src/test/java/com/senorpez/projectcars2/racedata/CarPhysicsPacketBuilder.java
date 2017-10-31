@@ -40,7 +40,7 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
     private byte expectedSteering = (byte) random.nextInt(Byte.MAX_VALUE);
     private short expectedGearNumGears = (short) random.nextInt(MAX_UNSIGNED_BYTE);
     private short expectedBoostAmount = (short) random.nextInt(MAX_UNSIGNED_BYTE);
-    private short expectedCrashState = (short) random.nextInt(MAX_UNSIGNED_BYTE);
+    private short expectedCrashState = (short) random.nextInt(CrashDamageState.CRASH_DAMAGE_MAX.ordinal());
     private float expectedOdometer = random.nextFloat();
     private List<Float> expectedOrientation = IntStream.range(0, 3).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
     private List<Float> expectedLocalVelocity = IntStream.range(0, 3).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
