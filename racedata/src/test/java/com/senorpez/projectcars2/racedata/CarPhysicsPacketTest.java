@@ -15,14 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.senorpez.projectcars2.racedata.CarPhysicsPacketBuilder.MAX_UNSIGNED_SHORT;
-import static com.senorpez.projectcars2.racedata.CarPhysicsPacketBuilder.MIN_UNSIGNED_SHORT;
 import static com.senorpez.projectcars2.racedata.PacketBuilder.*;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(Enclosed.class)
 public class CarPhysicsPacketTest {

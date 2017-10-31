@@ -1,14 +1,13 @@
 package com.senorpez.projectcars2.racedata;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
-import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class RaceDefinitionPacketTest {
     private RaceDefinitionPacket packet;
@@ -244,7 +243,7 @@ public class RaceDefinitionPacketTest {
     public void getEnforcedPitStopLap() throws Exception {
         final RaceDefinitionPacketBuilder builder = new RaceDefinitionPacketBuilder();
         packet = new RaceDefinitionPacket(builder.build());
-        assertThat(packet.getEnforcedPitStopLap(), Is.is(builder.getExpectedEnforcedPitStopLap()));
+        assertThat(packet.getEnforcedPitStopLap(), is(builder.getExpectedEnforcedPitStopLap()));
     }
 
     @Test

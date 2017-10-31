@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class PacketTest {
     private Packet packet;
