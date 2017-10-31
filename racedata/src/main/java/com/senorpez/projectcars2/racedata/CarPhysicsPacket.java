@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.senorpez.projectcars2.racedata.PacketType.PACKET_CAR_PHYSICS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 class CarPhysicsPacket extends Packet {
@@ -78,8 +79,12 @@ class CarPhysicsPacket extends Packet {
     private final short dPad;
     private final List<String> tyreCompound;
 
-    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException, InvalidCrashDamageStateException {
+    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException, InvalidCrashDamageStateException, InvalidPacketTypeException {
         super(data);
+
+        if (PacketType.valueOf(this.getPacketType()) != PACKET_CAR_PHYSICS) {
+            throw new InvalidPacketDataException();
+        }
 
         this.viewedParticipantIndex = data.get();
 

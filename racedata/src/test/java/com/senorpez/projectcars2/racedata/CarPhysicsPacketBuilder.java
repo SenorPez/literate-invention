@@ -92,6 +92,7 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
 
     CarPhysicsPacketBuilder() {
         super();
+        this.setExpectedPacketType((short) PacketType.PACKET_CAR_PHYSICS.ordinal());
     }
 
     byte getExpectedViewedParticipantIndex() {

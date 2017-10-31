@@ -142,28 +142,18 @@ public class PacketTest {
         assertThat(packet.getPacketType(), is(builder.getExpectedPacketType()));
     }
 
-    @Test
+    @Test(expected = InvalidPacketTypeException.class)
     public void getPacketType_MaxValue() throws Exception {
         final PacketBuilder builder = new PacketBuilder()
-                .setExpectedPacketType(PacketBuilder.MAX_UNSIGNED_BYTE);
+                .setExpectedPacketType((short) PacketType.PACKET_MAX.ordinal());
         packet = new PacketImpl(builder.build());
-        assertThat(packet.getPacketType(), is(PacketBuilder.MAX_UNSIGNED_BYTE));
-
-        builder.setExpectedPacketType((short) (PacketBuilder.MAX_UNSIGNED_BYTE + 1));
-        packet = new PacketImpl(builder.build());
-        assertThat(packet.getPacketType(), is(not(PacketBuilder.MAX_UNSIGNED_BYTE + 1)));
     }
 
-    @Test
+    @Test(expected = InvalidPacketTypeException.class)
     public void getPacketType_MinValue() throws Exception {
         final PacketBuilder builder = new PacketBuilder()
-                .setExpectedPacketType(PacketBuilder.MIN_UNSIGNED_BYTE);
+                .setExpectedPacketType((short) -1);
         packet = new PacketImpl(builder.build());
-        assertThat(packet.getPacketType(), is(PacketBuilder.MIN_UNSIGNED_BYTE));
-
-        builder.setExpectedPacketType((short) (PacketBuilder.MIN_UNSIGNED_BYTE - 1));
-        packet = new PacketImpl(builder.build());
-        assertThat(packet.getPacketType(), is(not(PacketBuilder.MIN_UNSIGNED_BYTE - 1)));
     }
 
     @Test
@@ -198,7 +188,7 @@ public class PacketTest {
     }
 
     private class PacketImpl extends Packet {
-        private PacketImpl(final ByteBuffer data) {
+        private PacketImpl(final ByteBuffer data) throws InvalidPacketTypeException {
             super(data);
         }
     }

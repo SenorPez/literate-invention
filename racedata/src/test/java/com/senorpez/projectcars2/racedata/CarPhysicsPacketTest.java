@@ -128,6 +128,27 @@ public class CarPhysicsPacketTest {
             packet = new CarPhysicsPacket(data);
         }
 
+        @Test(expected = InvalidPacketDataException.class)
+        public void throwInvalidPacketData_WrongPacketType() throws Exception {
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedPacketType((short) 2);
+            packet = new CarPhysicsPacket(builder.build());
+        }
+
+        @Test(expected = InvalidPacketTypeException.class)
+        public void throwInvalidPacketTypeException_MaxValue() throws Exception {
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedPacketType((short) PacketType.PACKET_MAX.ordinal());
+            packet = new CarPhysicsPacket(builder.build());
+        }
+
+        @Test(expected = InvalidPacketTypeException.class)
+        public void throwInvalidPacketTypeException_MinValue() throws Exception {
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedPacketType((short) -1);
+            packet = new CarPhysicsPacket(builder.build());
+        }
+
         @Test
         public void getViewedParticipantIndex() throws Exception {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder();

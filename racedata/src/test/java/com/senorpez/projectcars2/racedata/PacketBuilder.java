@@ -62,9 +62,10 @@ class PacketBuilder {
         return expectedPacketType;
     }
 
-    PacketBuilder setExpectedPacketType(final short expectedPacketType) {
+    @SuppressWarnings("unchecked")
+    <B extends PacketBuilder> B setExpectedPacketType(final short expectedPacketType) {
         this.expectedPacketType = expectedPacketType;
-        return this;
+        return (B) this;
     }
 
     short getExpectedPacketVersion() {

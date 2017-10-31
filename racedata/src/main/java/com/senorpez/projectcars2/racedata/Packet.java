@@ -10,12 +10,19 @@ abstract class Packet {
     private final short packetType;
     private final short packetVersion;
 
-    Packet(final ByteBuffer data) {
+    Packet(final ByteBuffer data) throws InvalidPacketTypeException {
         this.packetNumber = readUnsignedInt(data);
         this.categoryPacketNumber = readUnsignedInt(data);
         this.partialPacketIndex = readUnsignedByte(data);
         this.partialPacketNumber = readUnsignedByte(data);
-        this.packetType = readUnsignedByte(data);
+
+        final short packetTypeValue = readUnsignedByte(data);
+        if (packetTypeValue >= PacketType.PACKET_MAX.ordinal()
+                || packetTypeValue < 0) {
+            throw new InvalidPacketTypeException();
+        } else {
+            this.packetType = packetTypeValue;
+        }
         this.packetVersion = readUnsignedByte(data);
     }
 
