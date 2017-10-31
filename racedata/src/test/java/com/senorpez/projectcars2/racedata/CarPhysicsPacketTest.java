@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.senorpez.projectcars2.racedata.CarPhysicsPacketBuilder.MAX_UNSIGNED_SHORT;
@@ -25,6 +26,54 @@ import static org.hamcrest.core.Is.is;
 
 @RunWith(Enclosed.class)
 public class CarPhysicsPacketTest {
+    @RunWith(Parameterized.class)
+    public static class TyreFlagsTests {
+        private CarPhysicsPacket packet;
+
+        @Parameter()
+        public short value;
+
+        @Parameters(name = "Tyre Flags: {0}")
+        public static Collection<Object[]> data() {
+            final List<Object[]> output = new ArrayList<>();
+            IntStream.range(0, 1 << 3).forEach(value1 -> output.add(new Object[]{(short) value1}));
+            return output;
+        }
+
+        @Test
+        public void isTyreAttached() throws Exception {
+            final List<Short> values = Arrays.asList(value, value, value, value);
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedTyreFlags(values);
+            packet = new CarPhysicsPacket(builder.build());
+            final int mask = 1; /* 0000 0001 */
+            final List<Boolean> valueCheck = values.stream().map(v -> (v & mask) == mask).collect(Collectors.toList());
+            assertThat(packet.isTyreAttached(), is(valueCheck));
+        }
+
+        @Test
+        public void isTyreInflated() throws Exception {
+            final List<Short> values = Arrays.asList(value, value, value, value);
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedTyreFlags(values);
+            packet = new CarPhysicsPacket(builder.build());
+            final int mask = 2; /* 0000 0010 */
+            final List<Boolean> valueCheck = values.stream().map(v -> (v & mask) == mask).collect(Collectors.toList());
+            assertThat(packet.isTyreInflated(), is(valueCheck));
+        }
+
+        @Test
+        public void isTyreIsOnGround() throws Exception {
+            final List<Short> values = Arrays.asList(value, value, value, value);
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedTyreFlags(values);
+            packet = new CarPhysicsPacket(builder.build());
+            final int mask = 4; /* 0000 0100 */
+            final List<Boolean> valueCheck = values.stream().map(v -> (v & mask) == mask).collect(Collectors.toList());
+            assertThat(packet.isTyreIsOnGround(), is(valueCheck));
+        }
+    }
+
     @RunWith(Parameterized.class)
     public static class CarFlagsTests {
         private CarPhysicsPacket packet;
@@ -845,51 +894,6 @@ public class CarPhysicsPacketTest {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder();
             packet = new CarPhysicsPacket(builder.build());
             assertThat(packet.getExtentsCentre(), contains(builder.getExpectedExtentsCentre().toArray()));
-        }
-
-        @Test
-        public void getTyreFlags() throws Exception {
-            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder();
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTyreFlags(), contains(builder.getExpectedTyreFlags().toArray()));
-        }
-
-        @Test
-        public void getTyreFlags_MaxValue() throws Exception {
-            List<Short> values = Arrays.asList(MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE);
-            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedTyreFlags(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTyreFlags(), contains(builder.getExpectedTyreFlags().toArray()));
-
-            values = Arrays.asList(
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1)
-            );
-            builder.setExpectedTyreFlags(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTyreFlags(), is(not(builder.getExpectedTyreFlags().toArray())));
-        }
-
-        @Test
-        public void getTyreFlags_Min_Value() throws Exception {
-            List<Short> values = Arrays.asList(MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE);
-            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedTyreFlags(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTyreFlags(), is(builder.getExpectedTyreFlags()));
-
-            values = Arrays.asList(
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1)
-            );
-            builder.setExpectedTyreFlags(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTyreFlags(), is(not(builder.getExpectedTyreFlags())));
         }
 
         @Test(expected = InvalidTerrainException.class)

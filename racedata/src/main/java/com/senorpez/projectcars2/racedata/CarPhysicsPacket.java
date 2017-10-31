@@ -320,8 +320,16 @@ class CarPhysicsPacket extends Packet {
         return extentsCentre;
     }
 
-    List<Short> getTyreFlags() {
-        return tyreFlags;
+    List<Boolean> isTyreAttached() {
+        return tyreFlags.stream().map(TyreFlags.TYRE_ATTACHED::isSet).collect(Collectors.toList());
+    }
+
+    List<Boolean> isTyreInflated() {
+        return tyreFlags.stream().map(TyreFlags.TYRE_INFLATED::isSet).collect(Collectors.toList());
+    }
+
+    List<Boolean> isTyreIsOnGround() {
+        return tyreFlags.stream().map(TyreFlags.TYRE_IS_ON_GROUND::isSet).collect(Collectors.toList());
     }
 
     List<Terrain> getTerrain() {
