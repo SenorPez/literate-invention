@@ -79,7 +79,7 @@ class CarPhysicsPacket extends Packet {
     private final short dPad;
     private final List<String> tyreCompound;
 
-    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException, InvalidCrashDamageStateException, InvalidPacketTypeException {
+    CarPhysicsPacket(final ByteBuffer data) throws InvalidPacketDataException, InvalidCrashDamageStateException, InvalidPacketTypeException, InvalidTerrainException {
         super(data);
 
         if (PacketType.valueOf(this.getPacketType()) != PACKET_CAR_PHYSICS) {
@@ -128,7 +128,15 @@ class CarPhysicsPacket extends Packet {
         this.worldAcceleration = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
         this.extentsCentre = Collections.unmodifiableList(IntStream.range(0, 3).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
         this.tyreFlags = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
-        this.terrain = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
+
+        final List<Short> terrainValue = IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList());
+        if (terrainValue.stream().anyMatch(v -> v >= Terrain.TERRAIN_MAX.ordinal()
+                || v < 0)) {
+            throw new InvalidTerrainException();
+        } else {
+            this.terrain = Collections.unmodifiableList(terrainValue);
+        }
+
         this.tyreY = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
         this.tyreRps = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> data.getFloat()).collect(Collectors.toList()));
         this.tyreTemp = Collections.unmodifiableList(IntStream.range(0, 4).mapToObj(value -> readUnsignedByte(data)).collect(Collectors.toList()));
@@ -316,8 +324,8 @@ class CarPhysicsPacket extends Packet {
         return tyreFlags;
     }
 
-    List<Short> getTerrain() {
-        return terrain;
+    List<Terrain> getTerrain() {
+        return terrain.stream().map(Terrain::valueOf).collect(Collectors.toList());
     }
 
     List<Float> getTyreY() {

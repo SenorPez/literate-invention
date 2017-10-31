@@ -119,6 +119,31 @@ public class CarPhysicsPacketTest {
         }
     }
 
+    @RunWith(Parameterized.class)
+    public static class TerrainTests {
+        private CarPhysicsPacket packet;
+
+        @Parameter()
+        public Terrain terrain;
+
+        @Parameters(name = "Terrain: {0}")
+        public static Collection<Object[]> data() {
+            final List<Object[]> output = new ArrayList<>();
+            IntStream
+                    .range(0, Terrain.TERRAIN_MAX.ordinal())
+                    .forEach(value -> output.add(new Object[]{Terrain.valueOf(value)}));
+            return output;
+        }
+
+        @Test
+        public void getTerrain() throws Exception {
+            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
+                    .setExpectedTerrain(Arrays.asList((short) terrain.ordinal(), (short) terrain.ordinal(), (short) terrain.ordinal(), (short) terrain.ordinal()));
+            packet = new CarPhysicsPacket(builder.build());
+            assertThat(packet.getTerrain(), is(Arrays.asList(terrain, terrain, terrain, terrain)));
+        }
+    }
+
     public static class SingleTests {
         private CarPhysicsPacket packet;
 
@@ -867,49 +892,28 @@ public class CarPhysicsPacketTest {
             assertThat(packet.getTyreFlags(), is(not(builder.getExpectedTyreFlags())));
         }
 
-        @Test
-        public void getTerrain() throws Exception {
-            final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder();
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTerrain(), contains(builder.getExpectedTerrain().toArray()));
-        }
-
-        @Test
+        @Test(expected = InvalidTerrainException.class)
         public void getTerrain_MaxValue() throws Exception {
-            List<Short> values = Arrays.asList(MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE);
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedTerrain(values);
+                    .setExpectedTerrain(Arrays.asList(
+                            (short) Terrain.TERRAIN_MAX.ordinal(),
+                            (short) Terrain.TERRAIN_MAX.ordinal(),
+                            (short) Terrain.TERRAIN_MAX.ordinal(),
+                            (short) Terrain.TERRAIN_MAX.ordinal()
+                    ));
             packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTerrain(), contains(builder.getExpectedTerrain().toArray()));
-
-            values = Arrays.asList(
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1),
-                    (short) (MAX_UNSIGNED_BYTE + 1)
-            );
-            builder.setExpectedTerrain(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTerrain(), is(not(builder.getExpectedTerrain().toArray())));
         }
 
-        @Test
-        public void getTerrain_Min_Value() throws Exception {
-            List<Short> values = Arrays.asList(MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE, MIN_UNSIGNED_BYTE);
+        @Test(expected = InvalidTerrainException.class)
+        public void getTerrain_MinValue() throws Exception {
             final CarPhysicsPacketBuilder builder = new CarPhysicsPacketBuilder()
-                    .setExpectedTerrain(values);
+                    .setExpectedTerrain(Arrays.asList(
+                            (short) -1,
+                            (short) -1,
+                            (short) -1,
+                            (short) -1
+                    ));
             packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTerrain(), is(builder.getExpectedTerrain()));
-
-            values = Arrays.asList(
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1),
-                    (short) (MIN_UNSIGNED_BYTE - 1)
-            );
-            builder.setExpectedTerrain(values);
-            packet = new CarPhysicsPacket(builder.build());
-            assertThat(packet.getTerrain(), is(not(builder.getExpectedTerrain())));
         }
 
         @Test

@@ -50,7 +50,7 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
     private List<Float> expectedWorldAcceleration = IntStream.range(0, 3).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
     private List<Float> expectedExtentsCentre = IntStream.range(0, 3).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
     private List<Short> expectedTyreFlags = IntStream.range(0, 4).mapToObj(value -> (short) random.nextInt(MAX_UNSIGNED_BYTE)).collect(Collectors.toList());
-    private List<Short> expectedTerrain = IntStream.range(0, 4).mapToObj(value -> (short) random.nextInt(MAX_UNSIGNED_BYTE)).collect(Collectors.toList());
+    private List<Short> expectedTerrain = IntStream.range(0, 4).mapToObj(value -> (short) random.nextInt(Terrain.TERRAIN_MAX.ordinal())).collect(Collectors.toList());
     private List<Float> expectedTyreY = IntStream.range(0, 4).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
     private List<Float> expectedTyreRps = IntStream.range(0, 4).mapToObj(value -> random.nextFloat()).collect(Collectors.toList());
     private List<Short> expectedTyreTemp = IntStream.range(0, 4).mapToObj(value -> (short) random.nextInt(MAX_UNSIGNED_BYTE)).collect(Collectors.toList());
