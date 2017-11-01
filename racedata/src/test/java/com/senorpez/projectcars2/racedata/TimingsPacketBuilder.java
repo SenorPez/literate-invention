@@ -1,6 +1,7 @@
 package com.senorpez.projectcars2.racedata;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -117,13 +118,23 @@ class TimingsPacketBuilder extends PacketBuilder {
         private short expectedHighestFlag = (short) random.nextInt(MAX_UNSIGNED_BYTE);
         private short expectedPitModeSchedule = (short) random.nextInt(MAX_UNSIGNED_BYTE);
         private int expectedCarIndex = random.nextInt(MAX_UNSIGNED_SHORT);
-        private short expectedRaceState = (short) random.nextInt(MAX_UNSIGNED_BYTE);
+        private short expectedRaceState = (short) random.nextInt(RaceState.RACESTATE_MAX.ordinal());
         private short expectedCurrentLap = (short) random.nextInt(MAX_UNSIGNED_BYTE);
         private float expectedCurrentTime = random.nextFloat();
         private float expectedCurrentSectorTime = random.nextFloat();
 
-        List<Short> getExpectedWorldPosition() {
-            return expectedWorldPosition;
+        List<Float> getExpectedWorldPosition() {
+            final int xMask = 96; /* 0110 0000 */
+            final float xPrec = (expectedSector & xMask) / 4.0F;
+
+            final int zMask = 24; /* 0001 1000 */
+            final float zPrec = (expectedSector & zMask) / 4.0F;
+
+            return Arrays.asList(
+                    expectedWorldPosition.get(0) + xPrec,
+                    (float) expectedWorldPosition.get(1),
+                    expectedWorldPosition.get(2) + zPrec
+            );
         }
 
         void setExpectedWorldPosition(final List<Short> expectedWorldPosition) {

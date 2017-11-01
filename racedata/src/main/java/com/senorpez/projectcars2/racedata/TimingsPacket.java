@@ -1,6 +1,8 @@
 package com.senorpez.projectcars2.racedata;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +19,7 @@ class TimingsPacket extends Packet {
     private final float splitTime;
     private final List<ParticipantInfo> participants;
 
-    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException {
+    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException, InvalidRaceStateException {
         super(data);
 
         if (PacketType.valueOf(this.getPacketType()) != PacketType.PACKET_TIMINGS) {
@@ -31,11 +33,12 @@ class TimingsPacket extends Packet {
         this.splitTimeBehind = data.getFloat();
         this.splitTime = data.getFloat();
 
-        this.participants = Collections.unmodifiableList(IntStream
-                .range(0, UDP_STREAMER_PARTICIPANTS_SUPPORTED)
-                .mapToObj(v -> new ParticipantInfo(data))
-                .collect(Collectors.toList()));
-        
+        final List<ParticipantInfo> participantInfoList = new ArrayList<>();
+        for (int i = 0; i < UDP_STREAMER_PARTICIPANTS_SUPPORTED; i++) {
+            participantInfoList.add(new ParticipantInfo(data));
+        }
+        this.participants = Collections.unmodifiableList(participantInfoList);
+
         if (data.hasRemaining()) {
             throw new InvalidPacketDataException();
         }
@@ -83,7 +86,7 @@ class TimingsPacket extends Packet {
         private final float currentTime;
         private final float currentSectorTime;
         
-        private ParticipantInfo(final ByteBuffer data) {
+        private ParticipantInfo(final ByteBuffer data) throws InvalidRaceStateException {
             this.worldPosition = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.orientation = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.currentLapDistance = readUnsignedShort(data);
@@ -92,14 +95,32 @@ class TimingsPacket extends Packet {
             this.highestFlag = readUnsignedByte(data);
             this.pitModeSchedule = readUnsignedByte(data);
             this.carIndex = readUnsignedShort(data);
-            this.raceState = readUnsignedByte(data);
+
+            final short raceStateValue = readUnsignedByte(data);
+            if ((127 & raceStateValue) >= RaceState.RACESTATE_MAX.ordinal()
+                    || raceStateValue < 0) {
+                throw new InvalidRaceStateException();
+            } else {
+                this.raceState = raceStateValue;
+            }
+
             this.currentLap = readUnsignedByte(data);
             this.currentTime = data.getFloat();
             this.currentSectorTime = data.getFloat();
         }
 
-        List<Short> getWorldPosition() {
-            return worldPosition;
+        List<Float> getWorldPosition() {
+            final int xMask = 96; /* 0110 0000 */
+            final float xPrec = (sector & xMask) / 4.0F;
+
+            final int zMask = 24; /* 0001 1000 */
+            final float zPrec = (sector & zMask) / 4.0F;
+
+            return Arrays.asList(
+                    worldPosition.get(0) + xPrec,
+                    (float) worldPosition.get(1),
+                    worldPosition.get(2) + zPrec
+            );
         }
 
         List<Short> getOrientation() {
@@ -120,8 +141,9 @@ class TimingsPacket extends Packet {
             return racePosition & mask;
         }
 
-        short getSector() {
-            return sector;
+        int getSector() {
+            final int mask = 7; /* 0000 0111 */
+            return sector & mask;
         }
 
         short getHighestFlag() {
@@ -142,8 +164,14 @@ class TimingsPacket extends Packet {
             return carIndex & mask;
         }
 
-        short getRaceState() {
-            return raceState;
+        boolean isLapInvalidated() {
+            final int mask = 128; /* 1000 0000 */
+            return (raceState & mask) == mask;
+        }
+
+        RaceState getRaceState() {
+            final int mask = 127; /* 0111 1111 */
+            return RaceState.valueOf(raceState & mask);
         }
 
         short getCurrentLap() {
