@@ -10,7 +10,7 @@ import java.util.Arrays;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 public class Application {
-    public static void main(String[] args) throws IOException, InvalidPacketDataException {
+    public static void main(final String[] args) throws IOException, InvalidPacketDataException {
         final PushbackInputStream file = new PushbackInputStream(new FileInputStream(new File("C:\\Users\\senor\\Desktop\\pcars2.pcars")), Short.MAX_VALUE);
         getSectionHeaderBlock(file);
         getInterfaceDescriptionBlock(file);
@@ -18,23 +18,10 @@ public class Application {
         while (file.available() > 0) {
             final byte[] simplePacketBlock = getSimplePacketBlockData(getSimplePacketBlock(file));
 
-            ByteBuffer data = ByteBuffer.wrap(simplePacketBlock).order(LITTLE_ENDIAN);
-            Packet packet = PacketType.getPacket(data);
+            final ByteBuffer data = ByteBuffer.wrap(simplePacketBlock).order(LITTLE_ENDIAN);
+            final Packet packet = PacketType.getPacket(data);
 
-            if (packet instanceof ParticipantsPacket) {
-                ParticipantsPacket participantsPacket = (ParticipantsPacket) packet;
-                System.out.println(participantsPacket.getParticipantsChangedTimestamp());
-            }
-
-            if (packet instanceof TimingsPacket) {
-                TimingsPacket timingsPacket = (TimingsPacket) packet;
-                System.out.println(timingsPacket.getParticipantsChangedTimestamp());
-            }
-
-            if (packet instanceof TimeStatsPacket) {
-                TimeStatsPacket timeStatsPacket = (TimeStatsPacket) packet;
-                System.out.println(timeStatsPacket.getParticipantsChangedTimestamp());
-            }
+            System.out.println(packet.getPacketType());
         }
     }
 
@@ -43,12 +30,9 @@ public class Application {
 
         final byte[] blockTypeBuffer = new byte[4];
         file.read(blockTypeBuffer);
-//        assert file.read(blockTypeBuffer) == 4;
-//        assert Arrays.equals(blockTypeBuffer, blockType);
 
         final byte[] blockLengthBuffer = new byte[4];
         file.read(blockLengthBuffer);
-//        assert file.read(blockLengthBuffer) == 4;
         final int blockLength = ByteBuffer.wrap(blockLengthBuffer).order(LITTLE_ENDIAN).getInt();
 
         file.unread(blockLengthBuffer);
@@ -56,7 +40,6 @@ public class Application {
 
         final byte[] sectionHeaderBlock = new byte[blockLength];
         file.read(sectionHeaderBlock);
-//        assert file.read(sectionHeaderBlock) == blockLength;
     }
 
     private static void getInterfaceDescriptionBlock(final PushbackInputStream file) throws IOException {
@@ -64,12 +47,9 @@ public class Application {
 
         final byte[] blockTypeBuffer = new byte[4];
         file.read(blockTypeBuffer);
-//        assert file.read(blockTypeBuffer) == 4;
-//        assert ByteBuffer.wrap(blockTypeBuffer).order(LITTLE_ENDIAN).getInt() == blockType;
 
         final byte[] blockLengthBuffer = new byte[4];
         file.read(blockLengthBuffer);
-//        assert file.read(blockLengthBuffer) == 4;
         final int blockLength = ByteBuffer.wrap(blockLengthBuffer).order(LITTLE_ENDIAN).getInt();
 
         file.unread(blockLengthBuffer);
@@ -77,7 +57,6 @@ public class Application {
 
         final byte[] interfaceDescriptionBlock = new byte[blockLength];
         file.read(interfaceDescriptionBlock);
-//        assert file.read(interfaceDescriptionBlock) == blockLength;
     }
 
     private static byte[] getSimplePacketBlock(final PushbackInputStream file) throws IOException {
@@ -85,12 +64,9 @@ public class Application {
 
         final byte[] blockTypeBuffer = new byte[4];
         file.read(blockTypeBuffer);
-//        assert file.read(blockTypeBuffer) == 4;
-//        assert ByteBuffer.wrap(blockTypeBuffer).order(LITTLE_ENDIAN).getInt() == blockType;
 
         final byte[] blockLengthBuffer = new byte[4];
         file.read(blockLengthBuffer);
-//        assert file.read(blockLengthBuffer) == 4;
         final int blockLength = ByteBuffer.wrap(blockLengthBuffer).order(LITTLE_ENDIAN).getInt();
 
         file.unread(blockLengthBuffer);
@@ -98,13 +74,11 @@ public class Application {
 
         final byte[] simplePacketBlock = new byte[blockLength];
         file.read(simplePacketBlock);
-//        assert file.read(simplePacketBlock) == blockLength;
         return simplePacketBlock;
     }
 
     private static int getOriginalPacketLength(final byte[] simplePacketBlock) throws IOException {
         final byte[] originalPacketLengthBuffer = Arrays.copyOfRange(simplePacketBlock, 8, 12);
-//        assert originalPacketLengthBuffer.length == 4;
         return ByteBuffer.wrap(originalPacketLengthBuffer).order(LITTLE_ENDIAN).getInt();
     }
 
