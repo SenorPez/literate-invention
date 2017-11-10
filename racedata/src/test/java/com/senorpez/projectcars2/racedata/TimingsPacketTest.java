@@ -114,7 +114,66 @@ public class TimingsPacketTest {
                     .collect(Collectors.toList());
             assertThat(flagReasons, is(expectedFlagReasons));
         }
+    }
 
+    @RunWith(Parameterized.class)
+    public static class PitTests {
+        private TimingsPacket packet;
+
+        @Parameter
+        public PitMode pitMode;
+
+        @Parameter(1)
+        public PitSchedule pitSchedule;
+
+        @Parameters(name = "Mode: {0}, Schedule: {1}")
+        public static Collection<Object[]> data() {
+            final List<Object[]> output = new ArrayList<>();
+            IntStream
+                    .range(0, PitMode.PIT_MODE_MAX.ordinal())
+                    .forEach(modeVal -> IntStream
+                            .range(0, PitSchedule.PIT_SCHEDULE_MAX.ordinal())
+                            .forEach(scheduleVal -> output.add(new Object[]{
+                                    PitMode.valueOf(modeVal),
+                                    PitSchedule.valueOf(scheduleVal)
+                            }))
+                    );
+            return output;
+        }
+
+        @Test
+        public void getPitMode() throws Exception {
+            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder()
+                    .setExpectedPitModeSchedule((short) (pitMode.ordinal() | (pitSchedule.ordinal() << 4)));
+            packet = new TimingsPacket(builder.build());
+            final List<PitMode> pitModes = packet.getParticipants()
+                    .stream()
+                    .map(TimingsPacket.ParticipantInfo::getPitMode)
+                    .collect(Collectors.toList());
+            final List<PitMode> expectedPitModes = IntStream
+                    .range(0, pitModes.size())
+                    .mapToObj(v -> PitMode.valueOf((builder.getParticipantInfoBuilder().getExpectedPitModeSchedule()) & 15))
+                    .collect(Collectors.toList());
+            assertThat(pitModes, is(expectedPitModes));
+        }
+
+        @Test
+        public void getPitSchedule() throws Exception {
+            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder()
+                    .setExpectedPitModeSchedule((short) (pitMode.ordinal() | (pitSchedule.ordinal() << 4)));
+            packet = new TimingsPacket(builder.build());
+            final List<PitSchedule> pitSchedules = packet.getParticipants()
+                    .stream()
+                    .map(TimingsPacket.ParticipantInfo::getPitSchedule)
+                    .collect(Collectors.toList());
+            final List<PitSchedule> expectedPitSchedules = IntStream
+                    .range(0, pitSchedules.size())
+                    .mapToObj(v -> PitSchedule.valueOf(((builder.getParticipantInfoBuilder().getExpectedPitModeSchedule()) & 240) >>> 4))
+                    .collect(Collectors.toList());
+            assertThat(pitSchedules, is(expectedPitSchedules));
+        }
     }
 
     public static class SingleTests {
@@ -701,75 +760,18 @@ public class TimingsPacketTest {
             packet = new TimingsPacket(builder.build());
         }
 
-        @Test
-        public void getPitModeSchedule() throws Exception {
+        @Test(expected = InvalidPitModeException.class)
+        public void getPitMode_MaxValue() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule((short) PitMode.PIT_MODE_MAX.ordinal());
             packet = new TimingsPacket(builder.build());
-            final List<Short> PitModeSchedules = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getPitModeSchedule)
-                    .collect(Collectors.toList());
-            final List<Short> expectedPitModeSchedules = IntStream
-                    .range(0, PitModeSchedules.size())
-                    .mapToObj(v -> builder.getParticipantInfoBuilder().getExpectedPitModeSchedule())
-                    .collect(Collectors.toList());
-            assertThat(PitModeSchedules, is(expectedPitModeSchedules));
         }
 
-        @Test
-        public void getPitModeSchedule_MaxValue() throws Exception {
+        @Test(expected = InvalidPitScheduleException.class)
+        public void getPitSchedule_MaxValue() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
-            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule(MAX_UNSIGNED_BYTE);
+            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule((short) (PitSchedule.PIT_SCHEDULE_MAX.ordinal() << 4));
             packet = new TimingsPacket(builder.build());
-            List<Short> PitModeSchedules = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getPitModeSchedule)
-                    .collect(Collectors.toList());
-            List<Short> expectedPitModeSchedules = IntStream
-                    .range(0, PitModeSchedules.size())
-                    .mapToObj(v -> MAX_UNSIGNED_BYTE)
-                    .collect(Collectors.toList());
-            assertThat(PitModeSchedules, is(expectedPitModeSchedules));
-
-            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule((short) (MAX_UNSIGNED_BYTE + 1));
-            packet = new TimingsPacket(builder.build());
-            PitModeSchedules = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getPitModeSchedule)
-                    .collect(Collectors.toList());
-            expectedPitModeSchedules = IntStream
-                    .range(0, PitModeSchedules.size())
-                    .mapToObj(v -> (short) (MAX_UNSIGNED_BYTE + 1))
-                    .collect(Collectors.toList());
-            assertThat(PitModeSchedules, is(not(expectedPitModeSchedules)));
-        }
-
-        @Test
-        public void getPitModeSchedule_MinValue() throws Exception {
-            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
-            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule(MIN_UNSIGNED_BYTE);
-            packet = new TimingsPacket(builder.build());
-            List<Short> PitModeSchedules = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getPitModeSchedule)
-                    .collect(Collectors.toList());
-            List<Short> expectedPitModeSchedules = IntStream
-                    .range(0, PitModeSchedules.size())
-                    .mapToObj(v -> MIN_UNSIGNED_BYTE)
-                    .collect(Collectors.toList());
-            assertThat(PitModeSchedules, is(expectedPitModeSchedules));
-
-            builder.getParticipantInfoBuilder().setExpectedPitModeSchedule((short) (MIN_UNSIGNED_BYTE - 1));
-            packet = new TimingsPacket(builder.build());
-            PitModeSchedules = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getPitModeSchedule)
-                    .collect(Collectors.toList());
-            expectedPitModeSchedules = IntStream
-                    .range(0, PitModeSchedules.size())
-                    .mapToObj(v -> (short) (MIN_UNSIGNED_BYTE - 1))
-                    .collect(Collectors.toList());
-            assertThat(PitModeSchedules, is(not(expectedPitModeSchedules)));
         }
 
         @Test

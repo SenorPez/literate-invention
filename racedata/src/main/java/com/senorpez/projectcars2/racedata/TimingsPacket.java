@@ -19,7 +19,7 @@ class TimingsPacket extends Packet {
     private final float splitTime;
     private final List<ParticipantInfo> participants;
 
-    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException, InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException {
+    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException, InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException, InvalidPitScheduleException, InvalidPitModeException {
         super(data);
 
         if (PacketType.valueOf(this.getPacketType()) != PacketType.PACKET_TIMINGS) {
@@ -86,7 +86,7 @@ class TimingsPacket extends Packet {
         private final float currentTime;
         private final float currentSectorTime;
         
-        private ParticipantInfo(final ByteBuffer data) throws InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException {
+        private ParticipantInfo(final ByteBuffer data) throws InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException, InvalidPitModeException, InvalidPitScheduleException {
             this.worldPosition = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.orientation = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.currentLapDistance = readUnsignedShort(data);
@@ -102,7 +102,15 @@ class TimingsPacket extends Packet {
                 this.highestFlag = highestFlagValue;
             }
 
-            this.pitModeSchedule = readUnsignedByte(data);
+            final short pitModeScheduleValue = readUnsignedByte(data);
+            if ((15 & pitModeScheduleValue) >= PitMode.PIT_MODE_MAX.ordinal()) {
+                throw new InvalidPitModeException();
+            } else if (((240 & pitModeScheduleValue) >>> 4) >= PitSchedule.PIT_SCHEDULE_MAX.ordinal()) {
+                throw new InvalidPitScheduleException();
+            } else {
+                this.pitModeSchedule = pitModeScheduleValue;
+            }
+
             this.carIndex = readUnsignedShort(data);
 
             final short raceStateValue = readUnsignedByte(data);
@@ -165,8 +173,14 @@ class TimingsPacket extends Packet {
             return FlagReason.valueOf((mask & highestFlag) >>> 4);
         }
 
-        short getPitModeSchedule() {
-            return pitModeSchedule;
+        PitMode getPitMode() {
+            final int mask = 15; /* 0000 1111 */
+            return PitMode.valueOf(mask & pitModeSchedule);
+        }
+
+        PitSchedule getPitSchedule() {
+            final int mask = 240; /* 1111 0000 */
+            return PitSchedule.valueOf((mask & pitModeSchedule) >>> 4);
         }
 
         boolean isHuman() {

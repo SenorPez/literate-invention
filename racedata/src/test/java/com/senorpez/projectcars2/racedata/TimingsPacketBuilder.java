@@ -117,11 +117,14 @@ class TimingsPacketBuilder extends PacketBuilder {
         private short expectedRacePosition = (short) random.nextInt(MAX_UNSIGNED_BYTE);
         private short expectedSector = (short) random.nextInt(MAX_UNSIGNED_BYTE);
 
-        private int flagColour = random.nextInt(FlagColour.FLAG_COLOUR_MAX.ordinal());
-        private int flagReason = random.nextInt(FlagReason.FLAG_REASON_MAX.ordinal());
+        private final int flagColour = random.nextInt(FlagColour.FLAG_COLOUR_MAX.ordinal());
+        private final int flagReason = random.nextInt(FlagReason.FLAG_REASON_MAX.ordinal());
         private short expectedHighestFlag = (short) (flagColour | (flagReason << 4));
 
-        private short expectedPitModeSchedule = (short) random.nextInt(MAX_UNSIGNED_BYTE);
+        private final int pitMode = random.nextInt(PitMode.PIT_MODE_MAX.ordinal());
+        private final int pitSchedule = random.nextInt(PitSchedule.PIT_SCHEDULE_MAX.ordinal());
+        private short expectedPitModeSchedule = (short) (pitMode | (pitSchedule << 4));
+
         private int expectedCarIndex = random.nextInt(MAX_UNSIGNED_SHORT);
         private short expectedRaceState = (short) random.nextInt(RaceState.RACESTATE_MAX.ordinal());
         private short expectedCurrentLap = (short) random.nextInt(MAX_UNSIGNED_BYTE);
