@@ -36,7 +36,6 @@ public class TimingsPacketTest {
             return output;
         }
 
-
         @Test
         public void getRaceState() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
