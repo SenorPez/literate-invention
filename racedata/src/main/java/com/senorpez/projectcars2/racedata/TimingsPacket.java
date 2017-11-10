@@ -19,7 +19,7 @@ class TimingsPacket extends Packet {
     private final float splitTime;
     private final List<ParticipantInfo> participants;
 
-    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException, InvalidRaceStateException {
+    TimingsPacket(final ByteBuffer data) throws InvalidPacketTypeException, InvalidPacketDataException, InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException {
         super(data);
 
         if (PacketType.valueOf(this.getPacketType()) != PacketType.PACKET_TIMINGS) {
@@ -86,13 +86,22 @@ class TimingsPacket extends Packet {
         private final float currentTime;
         private final float currentSectorTime;
         
-        private ParticipantInfo(final ByteBuffer data) throws InvalidRaceStateException {
+        private ParticipantInfo(final ByteBuffer data) throws InvalidRaceStateException, InvalidFlagColourException, InvalidFlagReasonException {
             this.worldPosition = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.orientation = IntStream.range(0, 3).mapToObj(v -> data.getShort()).collect(Collectors.toList());
             this.currentLapDistance = readUnsignedShort(data);
             this.racePosition = readUnsignedByte(data);
             this.sector = readUnsignedByte(data);
-            this.highestFlag = readUnsignedByte(data);
+
+            final short highestFlagValue = readUnsignedByte(data);
+            if ((15 & highestFlagValue) >= FlagColour.FLAG_COLOUR_MAX.ordinal()) {
+                throw new InvalidFlagColourException();
+            } else if (((240 & highestFlagValue) >>> 4) >= FlagReason.FLAG_REASON_MAX.ordinal()) {
+                throw new InvalidFlagReasonException();
+            } else {
+                this.highestFlag = highestFlagValue;
+            }
+
             this.pitModeSchedule = readUnsignedByte(data);
             this.carIndex = readUnsignedShort(data);
 
@@ -146,8 +155,14 @@ class TimingsPacket extends Packet {
             return sector & mask;
         }
 
-        short getHighestFlag() {
-            return highestFlag;
+        FlagColour getFlagColour() {
+            final int mask = 15; /* 0000 1111 */
+            return FlagColour.valueOf(mask & highestFlag);
+        }
+
+        FlagReason getFlagReason() {
+            final int mask = 240; /* 1111 0000 */
+            return FlagReason.valueOf((mask & highestFlag) >>> 4);
         }
 
         short getPitModeSchedule() {

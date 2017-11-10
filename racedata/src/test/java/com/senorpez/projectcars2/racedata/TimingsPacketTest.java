@@ -56,6 +56,67 @@ public class TimingsPacketTest {
         }
     }
 
+    @RunWith(Parameterized.class)
+    public static class FlagTests {
+        private TimingsPacket packet;
+
+        @Parameter
+        public FlagColour flagColour;
+
+        @Parameter(1)
+        public FlagReason flagReason;
+
+        @Parameters(name = "Color: {0}, Reason: {1}")
+        public static Collection<Object[]> data() {
+            final List<Object[]> output = new ArrayList<>();
+            IntStream
+                    .range(0, FlagColour.FLAG_COLOUR_MAX.ordinal())
+                    .forEach(colourVal -> IntStream
+                            .range(0, FlagReason.FLAG_REASON_MAX.ordinal())
+                            .forEach(reasonVal -> output.add(new Object[]{
+                                    FlagColour.valueOf(colourVal),
+                                    FlagReason.valueOf(reasonVal)
+                            }))
+                    );
+            return output;
+        }
+
+        @Test
+        public void getFlagColour() throws Exception {
+            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder()
+                    .setExpectedHighestFlag((short) (flagColour.ordinal() | (flagReason.ordinal() << 4)));
+            packet = new TimingsPacket(builder.build());
+            final List<FlagColour> flagColours = packet.getParticipants()
+                    .stream()
+                    .map(TimingsPacket.ParticipantInfo::getFlagColour)
+                    .collect(Collectors.toList());
+            final List<FlagColour> expectedFlagColours = IntStream
+                    .range(0, flagColours.size())
+                    .mapToObj(v -> FlagColour.valueOf((builder.getParticipantInfoBuilder().getExpectedHighestFlag() & 15)))
+                    .collect(Collectors.toList());
+            assertThat(flagColours, is(expectedFlagColours));
+        }
+
+        @Test
+        public void getFlagReason() throws Exception {
+            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder()
+                    .setExpectedHighestFlag((short) (flagColour.ordinal() | (flagReason.ordinal() << 4)));
+            packet = new TimingsPacket(builder.build());
+            final List<FlagReason> flagReasons = packet.getParticipants()
+                    .stream()
+                    .map(TimingsPacket.ParticipantInfo::getFlagReason)
+                    .collect(Collectors.toList());
+            final List<FlagReason> expectedFlagReasons = IntStream
+                    .range(0, flagReasons.size())
+                    .mapToObj(v -> FlagReason.valueOf(((builder.getParticipantInfoBuilder().getExpectedHighestFlag() & 240) >>> 4)))
+                    .collect(Collectors.toList());
+            assertThat(flagReasons, is(expectedFlagReasons));
+        }
+
+    }
+
     public static class SingleTests {
         private TimingsPacket packet;
 
@@ -626,75 +687,18 @@ public class TimingsPacketTest {
             assertThat(Sectors, is(not(expectedSectors)));
         }
 
-        @Test
-        public void getHighestFlag() throws Exception {
+        @Test(expected = InvalidFlagColourException.class)
+        public void getFlagColor_MaxValue() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
+            builder.getParticipantInfoBuilder().setExpectedHighestFlag((short) FlagColour.FLAG_COLOUR_MAX.ordinal());
             packet = new TimingsPacket(builder.build());
-            final List<Short> HighestFlags = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getHighestFlag)
-                    .collect(Collectors.toList());
-            final List<Short> expectedHighestFlags = IntStream
-                    .range(0, HighestFlags.size())
-                    .mapToObj(v -> builder.getParticipantInfoBuilder().getExpectedHighestFlag())
-                    .collect(Collectors.toList());
-            assertThat(HighestFlags, is(expectedHighestFlags));
         }
 
-        @Test
-        public void getHighestFlag_MaxValue() throws Exception {
+        @Test(expected = InvalidFlagReasonException.class)
+        public void getFlagReason_MaxValue() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
-            builder.getParticipantInfoBuilder().setExpectedHighestFlag(MAX_UNSIGNED_BYTE);
+            builder.getParticipantInfoBuilder().setExpectedHighestFlag((short) (FlagReason.FLAG_REASON_MAX.ordinal() << 4));
             packet = new TimingsPacket(builder.build());
-            List<Short> HighestFlags = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getHighestFlag)
-                    .collect(Collectors.toList());
-            List<Short> expectedHighestFlags = IntStream
-                    .range(0, HighestFlags.size())
-                    .mapToObj(v -> MAX_UNSIGNED_BYTE)
-                    .collect(Collectors.toList());
-            assertThat(HighestFlags, is(expectedHighestFlags));
-
-            builder.getParticipantInfoBuilder().setExpectedHighestFlag((short) (MAX_UNSIGNED_BYTE + 1));
-            packet = new TimingsPacket(builder.build());
-            HighestFlags = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getHighestFlag)
-                    .collect(Collectors.toList());
-            expectedHighestFlags = IntStream
-                    .range(0, HighestFlags.size())
-                    .mapToObj(v -> (short) (MAX_UNSIGNED_BYTE + 1))
-                    .collect(Collectors.toList());
-            assertThat(HighestFlags, is(not(expectedHighestFlags)));
-        }
-
-        @Test
-        public void getHighestFlag_MinValue() throws Exception {
-            final TimingsPacketBuilder builder = new TimingsPacketBuilder();
-            builder.getParticipantInfoBuilder().setExpectedHighestFlag(MIN_UNSIGNED_BYTE);
-            packet = new TimingsPacket(builder.build());
-            List<Short> HighestFlags = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getHighestFlag)
-                    .collect(Collectors.toList());
-            List<Short> expectedHighestFlags = IntStream
-                    .range(0, HighestFlags.size())
-                    .mapToObj(v -> MIN_UNSIGNED_BYTE)
-                    .collect(Collectors.toList());
-            assertThat(HighestFlags, is(expectedHighestFlags));
-
-            builder.getParticipantInfoBuilder().setExpectedHighestFlag((short) (MIN_UNSIGNED_BYTE - 1));
-            packet = new TimingsPacket(builder.build());
-            HighestFlags = packet.getParticipants()
-                    .stream()
-                    .map(TimingsPacket.ParticipantInfo::getHighestFlag)
-                    .collect(Collectors.toList());
-            expectedHighestFlags = IntStream
-                    .range(0, HighestFlags.size())
-                    .mapToObj(v -> (short) (MIN_UNSIGNED_BYTE - 1))
-                    .collect(Collectors.toList());
-            assertThat(HighestFlags, is(not(expectedHighestFlags)));
         }
 
         @Test
