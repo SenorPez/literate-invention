@@ -45,6 +45,10 @@ class GameStatePacket extends Packet {
         this.windDirectionX = data.get();
         this.windDirectionY = data.get();
 
+        // Get rid of 2 padding bytes
+        final byte[] garbage = new byte[2];
+        data.get(garbage);
+
         if (data.hasRemaining()) {
             throw new InvalidPacketDataException();
         }

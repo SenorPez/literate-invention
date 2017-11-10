@@ -90,7 +90,8 @@ class TimingsPacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(993));
+        final int packetSize = PacketType.PACKET_TIMINGS.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize));
 
         data.put(expectedNumParticipants);
         writeUnsignedInt(expectedParticipantsChangedTimestamp, data);

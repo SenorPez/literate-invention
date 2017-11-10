@@ -116,7 +116,8 @@ class GameStatePacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(22).order(LITTLE_ENDIAN));
+        final int packetSize = PacketType.PACKET_GAME_STATE.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize).order(LITTLE_ENDIAN));
 
         writeUnsignedShort(expectedBuildVersionNumber, data);
         writeUnsignedByte((short) (expectedGameState | (expectedSessionState << 3)), data);

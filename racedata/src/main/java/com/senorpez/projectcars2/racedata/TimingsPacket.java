@@ -97,7 +97,7 @@ class TimingsPacket extends Packet {
             this.carIndex = readUnsignedShort(data);
 
             final short raceStateValue = readUnsignedByte(data);
-            if ((127 & raceStateValue) >= RaceState.RACESTATE_MAX.ordinal()
+            if ((7 & raceStateValue) >= RaceState.RACESTATE_MAX.ordinal()
                     || raceStateValue < 0) {
                 throw new InvalidRaceStateException();
             } else {
@@ -165,12 +165,12 @@ class TimingsPacket extends Packet {
         }
 
         boolean isLapInvalidated() {
-            final int mask = 128; /* 1000 0000 */
+            final int mask = 8; /* 0000 1000 */
             return (raceState & mask) == mask;
         }
 
         RaceState getRaceState() {
-            final int mask = 127; /* 0111 1111 */
+            final int mask = 7; /* 0000 0111 */
             return RaceState.valueOf(raceState & mask);
         }
 

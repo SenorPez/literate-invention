@@ -37,7 +37,8 @@ class ParticipantsPacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(1040));
+        final int packetSize = PacketType.PACKET_PARTICIPANTS.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize));
 
         writeUnsignedInt(expectedParticipantsChangedTimestamp, data);
         expectedNames.forEach(name -> writeString(name, PARTICIPANT_NAME_LENGTH_MAX, data));

@@ -36,7 +36,8 @@ class TimeStatsPacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(784));
+        final int packetSize = PacketType.PACKET_TIME_STATS.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize));
 
         writeUnsignedInt(expectedParticipantsChangedTimestamp, data);
 

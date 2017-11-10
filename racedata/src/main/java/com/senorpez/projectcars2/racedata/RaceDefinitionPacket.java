@@ -44,6 +44,10 @@ class RaceDefinitionPacket extends Packet {
         this.lapsTimeInEvent = readUnsignedShort(data);
         this.enforcedPitStopLap = data.get();
 
+        // Get rid of 1 padding bytes
+        final byte[] garbage = new byte[1];
+        data.get(garbage);
+
         if (data.hasRemaining()) {
             throw new InvalidPacketDataException();
         }

@@ -167,7 +167,8 @@ class RaceDefinitionPacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(307).order(LITTLE_ENDIAN));
+        final int packetSize = PacketType.PACKET_RACE_DEFINITION.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize).order(LITTLE_ENDIAN));
 
         data.putFloat(expectedWorldFastestLapTime);
         data.putFloat(expectedPersonalFastestLapTime);

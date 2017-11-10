@@ -876,7 +876,7 @@ public class TimingsPacketTest {
         @Test
         public void getIsInvalidated_True() throws Exception {
             final TimingsPacketBuilder builder = new TimingsPacketBuilder();
-            builder.getParticipantInfoBuilder().setExpectedRaceState((short) (1 << 7));
+            builder.getParticipantInfoBuilder().setExpectedRaceState((short) (1 << 3));
             packet = new TimingsPacket(builder.build());
             final List<Boolean> values = packet.getParticipants()
                     .stream()

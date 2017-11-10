@@ -667,7 +667,8 @@ class CarPhysicsPacketBuilder extends PacketBuilder {
 
     @Override
     ByteBuffer build() {
-        final ByteBuffer data = build(ByteBuffer.allocate(538).order(LITTLE_ENDIAN));
+        final int packetSize = PacketType.PACKET_CAR_PHYSICS.getPacketLength();
+        final ByteBuffer data = build(ByteBuffer.allocate(packetSize).order(LITTLE_ENDIAN));
 
         data.put(expectedViewedParticipantIndex);
 
