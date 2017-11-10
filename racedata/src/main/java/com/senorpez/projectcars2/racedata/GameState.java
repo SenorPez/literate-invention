@@ -14,7 +14,7 @@ enum GameState {
     GAME_INGAME_INMENU_TIME_TICKING,
     GAME_INGAME_RESTARTING,
     GAME_INGAME_REPLY,
-    GAME_FONRT_END_REPLAY,
+    GAME_FRONT_END_REPLAY,
     GAME_MAX;
 
     private static final Map<Integer, GameState> lookup = new HashMap<>();
